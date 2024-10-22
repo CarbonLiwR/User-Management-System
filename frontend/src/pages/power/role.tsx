@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Row, Col } from "antd";
-import TypeModal, { Info } from "@/components/modal/type";
+import RoleModal, { Info } from "@/components/modal/role";
 import { getPower } from "@/api";
 import MyTable from "@/components/table";
 import "./index.less";
@@ -16,7 +16,7 @@ function formatMenuKey(list: MenuList) {
   });
 }
 
-function useTypes() {
+function useRoles() {
   const [showModal, setShow] = useState(false);
   const [tableData, setData] = useState<PowerList>([]);
   const [tableCol, setCol] = useState<MapKey>([]);
@@ -24,7 +24,7 @@ function useTypes() {
   const [menuList, setMenuList] = useState<MenuList>([]);
 
   useEffect(() => {
-    getTypeData();
+    getRoleData();
     // eslint-disable-next-line
   }, []);
   const modalControl = (info: Info, open: boolean) => {
@@ -52,7 +52,7 @@ function useTypes() {
       </Col>
     </Row>
   )
-  const getTypeData = () => {
+  const getRoleData = () => {
     getPower().then((res) => {
       if (res.status === 0) {
         res.mapKey.push(activeCol);
@@ -70,11 +70,11 @@ function useTypes() {
     choose,
     menuList,
     modalControl,
-    getTypeData,
+    getRoleData,
   };
 }
 
-export default function Types() {
+export default function Roles() {
   const {
     renderTitle,
     tableCol,
@@ -83,25 +83,25 @@ export default function Types() {
     choose,
     modalControl,
     menuList,
-    getTypeData,
-  } = useTypes();
+    getRoleData,
+  } = useRoles();
   return (
-    <div className="type-container">
+    <div className="Role-container">
       <MyTable
-        rowKey="type_id"
+        rowKey="Role_id"
         title={renderTitle}
         columns={tableCol}
         dataSource={tableData}
       />
-      <TypeModal
+      <RoleModal
         isShow={showModal}
         info={choose}
         menuList={menuList}
         onCancel={modalControl}
-        onOk={getTypeData}
+        onOk={getRoleData}
       />
     </div>
   );
 }
 
-Types.route = { [MENU_PATH]: "/power/type" };
+Roles.route = { [MENU_PATH]: "/power/role" };

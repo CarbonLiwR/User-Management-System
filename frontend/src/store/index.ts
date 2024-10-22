@@ -4,6 +4,7 @@ import UserReducer from "./user/reducer";
 import LayoutReducer from "./layout/reducer";
 import VisibleReducer from "./visible/reducer";
 import ThemeReducer from "./theme/reducer"
+// import useUserStore from './user';
 const reducer = combineReducers({
   menu: MenuReducer,
   user: UserReducer,
@@ -18,5 +19,5 @@ const store = createStore(
   window.__REDUX_DEVTOOLS_EXTENSION__ &&
   window.__REDUX_DEVTOOLS_EXTENSION__()
 );
-
+// export {useUserStore}
 export default store;

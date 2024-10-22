@@ -1,4 +1,4 @@
-import { getSessionUser } from "@/utils";
+import { getSessionUser } from "@/utils/index1";
 import { UserInfo, UserAction } from "@/types"
 import * as actionTypes from "./actionTypes";
 const initState: UserInfo = getSessionUser()

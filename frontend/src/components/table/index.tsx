@@ -12,7 +12,7 @@ import {
 } from "antd";
 import MyIcon from "../icon";
 import arrayMove from "array-move";
-import { getKey, setKey, rmKey } from "@/utils";
+import { getKey, setKey, rmKey } from "@/utils/index1";
 import "./index.less";
 import useStyle from "./style"
 import { MyTableProps, Columns, renderArugs, Column } from "./types"
@@ -166,7 +166,7 @@ function UseTable(columns: Columns, saveKey: MyTableProps["saveKey"]) {
     } else if (!data && columns && columns.length !== col.length) {
       initDefaultCol()
     }
-    // eslint-disable-next-line 
+    // eslint-disable-next-line
   }, [saveKey, columns]);
 
   useEffect(() => {
@@ -278,7 +278,7 @@ function UseTable(columns: Columns, saveKey: MyTableProps["saveKey"]) {
     }
   };
   console.log(col);
-  
+
   return {
     col,
     showDrawer,

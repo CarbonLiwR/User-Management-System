@@ -101,6 +101,7 @@ async def create_new_token(sub: str, token: str, refresh_token: str, multi_login
     :return:
     """
     redis_refresh_token = await redis_client.get(f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}')
+
     if not redis_refresh_token or redis_refresh_token != refresh_token:
         raise TokenError(msg='Refresh Token 已过期')
 
@@ -177,19 +178,18 @@ async def get_current_user(db: AsyncSession, pk: int) -> User:
     from backend.app.admin.crud.crud_user import user_dao
 
     user = await user_dao.get_with_relation(db, user_id=pk)
+
+
     if not user:
         raise TokenError(msg='Token 无效')
     if not user.status:
         raise AuthorizationError(msg='用户已被锁定，请联系系统管理员')
-    if user.dept_id:
-        if not user.dept.status:
-            raise AuthorizationError(msg='用户所属部门已锁定')
-        if user.dept.del_flag:
-            raise AuthorizationError(msg='用户所属部门已删除')
+
     if user.roles:
         role_status = [role.status for role in user.roles]
         if all(status == 0 for status in role_status):
             raise AuthorizationError(msg='用户所属角色已锁定')
+
     return user
 
 

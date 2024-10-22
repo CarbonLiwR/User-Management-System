@@ -9,21 +9,17 @@ const { Meta } = Card;
 const tagInitVal = [
   { value: "足球", color: "magenta" },
   { value: "跑步", color: "volcano" },
-  { value: "web前端", color: "orange" },
-  { value: "90后", color: "gold" },
+  { value: "Web前端", color: "orange" },
 ];
+
 function getRandomColor() {
   return "#" + Math.random().toString(16).slice(2, 8);
 }
 
 const listData = Array.from({ length: 10 }, (v, k) => ({
-  href: "https://ant.design",
-  title: `ant design part ${k + 1}`,
+  title: `Item ${k + 1}`,
   avatar: "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png",
-  description:
-    "Ant Design, a design language for background applications, is refined by Ant UED Team.",
-  content:
-    "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.",
+  description: "描述信息。",
 }));
 
 const IconText = ({ icon, text }: { icon: ReactNode, text: string }) => (
@@ -35,69 +31,51 @@ const IconText = ({ icon, text }: { icon: ReactNode, text: string }) => (
 
 const tabpanes = Array.from({ length: 3 }, (v, k) => ({
   key: k + '',
-  label: `tab${k + 1}`,
-  children: (<List
-    itemLayout="vertical"
-    size="large"
-    header={<h2>Tab {k + 1}</h2>}
-    dataSource={listData}
-    renderItem={(item) => (
-      <List.Item
-        key={item.title}
-        actions={[
-          <IconText
-            icon={<MyIcon type="icon_collection" />}
-            text="156"
-            key="list-vertical-star-o"
-          />,
-          <IconText
-            icon={<MyIcon type="icon_zan" />}
-            text="156"
-            key="list-vertical-like-o"
-          />,
-          <IconText
-            icon={<MyIcon type="icon_voice" />}
-            text="2"
-            key="list-vertical-message"
-          />,
-        ]}
-        extra={
-          <img
-            width={272}
-            alt="logo"
-            src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+  label: `Tab ${k + 1}`,
+  children: (
+    <List
+      itemLayout="vertical"
+      size="large"
+      dataSource={listData}
+      renderItem={(item) => (
+        <List.Item
+          key={item.title}
+          actions={[
+            <IconText icon={<MyIcon type="icon_collection" />} text="156" />,
+            <IconText icon={<MyIcon type="icon_zan" />} text="156" />,
+          ]}
+        >
+          <List.Item.Meta
+            avatar={<Avatar src={item.avatar} />}
+            title={item.title}
+            description={item.description}
           />
-        }
-      >
-        <List.Item.Meta
-          avatar={<Avatar src={item.avatar} />}
-          title={<a href={item.href}>{item.title}</a>}
-          description={item.description}
-        />
-        {item.content}
-      </List.Item>
-    )}
-  />)
-})
-);
+        </List.Item>
+      )}
+    />
+  )
+}));
 
 export default function Person() {
   const [tags, setTag] = useState(tagInitVal);
   const [isInput, setInput] = useState(false);
   const [value, setVal] = useState("");
-  const { styles } = useStyle()
+  const { styles } = useStyle();
+
   const addTags = () => {
     if (!value) {
       return setInput(false);
     }
-    let tempTag = { value: value, color: getRandomColor() };
+    const tempTag = { value: value, color: getRandomColor() };
     setVal("");
     setTag([...tags, tempTag]);
     setInput(false);
   };
+
   return (
     <div className="person-container">
       <Row>
+        {/*用户*/}
         <Col span={6}>
           <Card
             cover={
@@ -107,46 +85,16 @@ export default function Person() {
               />
             }
           >
-            <Meta title="孔乙己拉夫米" description="生死看淡不服就干！" />
+            <Meta title="用户名" description="个人描述" />
             <div className={styles.info}>
               <p>
                 <MyIcon type="icon_infopersonal" className="icon" />
-                Web前端
+                职业
                 <span className={styles.font}>123</span>
               </p>
               <p>
                 <MyIcon type="icon_address1" className="icon" />
-                广东·深圳
-              </p>
-              <p>
-                <MyIcon type="icon_edit" className="icon" />
-                <a
-                  href="https://www.cnblogs.com/kongyijilafumi/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  博客地址
-                </a>
-              </p>
-              <p>
-                <MyIcon type="icon_github" className="icon" />
-                <a
-                  href="https://github.com/kongyijilafumi/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  github地址
-                </a>
-              </p>
-              <p>
-                <MyIcon className="icon" type="icon_QQ" />
-                <a
-                  href="https://jq.qq.com/?_wv=1027&k=pzP2acC5"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  qq交流群
-                </a>
+                地点
               </p>
             </div>
             <div className="tags">
@@ -172,8 +120,9 @@ export default function Person() {
             </div>
           </Card>
         </Col>
+        {/*展板*/}
         <Col span={17} offset={1} className={styles.tabs}>
-          <Tabs defaultActiveKey="1" items={tabpanes}> </Tabs>
+          <Tabs defaultActiveKey="1" items={tabpanes} />
         </Col>
       </Row>
     </div>

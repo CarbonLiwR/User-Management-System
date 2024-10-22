@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Modal, message, Tree, FormInstance } from "antd";
 import MyForm, { FormItemData } from "@/components/form";
-import { addType, editType } from "@/api";
+import { addRole, editRole } from "@/api";
 import { MenuItem, MenuList } from "@/types";
-import { reduceMenuList } from "@/utils";
+import { reduceMenuList } from "@/utils/index1";
 const initFormItems: FormItemData[] = [
   {
-    itemType: "input",
+    itemRole: "input",
     itemProps: {
       rules: [{ required: true, message: "请填写权限名称" }],
       label: "权限名称",
@@ -17,14 +17,14 @@ const initFormItems: FormItemData[] = [
     },
   },
   {
-    itemType: "input",
+    itemRole: "input",
     itemProps: {
-      name: "type_id",
+      name: "Role_id",
       hidden: true,
     },
   },
 ];
-export type Info = { name: string, type: string, menu_id: string } | null
+export type Info = { name: string, Role: string, menu_id: string } | null//
 interface ModalProps {
   info: Info
   isShow: boolean
@@ -32,7 +32,7 @@ interface ModalProps {
   onOk: () => void
   menuList: MenuList
 }
-type CheckList = Array<string | number>
+type CheckList = Array<string | number>//
 const ColorStyle = {
   color: "red",
 };
@@ -63,7 +63,7 @@ function filterParentId(parent: CheckList, list: MenuList, id: MenuItem["key"]) 
   }
 }
 
-export default function TypeModal({ info, isShow, onCancel, onOk, menuList }: ModalProps) {
+export default function RoleModal({ info, isShow, onCancel, onOk, menuList }: ModalProps) {
   const [form, setForm] = useState<FormInstance | null>(null);
   const [menuId, setMenuId] = useState<number[]>([]);
   const reducerList = useMemo(() => {
@@ -92,7 +92,7 @@ export default function TypeModal({ info, isShow, onCancel, onOk, menuList }: Mo
 
   const submit = () => {
     form?.validateFields().then((values) => {
-      let fn = Boolean(info) ? editType : addType;
+      let fn = Boolean(info) ? editRole : addRole;
       let checkMenuId: CheckList = []
       menuId.forEach(id => {
         if (!checkMenuId.includes(id)) {

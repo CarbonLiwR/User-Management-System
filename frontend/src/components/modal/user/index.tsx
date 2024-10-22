@@ -15,9 +15,9 @@ const { Option } = Select;
 const paswdRule = [{ required: true, message: "请填写登录密码" }];
 const initFormItems: FormItemData[] = [
   {
-    itemType: "input",
+    itemRole: "input",
     itemProps: {
-      name: "username",
+      name: "nickname",
       rules: [{ required: true, message: "请填写用户名" }],
       label: "用户名",
     },
@@ -26,7 +26,7 @@ const initFormItems: FormItemData[] = [
     },
   },
   {
-    itemType: "input",
+    itemRole: "input",
     itemProps: {
       name: "account",
       rules: [{ required: true, message: "请填写登录账号" }],
@@ -37,7 +37,7 @@ const initFormItems: FormItemData[] = [
     },
   },
   {
-    itemType: "input",
+    itemRole: "input",
     itemProps: {
       name: "pswd",
       label: "登录密码",
@@ -48,7 +48,7 @@ const initFormItems: FormItemData[] = [
     },
   },
   {
-    itemType: "select",
+    itemRole: "select",
     itemProps: {
       rules: [{ required: true, message: "请选择菜单权限" }],
       name: "type_id",
@@ -73,7 +73,7 @@ export default function UserModal({ user_id, isShow, onCancel, onOk }: UserProps
             if (i.itemProps.name === "type_id") {
               i.childProps = { ...i.childProps }
               i.childProps.children = data.map((power) => (
-                <Option value={power.type_id} key={power.type_id}>
+                <Option value={power.role_id} key={power.role_id}>
                   {power.name}
                 </Option>
               ));

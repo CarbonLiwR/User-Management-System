@@ -57,6 +57,7 @@ def select_as_dict(row: R, use_alias: bool = False) -> dict:
         result = row.__dict__
         if '_sa_instance_state' in result:
             del result['_sa_instance_state']
+            return result
     else:
         result = {}
         mapper = class_mapper(row.__class__)
@@ -64,8 +65,7 @@ def select_as_dict(row: R, use_alias: bool = False) -> dict:
             if isinstance(prop, (ColumnProperty, SynonymProperty)):
                 key = prop.key
                 result[key] = getattr(row, key)
-
-    return result
+        return result
 
 
 class MsgSpecJSONResponse(JSONResponse):

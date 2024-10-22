@@ -1,4 +1,4 @@
-import { getCompVisible } from "@/utils";
+import { getCompVisible } from "@/utils/index1";
 import { State } from "@/types"
 const visible = getCompVisible() || { footer: true, topMenu: true };
 

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Layout, Menu, Button, Affix, Col } from "antd";
 import MyIcon from "@/components/icon";
-import { stopPropagation } from "@/utils";
+import { stopPropagation } from "@/utils/index1";
 import { MenuItem } from "@/types"
 import type { MenuProps } from 'antd/es/menu';
 type AntdMenuItem = Required<MenuProps>['items'][number];
@@ -21,33 +21,42 @@ const getItem = (label: React.ReactNode, key?: React.Key | null, icon?: React.Re
 }) as AntdMenuItem
 
 
-const renderMenu = (item: MenuItem, path: string): AntdMenuItem => {
+const renderMenu = (item: MenuItem, path: string): AntdMenuItem | null => {
   if (item[MENU_SHOW] === "false") {
     return null;
   }
-  if (!item.children) {
-    return getItem(<Link to={path + item[MENU_PATH]}>{item[MENU_TITLE]}</Link>, item[MENU_KEY], <MyIcon type={item[MENU_ICON] as string} />)
-  }
-  return (
-    getItem(item[MENU_TITLE], item[MENU_KEY], <MyIcon type={item[MENU_ICON] as string} />, item.children.map(i => renderMenu(i, path + item[MENU_PATH])))
+  const menuItem = getItem(
+    <Link to={path + item[MENU_PATH]}>{item[MENU_TITLE]}</Link>,
+    item[MENU_KEY],
+    <MyIcon type={item[MENU_ICON] as string} />
   );
+
+  if (item.children) {
+    const childrenItems = item.children.map(i => renderMenu(i, path + item[MENU_PATH])).filter(Boolean);
+    return getItem(item[MENU_TITLE], item[MENU_KEY], <MyIcon type={item[MENU_ICON] as string} />, childrenItems);
+  }
+
+  return menuItem;
 };
 
-const FlexBox = ({ children }: { children: JSX.Element }) => {
+
+const FlexBox: React.FC<{ children: JSX.Element }> = ({ children }) => {
   return (
     <Col sm={6} md={10} lg={15} className="fl">
       {children}
     </Col>
   );
-}
+};
+
 const SliderContent = ({ children }: { children: JSX.Element }) => {
   const [collapsed, setCollapsed] = useState(false);
   const { styles } = useStyle()
   // 折叠菜单
-  const toggleCollapsed = (e: any) => {
-    setCollapsed(!collapsed);
-    stopPropagation(e);
-  };
+  const toggleCollapsed = (e: React.MouseEvent) => {
+  setCollapsed(!collapsed);
+  e.stopPropagation();
+};
+
   return (
     <Affix className={styles.column}>
       <Sider width={200} collapsed={collapsed} >
@@ -68,7 +77,7 @@ const SiderMenu = () => {
   const layout = useStateLayout()
   const menuList = useStateMenuList()
   const { styles } = useStyle()
-  // 菜单组折叠  
+  // 菜单组折叠
   const { stateSetOpenMenuKey: onOpenChange } = useDispatchMenu()
 
   // 菜单选项

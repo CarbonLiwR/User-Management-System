@@ -19,7 +19,6 @@ class AuthSchemaBase(SchemaBase):
 class AuthLoginParam(AuthSchemaBase):
     captcha: str
 
-
 class RegisterUserParam(AuthSchemaBase):
     nickname: str | None = None
     email: EmailStr = Field(..., examples=['user@example.com'])
@@ -33,7 +32,7 @@ class AddUserParam(AuthSchemaBase):
 
 
 class UserInfoSchemaBase(SchemaBase):
-    dept_id: int | None = None
+    # dept_id: int | None = None
     username: str
     nickname: str
     email: EmailStr = Field(..., examples=['user@example.com'])
@@ -47,6 +46,8 @@ class UpdateUserParam(UserInfoSchemaBase):
 class UpdateUserRoleParam(SchemaBase):
     roles: list[int]
 
+class UpdateUserDeptParam(SchemaBase):
+    depts: list[int]
 
 class AvatarParam(SchemaBase):
     url: HttpUrl = Field(..., description='头像 http 地址')
@@ -54,8 +55,6 @@ class AvatarParam(SchemaBase):
 
 class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
     model_config = ConfigDict(from_attributes=True)
-
-    dept_id: int | None = None
     id: int
     uuid: str
     avatar: str | None = None
@@ -70,23 +69,26 @@ class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
 class GetUserInfoListDetails(GetUserInfoNoRelationDetail):
     model_config = ConfigDict(from_attributes=True)
 
-    dept: GetDeptListDetails | None = None
+    depts: list[GetDeptListDetails]
     roles: list[GetRoleListDetails]
+
 
 
 class GetCurrentUserInfoDetail(GetUserInfoListDetails):
     model_config = ConfigDict(from_attributes=True)
 
-    dept: GetDeptListDetails | str | None = None
+    depts: list[GetDeptListDetails] | list[str] | None = None
     roles: list[GetRoleListDetails] | list[str] | None = None
 
     @model_validator(mode='after')
     def handel(self) -> Self:
         """处理部门和角色"""
-        dept = self.dept
-        if dept:
-            self.dept = dept.name  # type: ignore
+        depts = self.depts
+
+        # if depts:
+        #     self.depts = [dept.name for dept in depts]  # type: ignore
         roles = self.roles
+
         if roles:
             self.roles = [role.name for role in roles]  # type: ignore
         return self

@@ -12,7 +12,7 @@ from backend.app.admin.schema.casbin_rule import (
     DeletePolicyParam,
     DeleteUserRoleParam,
     GetPolicyListDetails,
-    UpdatePolicyParam,
+    UpdatePolicyParam, CreateUserDeptParam,
 )
 from backend.app.admin.service.casbin_service import casbin_service
 from backend.common.pagination import DependsPagination, paging_data
@@ -156,6 +156,39 @@ async def get_all_groups() -> ResponseModel:
     data = await casbin_service.get_group_list()
     return response_base.success(data=data)
 
+@router.post(
+    '/dept/group',
+    summary='添加G权限策略',
+    dependencies=[
+        Depends(RequestPermission('casbin:g:add')),
+        DependsRBAC,
+    ],
+)
+async def create_dept_group(g: CreateUserDeptParam) -> ResponseModel:
+    """
+    g 策略 (**依赖 p 策略**):
+
+    - 如果在 p 策略中添加了基于角色的访问权限, 则还需要在 g 策略中添加基于用户组的访问权限, 才能真正拥有访问权限<br>
+    **格式**: 用户 uuid + 角色 role
+
+    - 如果在 p 策略中添加了基于用户的访问权限, 则不添加相应的 g 策略能直接拥有访问权限<br>
+    但是拥有的不是用户角色的所有权限, 而只是单一的对应的 p 策略所添加的访问权限
+    """
+    data = await casbin_service.create_dept_group(g=g)
+    return response_base.success(data=data)
+
+
+@router.post(
+    '/dept/groups',
+    summary='添加多组G权限策略',
+    dependencies=[
+        Depends(RequestPermission('casbin:g:group:add')),
+        DependsRBAC,
+    ],
+)
+async def create_dept_groups(gs: list[CreateUserDeptParam]) -> ResponseModel:
+    data = await casbin_service.create_dept_groups(gs=gs)
+    return response_base.success(data=data)
 
 @router.post(
     '/group',

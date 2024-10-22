@@ -1,17 +1,29 @@
 // 用户信息
 export type UserInfo = {
   account: string
-  type: string
+  role: string
   user_id: number
-  username: string
+  nickname: string
   isLogin?: boolean
 } | null
 
 export type UserAction = {
-  type: string
+  role: string
   info?: UserInfo
 }
 
 export type UserState = {
   user: UserInfo
 }
+
+// export type UserInfo = {
+//   username: string
+//   role: string
+//   uuid: number
+//   nickname: string
+//   isLogin?: boolean
+// } | null
+// export type UserAction = {
+//   role: string
+//   info?: UserInfo
+// }

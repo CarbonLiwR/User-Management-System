@@ -1,5 +1,5 @@
 import { Result, Button } from "antd";
-import { getDefaultMenu, } from "@/utils";
+import { getDefaultMenu, } from "@/utils/index1";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCallback } from "react";
 import { useDispatchMenu, useStateOpenedMenu } from "@/store/hooks";

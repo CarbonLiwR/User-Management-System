@@ -16,6 +16,7 @@ from backend.app.admin.schema.user import (
     ResetPasswordParam,
     UpdateUserParam,
     UpdateUserRoleParam,
+    UpdateUserDeptParam,
 )
 from backend.common.exception import errors
 from backend.common.security.jwt import get_hash_password, get_token, password_verify, superuser_verify
@@ -89,6 +90,14 @@ class UserService:
             return count
 
     @staticmethod
+    async def get_userinfo_by_uuid(*, user_uuid: str) -> User:
+        async with async_db_session() as db:
+            user = await user_dao.get_with_relation(db, user_uuid=user_uuid)
+            if not user:
+                raise errors.NotFoundError(msg='用户不存在')
+            return user
+
+    @staticmethod
     async def get_userinfo(*, username: str) -> User:
         async with async_db_session() as db:
             user = await user_dao.get_with_relation(db, username=username)
@@ -122,6 +131,23 @@ class UserService:
             return count
 
     @staticmethod
+    async def update_depts(*, request: Request, username: str, obj: UpdateUserDeptParam) -> None:
+        async with async_db_session.begin() as db:
+            if not request.user.is_superuser:
+                if request.user.username != username:
+                    raise errors.AuthorizationError
+            input_user = await user_dao.get_with_relation(db, username=username)
+            if not input_user:
+                raise errors.NotFoundError(msg='用户不存在')
+            for dept_id in obj.depts:
+                dept = await dept_dao.get(db, dept_id)
+                if not dept:
+                    raise errors.NotFoundError(msg='部门不存在')
+            await user_dao.update_dept(db, input_user, obj)
+            await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
+            await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
+
+    @staticmethod
     async def update_roles(*, request: Request, username: str, obj: UpdateUserRoleParam) -> None:
         async with async_db_session.begin() as db:
             if not request.user.is_superuser:
@@ -137,6 +163,8 @@ class UserService:
             await user_dao.update_role(db, input_user, obj)
             await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
+
+
 
     @staticmethod
     async def update_avatar(*, request: Request, username: str, avatar: AvatarParam) -> int:

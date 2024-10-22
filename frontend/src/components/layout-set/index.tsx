@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import MyIcon from "../icon";
 import { Button, Drawer, message, Row, Radio } from "antd";
 import * as Types from "@/store/layout/actionTypes";
-import { setLayoutMode, setCompVisible as util_setCompVisible } from "@/utils";
+import { setLayoutMode, setCompVisible as util_setCompVisible } from "@/utils/index1";
 import singImg from "@/assets/images/layout2.jpg";
 import twoImg from "@/assets/images/layout1.jpg";
 import twoFlanksImg from "@/assets/images/layout3.jpg";
@@ -61,7 +61,7 @@ function LayoutSet() {
   }, [layoutMode, componentsVisible])
   return (
     <div className={styles.layoutsetContainer}>
-      <MyIcon type="icon_setting" onClick={wakeup} />
+      {/*<MyIcon type="icon_setting" onClick={wakeup} />*/}
       <Drawer
         className={styles.layoutsetDrawer}
         title="设置布局"

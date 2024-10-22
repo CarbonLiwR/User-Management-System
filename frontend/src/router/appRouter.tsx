@@ -3,42 +3,43 @@ import { BrowserRouter, HashRouter } from "react-router-dom";
 import { Spin } from "antd";
 import Layout from "@/layout";
 import Login from "@/pages/login";
-import { getLocalUser } from "@/utils";
+import HomePages from "@/pages/worklogsearch";
+import { getLocalUser } from "@/utils/index1";
 import { useDispatchUser, useStateUserInfo } from "@/store/hooks";
 
-const isHash = import.meta.env.REACT_APP_ROUTER_ISHASH === "1"
-const RouterBasename = import.meta.env.REACT_APP_ROUTERBASE || "/"
+const isHash = import.meta.env.REACT_APP_ROUTER_ISHASH === "1";
+const RouterBasename = import.meta.env.REACT_APP_ROUTERBASE || "/";
 
 function AppRouter() {
   const [loading, setLoad] = useState(true);
-  const { stateSetUser } = useDispatchUser()
-  const userInfo = useStateUserInfo()
+  const { stateSetUser } = useDispatchUser();
+  const userInfo = useStateUserInfo();
+
   useEffect(() => {
-    if (!userInfo) {
-      let localInfo = getLocalUser();
-      if (localInfo && localInfo.isLogin === true) {
-        stateSetUser(localInfo);
-      }
-      return setLoad(false);
-    } else {
-      setLoad(false);
+    const localInfo = getLocalUser();
+    if (localInfo && localInfo.isLogin) {
+      stateSetUser(localInfo);
     }
-  }, [userInfo, stateSetUser]);
-  if (loading)
+    setLoad(false);
+  }, [stateSetUser]);
+
+  if (loading) {
     return (
       <Spin size="large" wrapperClassName="loading-page" tip="Loading..." />
     );
-  if (!userInfo) return <Login />;
-  if (isHash) {
-    return <HashRouter>
-      <Layout />
-    </HashRouter>
   }
 
+  if (!userInfo) {
+    return <Login />;
+  }
+
+  // 确保使用 HashRouter 或 BrowserRouter
+  const Router = isHash ? HashRouter : BrowserRouter;
+
   return (
-    <BrowserRouter basename={RouterBasename}>
+    <Router basename={isHash ? undefined : RouterBasename}>
       <Layout />
-    </BrowserRouter>
+    </Router>
   );
 }
 

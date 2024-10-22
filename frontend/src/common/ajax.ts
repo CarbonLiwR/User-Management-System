@@ -1,6 +1,6 @@
 import axios, { AxiosResponse, AxiosError } from "axios";
 import { message, notification } from "antd";
-import { getToken, clearLocalDatas, USER_INFO, TOKEN, MENU } from "@/utils";
+import { getToken, clearLocalDatas, USER_INFO, TOKEN, MENU } from "@/utils/index1";
 import qs from "qs"
 import store from "@/store";
 import { clearUser } from "@/store/action";

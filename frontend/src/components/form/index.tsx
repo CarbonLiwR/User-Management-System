@@ -7,7 +7,7 @@ interface MyFormProps {
   [key: string]: any
 }
 export interface FormItemData {
-  itemType: string
+  itemRole: string
   childProps?: {
     [key: string]: any
   }
@@ -23,8 +23,8 @@ export interface FormItemData {
   }
 }
 
-function getChild(type: string): any {
-  switch (type) {
+function getChild(Role: string): any {
+  switch (Role) {
     case "input":
       return Input;
     case "select":
@@ -41,8 +41,8 @@ function getChild(type: string): any {
       return null;
   }
 }
-function renderItem({ itemType, childProps, itemProps }: FormItemData) {
-  const Child = getChild(itemType);
+function renderItem({ itemRole, childProps, itemProps }: FormItemData) {
+  const Child = getChild(itemRole);
   if (!Child) return Child;
   return (
     <Form.Item {...itemProps} key={itemProps.name}>

@@ -3,10 +3,12 @@ __pycache__/
 venv/
 .venv/
 .mypy_cache/
-/log
 alembic/versions/
 static/media/
 .ruff_cache/
 .pytest_cache/
-.python-version
+.pdm-python
 celerybeat-schedule.*
+/log/
+/app/worklog/service/embed_model/
+/embed_model/

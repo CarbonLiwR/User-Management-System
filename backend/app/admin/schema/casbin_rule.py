@@ -22,8 +22,11 @@ class DeletePolicyParam(CreatePolicyParam):
 
 class DeleteAllPoliciesParam(SchemaBase):
     uuid: str | None = None
-    role: str
+    # role: str
 
+class CreateUserDeptParam(SchemaBase):
+    uuid: str = Field(..., description='用户 uuid')
+    dept: str = Field(..., description='部门')
 
 class CreateUserRoleParam(SchemaBase):
     uuid: str = Field(..., description='用户 uuid')
@@ -31,6 +34,9 @@ class CreateUserRoleParam(SchemaBase):
 
 
 class DeleteUserRoleParam(CreateUserRoleParam):
+    pass
+
+class DeleteUserDeptParam(CreateUserDeptParam):
     pass
 
 

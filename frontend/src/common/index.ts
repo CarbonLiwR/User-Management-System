@@ -1,4 +1,4 @@
-import { getLocalMenu, saveLocalMenu } from "../utils";
+import { getLocalMenu, saveLocalMenu } from "../utils/index1";
 import { getMenu } from "@/api";
 import { MenuResponse } from "@/types"
 let currentJob: Promise<MenuResponse> | null

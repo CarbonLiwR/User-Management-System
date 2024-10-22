@@ -26,7 +26,7 @@
     - Any Python version between Python >= 3.10
     - virtualenv or other virtual environment tool
     - git
-    - [uv](https://docs.astral.sh/uv/getting-started/installation/)
+    - [PDM](https://pdm-project.org/latest/)
 
 2. Installation and setup
 
@@ -36,9 +36,8 @@
    
    cd fastapi_best_architecture/backend
    
-   vv venv
-   
-   uv pip install -r requirements.txt
+   # Install requirements.txt
+   pdm install
    ```
 
 3. Check out a new branch and make your changes
@@ -53,7 +52,7 @@
 
    ```shell
    # Run automated code formatting and linting
-   pre-commit run --all-files
+   pdm lint
    ```
 
 5. Commit and push your changes
@@ -72,8 +71,8 @@
 
 - `celery-start.sh`: For celery docker script, implementation is not recommended
 
-- `scripts/format.sh`: Perform ruff format check
+- `format.sh`: Perform ruff format check
 
-- `scripts/lint.sh`: Perform pre-commit formatting
+- `lint.sh`: Perform pre-commit formatting
 
-- `scripts/export.sh`: Execute uv export dependency package
+- `pdm_export.sh`: Execute pdm export dependency package

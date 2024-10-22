@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Any
+from typing import Any, Sequence
 
 from backend.app.admin.crud.crud_dept import dept_dao
 from backend.app.admin.model import Dept
@@ -18,6 +18,19 @@ class DeptService:
             if not dept:
                 raise errors.NotFoundError(msg='部门不存在')
             return dept
+
+    @staticmethod
+    async def get_all() -> Sequence[Dept]:
+        async with async_db_session() as db:
+            depts = await dept_dao.get_all(db)
+            return depts
+
+    @staticmethod
+    async def get_user_depts(*, pk: int) -> Sequence[Dept]:
+        async with async_db_session() as db:
+            depts = await dept_dao.get_user_depts(db, user_id=pk)
+            return depts
+
 
     @staticmethod
     async def get_dept_tree(
@@ -57,6 +70,8 @@ class DeptService:
                 raise errors.ForbiddenError(msg='禁止关联自身为父级')
             count = await dept_dao.update(db, pk, obj)
             return count
+
+
 
     @staticmethod
     async def delete(*, pk: int) -> int:

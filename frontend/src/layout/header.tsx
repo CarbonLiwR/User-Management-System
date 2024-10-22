@@ -8,7 +8,7 @@ import {
   USER_INFO,
   TOKEN,
   MENU,
-} from "@/utils";
+} from "@/utils/index1";
 import { useCallback } from "react";
 import { useDispatchUser, useStateUserInfo } from "@/store/hooks";
 import { useStyle } from "./style"
@@ -51,7 +51,7 @@ const LayoutHeader = ({ children }: LayoutHeaderProps) => {
     <Header className={styles.header}>
       <div className="logo">
         <img src={logo} alt="logo"></img>
-        <span>react-ant-admin</span>
+        <span>用户管理系统</span>
       </div>
       {children}
       <div className="right">
@@ -60,7 +60,7 @@ const LayoutHeader = ({ children }: LayoutHeaderProps) => {
           getPopupContainer={getPopupContainer}
           dropdownRender={dropdownRender}
         >
-          <div>管理员：{userInfo && userInfo.username}</div>
+          <div>{userInfo && userInfo.username}</div>
         </Dropdown>
       </div>
     </Header>

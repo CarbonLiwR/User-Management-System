@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import random
 from fastapi import Request, Response
 from fastapi.security import HTTPBasicCredentials
 from starlette.background import BackgroundTask, BackgroundTasks
@@ -8,7 +9,7 @@ from backend.app.admin.conf import admin_settings
 from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
-from backend.app.admin.schema.user import AuthLoginParam
+from backend.app.admin.schema.user import AuthLoginParam, RegisterUserParam
 from backend.app.admin.service.login_log_service import LoginLogService
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
@@ -106,12 +107,36 @@ class AuthService:
                     httponly=True,
                 )
                 await db.refresh(current_user)
+
                 data = GetLoginToken(
                     access_token=access_token.access_token,
                     access_token_expire_time=access_token.access_token_expire_time,
                     user=current_user,  # type: ignore
                 )
                 return data
+
+    @staticmethod
+    async def register(
+            *, request: Request, response: Response, obj: RegisterUserParam,
+    ) -> GetLoginToken:
+        async with async_db_session.begin() as db:
+            try:
+                if not obj.password:
+                    raise errors.ForbiddenError(msg='密码为空')
+                username = await user_dao.get_by_username(db, obj.username)
+                if username:
+                    raise errors.ForbiddenError(msg='用户已注册')
+                obj.nickname = obj.nickname if obj.nickname else f'#{random.randrange(10000, 88888)}'
+                nickname = await user_dao.get_by_nickname(db, obj.nickname)
+                if nickname:
+                    raise errors.ForbiddenError(msg='昵称已注册')
+                email = await user_dao.check_email(db, obj.email)
+                if email:
+                    raise errors.ForbiddenError(msg='邮箱已注册')
+                await user_dao.create(db, obj)
+            except errors.NotFoundError as e:
+                raise errors.NotFoundError(msg=e.msg)
+
 
     @staticmethod
     async def new_token(*, request: Request, response: Response) -> GetNewToken:

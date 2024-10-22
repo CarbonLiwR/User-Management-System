@@ -8,9 +8,11 @@ from backend.app.admin.crud.crud_casbin import casbin_dao
 from backend.app.admin.schema.casbin_rule import (
     CreatePolicyParam,
     CreateUserRoleParam,
+    CreateUserDeptParam,
     DeleteAllPoliciesParam,
     DeletePolicyParam,
     DeleteUserRoleParam,
+    DeleteUserDeptParam,
     UpdatePolicyParam,
 )
 from backend.common.exception import errors
@@ -95,6 +97,39 @@ class CasbinService:
         return data
 
     @staticmethod
+    async def create_dept_group(*, g: CreateUserDeptParam) -> bool:
+        enforcer = await rbac.enforcer()
+        data = await enforcer.add_grouping_policy(g.uuid, g.dept)
+        if not data:
+            raise errors.ForbiddenError(msg='权限已存在')
+        return data
+
+    @staticmethod
+    async def create_dept_groups(*, gs: list[CreateUserDeptParam]) -> bool:
+        enforcer = await rbac.enforcer()
+        data = await enforcer.add_grouping_policies([list(g.model_dump().values()) for g in gs])
+        if not data:
+            raise errors.ForbiddenError(msg='权限已存在')
+        return data
+
+    @staticmethod
+    async def delete_dept_group(*, g: DeleteUserDeptParam) -> bool:
+        enforcer = await rbac.enforcer()
+        _g = enforcer.has_grouping_policy(g.uuid, g.role)
+        if not _g:
+            raise errors.NotFoundError(msg='权限不存在')
+        data = await enforcer.remove_grouping_policy(g.uuid, g.role)
+        return data
+
+    @staticmethod
+    async def delete_dept_groups(*, gs: list[DeleteUserDeptParam]) -> bool:
+        enforcer = await rbac.enforcer()
+        data = await enforcer.remove_grouping_policies([list(g.model_dump().values()) for g in gs])
+        if not data:
+            raise errors.NotFoundError(msg='权限不存在')
+        return data
+
+    @staticmethod
     async def create_group(*, g: CreateUserRoleParam) -> bool:
         enforcer = await rbac.enforcer()
         data = await enforcer.add_grouping_policy(g.uuid, g.role)
@@ -131,6 +166,7 @@ class CasbinService:
     async def delete_all_groups(*, uuid: UUID) -> int:
         async with async_db_session.begin() as db:
             count = await casbin_dao.delete_groups_by_uuid(db, uuid)
+            print('okok')
         return count
 
 

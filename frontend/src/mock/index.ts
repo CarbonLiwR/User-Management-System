@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { message } from "antd";
 import { PowerApi, LoginApi, ResponseData, MenuInfoApi, MessageList, MessageAPi, MenuResponse, MenuList, MenuItem } from "@/types"
-import { formatMenu } from "@/utils";
+import { formatMenu } from "@/utils/index1";
 
 type MockDataType = {
   "/getmenu": MenuResponse
@@ -20,38 +20,38 @@ type MockDataType = {
 const userInfoList = [
   {
     user_id: 1,
-    username: "张同学",
+    nickname: "张同学",
     account: "admin",
-    type_id: "超级管理员",
-    t_id: 1,
+    role_id: "超级管理员",
+    r_id: 1,
   },
   {
     user_id: 2,
-    username: "王五",
+    nickname: "王五",
     account: "user",
-    type_id: "用户",
-    t_id: 2,
+    role_id: "用户",
+    r_id: 2,
   },
   {
     user_id: 4,
-    username: "李四",
+    nickname: "李四",
     account: "qq123456",
-    type_id: "游客",
-    t_id: 3,
+    role_id: "游客",
+    r_id: 3,
   },
   {
     user_id: 5,
-    username: "路过的老鼠",
+    nickname: "路过的老鼠",
     account: "jake",
-    type_id: "低权游客",
-    t_id: 4,
+    role_id: "低权游客",
+    r_id: 4,
   },
   {
     user_id: 6,
-    username: "站长",
+    nickname: "站长",
     account: "superAdmin",
-    type_id: "超级管理员",
-    t_id: 1,
+    role_id: "超级管理员",
+    r_id: 1,
   },
 ];
 let currentUser = userInfoList[0];
@@ -185,7 +185,7 @@ let menu: MenuList = [
   },
   {
     [MENU_TITLE]: "权限类别",
-    [MENU_PATH]: "/type",
+    [MENU_PATH]: "/role",
     [MENU_KEY]: 14,
     [MENU_PARENTKEY]: 12,
     [MENU_ICON]: "icon_safety",
@@ -220,23 +220,23 @@ let menu: MenuList = [
     [MENU_ORDER]: 10,
   },
 ];
-const typeList = [
+const roleList = [
   {
-    type_id: 1,
+    role_id: 1,
     name: "超级管理员",
     menu_id: "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,1",
   },
-  { type_id: 2, name: "用户", menu_id: "1,9,10,11,2,7,6,17,18,16,3,4,5,8" },
-  { type_id: 3, name: "游客", menu_id: "9,1,10,11,2,7,6,17,18,12" },
-  { type_id: 4, name: "低权游客", menu_id: "9,10" },
+  { role_id: 2, name: "用户", menu_id: "1,9,10,11,2,7,6,17,18,16,3,4,5,8" },
+  { role_id: 3, name: "游客", menu_id: "9,1,10,11,2,7,6,17,18,12" },
+  { role_id: 4, name: "低权游客", menu_id: "9,10" },
 ];
 const power = {
   status: 0,
-  data: typeList,
+  data: roleList,
   mapKey: [
-    { title: "权限id", dataIndex: "type_id", key: "type_id" },
+    { title: "权限id", dataIndex: "role_id", key: "role_id" },
     { title: "权限简称", dataIndex: "name", key: "name" },
-    { title: "显示菜单列表id", dataIndex: "menu_id", key: "menu_id" },
+    { title: "显示菜单列表", dataIndex: "menu_id", key: "menu_id" },
   ],
   menu: formatMenu(menu),
 };
@@ -245,7 +245,7 @@ const userInfo = {
   msg: "登录成功",
   status: 0,
   token: "12323",
-  data: { user_id: 1, username: "超级管理员", account: "admin", type: "0", isLogin: true },
+  data: { user_id: 1, nickname: "超级管理员", account: "admin", role: "0", isLogin: true },
 };
 
 const addMenu = {
@@ -304,16 +304,16 @@ const msg: MessageAPi = {
   msg: "",
 };
 const delMenu = { msg: "操作成功", status: 0 };
-// const MenuMapKey = [
-//   { title: "菜单id", dataIndex: "menu_id", key: "menu_id" },
-//   { title: "菜单名称", dataIndex: "title", key: "title" },
-//   { title: "菜单路由", dataIndex: "path", key: "path" },
-//   { title: "菜单唯一key", dataIndex: "key", key: "key" },
-//   { title: "菜单父级key", dataIndex: "parentKey", key: "parentKey" },
-//   { title: "菜单图标", dataIndex: "icon", key: "icon" },
-//   { title: "页面是否保持状态", dataIndex: "keepAlive", key: "keepAlive" },
-//   { title: "菜单排序", dataIndex: "order", key: "order" },
-// ]
+const MenuMapKey = [
+  { title: "菜单id", dataIndex: "menu_id", key: "menu_id" },
+  { title: "菜单名称", dataIndex: "title", key: "title" },
+  { title: "菜单路由", dataIndex: "path", key: "path" },
+  { title: "菜单唯一key", dataIndex: "key", key: "key" },
+  { title: "菜单父级key", dataIndex: "parentKey", key: "parentKey" },
+  { title: "菜单图标", dataIndex: "icon", key: "icon" },
+  { title: "页面是否保持状态", dataIndex: "keepAlive", key: "keepAlive" },
+  { title: "菜单排序", dataIndex: "order", key: "order" },
+]
 const MockData: MockDataType = {
   "/getmenu": formatMenu(menu),
   "/getpower": power,
@@ -330,10 +330,11 @@ type UrlType = keyof MockDataType
 function get(url: UrlType) {
   return new Promise((res) => {
     setTimeout(() => {
+      console.log("hello")
       if (url === "/getmenu") {
-        let typeId = currentUser.t_id;
-        if (typeId) {
-          let action: string | undefined | number[] = typeList.find((i) => i.type_id === typeId)?.menu_id;
+        let roleId = currentUser.r_id;
+        if (roleId) {
+          let action: string | undefined | number[] = roleList.find((i) => i.role_id === roleId)?.menu_id;
           action = action ? action.split(",").map(Number) : [];
           let menuList = menu.filter((i) => (action as number[]).includes(i[MENU_KEY] as number));
           MockData[url] = formatMenu(menuList);
@@ -355,7 +356,6 @@ function get(url: UrlType) {
 }
 
 
-
 function post(url: UrlType, data: any) {
   return new Promise((res, rej) => {
     setTimeout(() => {
@@ -363,8 +363,8 @@ function post(url: UrlType, data: any) {
         case "/login":
           userInfo.data.account = data.account;
           if (data.account.indexOf("admin") === -1) {
-            userInfo.data.type = "1";
-            userInfo.data.username = "普通用户";
+            userInfo.data.role = "1";
+            userInfo.data.nickname = "普通用户";
           }
           return res(userInfo);
         case "/addmenu":
@@ -374,7 +374,7 @@ function post(url: UrlType, data: any) {
           msgList.push({
             ...data,
             m_id: Math.random(),
-            creator: userInfo.data.username,
+            creator: userInfo.data.nickname,
             add_time: dayjs().format("YYYY-MM-DD HH:mm:ss"),
           });
           if (msg.data) {

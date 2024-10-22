@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from backend.app.admin.schema.user import GetUserInfoNoRelationDetail
+from backend.app.admin.schema.user import GetUserInfoNoRelationDetail, GetUserInfoListDetails, GetCurrentUserInfoDetail
 from backend.common.schema import SchemaBase
 
 
 class GetSwaggerToken(SchemaBase):
     access_token: str
     token_type: str = 'Bearer'
-    user: GetUserInfoNoRelationDetail
+    user: GetCurrentUserInfoDetail
 
 
 class AccessTokenBase(SchemaBase):
@@ -23,4 +23,4 @@ class GetNewToken(AccessTokenBase):
 
 
 class GetLoginToken(AccessTokenBase):
-    user: GetUserInfoNoRelationDetail
+    user: GetCurrentUserInfoDetail

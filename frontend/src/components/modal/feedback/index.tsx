@@ -4,7 +4,7 @@ import MyForm from "@/components/form";
 import { FormInstance } from "antd";
 const initFormItems = [
   {
-    itemType: "inputText",
+    itemRole: "inputText",
     itemProps: {
       name: "f_back",
     },
@@ -14,7 +14,7 @@ const initFormItems = [
     },
   },
   {
-    itemType: "input",
+    itemRole: "input",
     itemProps: {
       name: "fd_id",
       hidden: true,

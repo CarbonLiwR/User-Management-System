@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Drawer, Col, Row, message, Button, Radio, notification, RadioChangeEvent, theme } from "antd";
 import MyIcon from "@/components/icon";
 import Color from "@/components/color";
-import { getKey, setKey, rmKey } from "@/utils";
+import { getKey, setKey, rmKey } from "@/utils/index1";
 import { useDispatchThemeToken } from "@/store/hooks";
 import { useThemeToken } from "@/hooks";
 import useStyle from "./style"

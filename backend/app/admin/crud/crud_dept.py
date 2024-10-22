@@ -32,6 +32,18 @@ class CRUDDept(CRUDPlus[Dept]):
         """
         return await self.select_model_by_column(db, name=name, del_flag=0)
 
+    async def get_user_depts(self, db, user_id: int) -> Sequence[Dept]:
+        """
+        获取用户所有部门
+
+        :param db:
+        :param user_id:
+        :return:
+        """
+        stmt = select(self.model).join(self.model.users).where(User.id == user_id)
+        depts = await db.execute(stmt)
+        return depts.scalars().all()
+
     async def get_all(
         self, db: AsyncSession, name: str = None, leader: str = None, phone: str = None, status: int = None
     ) -> Sequence[Dept]:

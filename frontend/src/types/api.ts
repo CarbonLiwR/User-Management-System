@@ -32,7 +32,7 @@ export interface LoginApi extends ResponseData {
   token: string
 }
 export type PowerList = {
-  type_id: number
+  role_id: number
   name: string
   menu_id: string
 }[]
@@ -50,10 +50,19 @@ export interface MenuInfoApi extends ResponseData {
 export type ResponseUserInfo = {
   account: string
   pswd: string
-  type: string
+  role: string
   user_id: number
-  username: string
+  nickname: string
 }
+
+// export type ResponseUserInfo = {
+//   username: string
+//   password: string
+//   role: string
+//   uuid: number
+//   nickname: string
+// }
+
 export interface UserListApi extends ResponseData {
   data: {
     list: ResponseUserInfo[]

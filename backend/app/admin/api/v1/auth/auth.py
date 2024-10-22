@@ -7,6 +7,7 @@ from fastapi.security import HTTPBasicCredentials
 from fastapi_limiter.depends import RateLimiter
 from starlette.background import BackgroundTasks
 
+from backend.app.admin.schema.user import RegisterUserParam
 from backend.app.admin.schema.token import GetSwaggerToken
 from backend.app.admin.schema.user import AuthLoginParam
 from backend.app.admin.service.auth_service import auth_service
@@ -28,10 +29,20 @@ async def swagger_login(obj: Annotated[HTTPBasicCredentials, Depends()]) -> GetS
     description='json 格式登录, 仅支持在第三方api工具调试, 例如: postman',
     dependencies=[Depends(RateLimiter(times=5, minutes=1))],
 )
+
 async def user_login(
     request: Request, response: Response, obj: AuthLoginParam, background_tasks: BackgroundTasks
 ) -> ResponseModel:
     data = await auth_service.login(request=request, response=response, obj=obj, background_tasks=background_tasks)
+    return response_base.success(data=data)
+
+@router.post(
+    '/register',
+    summary='注册用户' ,
+    dependencies=[Depends(RateLimiter(times=5, minutes=1))])
+async def user_register(request: Request, response: Response,obj: RegisterUserParam
+) -> ResponseModel:
+    data = await auth_service.register(request=request, response=response, obj=obj)
     return response_base.success(data=data)
 
 

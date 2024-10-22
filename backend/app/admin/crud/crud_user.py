@@ -3,17 +3,18 @@
 from fast_captcha import text_captcha
 from sqlalchemy import and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.sql import Select
 from sqlalchemy_crud_plus import CRUDPlus
 
-from backend.app.admin.model import Role, User
+from backend.app.admin.model import Role, User ,Dept
 from backend.app.admin.schema.user import (
     AddUserParam,
     AvatarParam,
     RegisterUserParam,
     UpdateUserParam,
     UpdateUserRoleParam,
+    UpdateUserDeptParam,
 )
 from backend.common.security.jwt import get_hash_password
 from backend.utils.timezone import timezone
@@ -34,11 +35,21 @@ class CRUDUser(CRUDPlus[User]):
         """
         通过 username 获取用户
 
-        :param db:
-        :param username:
-        :return:
+        :param db: 异步数据库会话
+        :param username: 用户名
+        :return: 返回找到的用户，或者 None
         """
-        return await self.select_model_by_column(db, username=username)
+        stmt = (
+            select(self.model)
+            .options(selectinload(self.model.depts))
+            .options(selectinload(self.model.roles).joinedload(Role.menus))
+        )
+        filters = []
+
+        if username:
+            filters.append(self.model.username == username)
+        user = await db.execute(stmt.where(*filters))
+        return user.scalars().first()
 
     async def get_by_nickname(self, db: AsyncSession, nickname: str) -> User | None:
         """
@@ -111,6 +122,24 @@ class CRUDUser(CRUDPlus[User]):
         return await self.update_model(db, input_user, obj)
 
     @staticmethod
+    async def update_dept(db: AsyncSession, input_user: User, obj: UpdateUserDeptParam) -> None:
+        """
+            更新用户部门
+            :param db:
+            :param input_user:
+            :param obj:
+            :return:
+            """
+        # 删除用户所有角色
+        for i in list(input_user.depts):
+            input_user.depts.remove(i)
+        # 添加用户角色
+        dept_list = []
+        for dept_id in obj.depts:
+            dept_list.append(await db.get(Dept, dept_id))
+        input_user.depts.extend(dept_list)
+
+    @staticmethod
     async def update_role(db: AsyncSession, input_user: User, obj: UpdateUserRoleParam) -> None:
         """
         更新用户角色
@@ -128,6 +157,7 @@ class CRUDUser(CRUDPlus[User]):
         for role_id in obj.roles:
             role_list.append(await db.get(Role, role_id))
         input_user.roles.extend(role_list)
+
 
     async def update_avatar(self, db: AsyncSession, input_user: int, avatar: AvatarParam) -> int:
         """
@@ -183,7 +213,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         stmt = (
             select(self.model)
-            .options(selectinload(self.model.dept))
+            .options(selectinload(self.model.depts))
             .options(selectinload(self.model.roles).selectinload(Role.menus))
             .order_by(desc(self.model.join_time))
         )
@@ -288,7 +318,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         return await self.update_model(db, user_id, {'is_multi_login': multi_login})
 
-    async def get_with_relation(self, db: AsyncSession, *, user_id: int = None, username: str = None) -> User | None:
+    async def get_with_relation(self, db: AsyncSession, *, user_id: int = None, username: str = None,user_uuid:str = None) -> User | None:
         """
         获取用户和（部门，角色，菜单）
 
@@ -299,7 +329,7 @@ class CRUDUser(CRUDPlus[User]):
         """
         stmt = (
             select(self.model)
-            .options(selectinload(self.model.dept))
+            .options(selectinload(self.model.depts))
             .options(selectinload(self.model.roles).joinedload(Role.menus))
         )
         filters = []
@@ -307,7 +337,13 @@ class CRUDUser(CRUDPlus[User]):
             filters.append(self.model.id == user_id)
         if username:
             filters.append(self.model.username == username)
-        user = await db.execute(stmt.where(*filters))
+        if user_uuid:
+            filters.append(self.model.uuid == user_uuid)
+        if filters:
+            stmt = stmt.where(*filters)
+
+        user = await db.execute(stmt)
+
         return user.scalars().first()
 
 

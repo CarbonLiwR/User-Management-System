@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import routerList, { RouterInfo } from "./list";
 import Intercept from "./intercept";
 import { getMenus } from "@/common";
-import { formatMenu, reduceMenuList } from "@/utils";
+import { formatMenu, reduceMenuList } from "@/utils/index1";
 import { MenuList } from "@/types"
 import { useDispatchMenu } from "@/store/hooks";
 

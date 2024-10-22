@@ -43,9 +43,11 @@ class MenuService:
             return menu_tree
 
     @staticmethod
-    async def get_user_menu_tree(*, request: Request) -> list[dict[str, Any]]:
+    async def get_user_menu_tree(*,  request: Request) -> list[dict[str, Any]]:
         async with async_db_session() as db:
             roles = request.user.roles
+            print(request.user)
+            print(roles)
             menu_ids = []
             menu_tree = []
             if roles:

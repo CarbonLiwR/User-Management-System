@@ -3,6 +3,7 @@ import mock from "../mock/index";
 import { MessageAPi, ResponseData, LoginApi, PowerApi, MenuInfoApi, UserListApi, ResponseUserInfo, VisitorApi, VisitorListApi, MenuResponse, MenuListResponse } from "@/types"
 
 const request = import.meta.env.REACT_APP_MOCK === "1" ? mock : ajax;
+// const request = ajax;
 
 const getMenu = () => request.get("/getmenu") as Promise<MenuResponse>;
 const getMenuList = () => request.get("/getmenulist") as Promise<MenuListResponse>;
@@ -20,8 +21,8 @@ const getUserList = (data: any) => request.get("/getuserlist", data) as Promise<
 const addUser = (data: any) => request.post("/adduserinfo", data) as Promise<ResponseData>;
 const getUser = (data: any) => request.get("/getuserinfo", data) as Promise<ResponseData & { data: ResponseUserInfo }>;
 const editUser = (data: any) => request.post("/edituserinfo", data) as Promise<ResponseData>;
-const editType = (data: any) => request.post("/edittype", data) as Promise<ResponseData>;
-const addType = (data: any) => request.post("/addtype", data) as Promise<ResponseData>;
+const editRole = (data: any) => request.post("/editrole", data) as Promise<ResponseData>;
+const addRole = (data: any) => request.post("/addrole", data) as Promise<ResponseData>;
 export const getFeedBack = (data: any) => request.post("/getfeedback", data) as Promise<ResponseData>;
 export const reply = (data: any) => request.post("/reply", data) as Promise<ResponseData>;
 export {
@@ -40,7 +41,7 @@ export {
   addUser,
   getUser,
   editUser,
-  editType,
-  addType,
+  editRole,
+  addRole,
   getMenuList
 };

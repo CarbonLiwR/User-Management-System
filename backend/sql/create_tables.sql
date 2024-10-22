@@ -32,28 +32,17 @@ CREATE TABLE `sys_casbin_rule`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
--- sys_dept: table
-CREATE TABLE `sys_dept`
-(
-    `id`           int         NOT NULL AUTO_INCREMENT COMMENT '主键id',
-    `name`         varchar(50) NOT NULL COMMENT '部门名称',
-    `level`        int         NOT NULL COMMENT '部门层级',
-    `sort`         int         NOT NULL COMMENT '排序',
-    `leader`       varchar(20) DEFAULT NULL COMMENT '负责人',
-    `phone`        varchar(11) DEFAULT NULL COMMENT '手机',
-    `email`        varchar(50) DEFAULT NULL COMMENT '邮箱',
-    `status`       int         NOT NULL COMMENT '部门状态(0停用 1正常)',
-    `del_flag`     tinyint(1)  NOT NULL COMMENT '删除标志（0删除 1存在）',
-    `parent_id`    int         DEFAULT NULL COMMENT '父部门ID',
-    `created_time` datetime    NOT NULL COMMENT '创建时间',
-    `updated_time` datetime    DEFAULT NULL COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    KEY `ix_sys_dept_id` (`id`),
-    KEY `ix_sys_dept_parent_id` (`parent_id`),
-    CONSTRAINT `sys_dept_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `sys_dept` (`id`) ON DELETE SET NULL
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE sys_user_dept (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    user_id INTEGER NOT NULL COMMENT '用户ID',
+    dept_id INTEGER NOT NULL COMMENT '部门ID',
+    UNIQUE KEY (user_id, dept_id),
+    FOREIGN KEY (user_id) REFERENCES sys_user (id) ON DELETE CASCADE,
+    FOREIGN KEY (dept_id) REFERENCES sys_dept (id) ON DELETE CASCADE
+);
+
+
 
 -- sys_dict_data: table
 CREATE TABLE `sys_dict_data`
@@ -237,6 +226,29 @@ CREATE TABLE `sys_role`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
+-- sys_dept: table
+CREATE TABLE `sys_dept`
+(
+    `id`           int         NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `name`         varchar(50) NOT NULL COMMENT '部门名称',
+    `level`        int         NOT NULL COMMENT '部门层级',
+    `sort`         int         NOT NULL COMMENT '排序',
+    `leader`       varchar(20) DEFAULT NULL COMMENT '负责人',
+    `phone`        varchar(11) DEFAULT NULL COMMENT '手机',
+    `email`        varchar(50) DEFAULT NULL COMMENT '邮箱',
+    `status`       int         NOT NULL COMMENT '部门状态(0停用 1正常)',
+    `del_flag`     tinyint(1)  NOT NULL COMMENT '删除标志（0删除 1存在）',
+    `parent_id`    int         DEFAULT NULL COMMENT '父部门ID',
+    `created_time` datetime    NOT NULL COMMENT '创建时间',
+    `updated_time` datetime    DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `ix_sys_dept_id` (`id`),
+    KEY `ix_sys_dept_parent_id` (`parent_id`),
+    CONSTRAINT `sys_dept_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `sys_dept` (`id`) ON DELETE SET NULL
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
 -- sys_role_menu: table
 CREATE TABLE `sys_role_menu`
 (
@@ -286,6 +298,11 @@ CREATE TABLE `sys_user`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
+
+# ALTER TABLE sys_user
+# DROP FOREIGN KEY sys_user_ibfk_1, -- 删除外键
+# DROP COLUMN dept_id;              -- 删除列
+
 -- sys_user_role: table
 CREATE TABLE `sys_user_role`
 (
@@ -322,3 +339,31 @@ CREATE TABLE `sys_user_social`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE workLog (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    uuid VARCHAR(32) UNIQUE NOT NULL,
+    user_uuid VARCHAR(32) NOT NULL,
+    group_uuid VARCHAR(32) NOT NULL,
+    content TEXT,
+    task TEXT,
+    solution TEXT,
+    effect TEXT,
+    create_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_datetime DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    active BOOLEAN,
+    INDEX idx_worklog_uuid (uuid),
+    INDEX idx_worklog_id (id)
+);
+
+# ALTER TABLE workLog
+# ADD COLUMN group_uuid VARCHAR(32);
+
+ALTER TABLE workLog
+ADD COLUMN content TEXT;
+
+ALTER TABLE workLog
+ADD COLUMN embedding BLOB;
+
+ALTER TABLE workLog MODIFY COLUMN user_uuid VARCHAR(36);
