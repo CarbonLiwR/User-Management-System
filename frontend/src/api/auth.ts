@@ -14,8 +14,8 @@ export interface LoginRes {
 export interface CaptchaRes {
   data: {
     data:{
-      image_type: string; // 'base64' 类型
-    image: string; // Base64 编码的图片
+      image_type: string;
+    image: string;
     }
 
   };

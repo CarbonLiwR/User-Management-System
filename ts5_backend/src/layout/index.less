@@ -1,0 +1,51 @@
+.ant-menu-item {
+  align-items: center;
+  display    : flex;
+
+  .anticon {
+    font-size: 24px;
+  }
+}
+
+.fl {
+  float: left;
+}
+
+.my-layout-body {
+  min-height: 100vh;
+
+  &.twoflanks {
+    .top-menu-wrapper {
+      margin: 0 20px;
+    }
+  }
+
+
+  .ant-layout-sider-children {
+    position: relative;
+    height  : auto;
+  }
+
+  .layout-content-wrap {
+    padding   : 0 24px 24px;
+    margin    : 0;
+    min-height: 200px;
+
+    &.reset-padding {
+      padding: 0;
+
+      .layout-content-body {
+        margin: 10px 20px 20px;
+      }
+
+    }
+  }
+
+  .footer {
+    text-align: center;
+
+    p {
+      margin-bottom: 5px;
+    }
+  }
+}

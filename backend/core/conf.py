@@ -126,7 +126,8 @@ class Settings(BaseSettings):
     # CORS
     CORS_ALLOWED_ORIGINS: list[str] = [
         'http://localhost:3000',
-
+        'http://localhost:5173',
+        'http://localhost:5174',
     ]
     CORS_EXPOSE_HEADERS: list[str] = [
         TRACE_ID_REQUEST_HEADER_KEY,

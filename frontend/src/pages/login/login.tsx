@@ -47,6 +47,8 @@ function LoginPage() {
           message.error('登录失败，请重试');
           return;
         }
+        // sessionStorage.clear();
+
         const data1 = {user_id: 1, nickname: "超级管理员", account: "admin", type: "0"};
         const info = Object.assign({isLogin: true}, data1);
         saveToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6IuW8oOWQjOWtpiIsImFjY291bnQiOiJhZG1pbiIsInR5cGVfaWQiOjEsImlhdCI6MTcyOTE1MTE3NSwiZXhwIjoxNzMwNDQ3MTc1fQ.bKEbI9q2GwJw34sJ9Y-wXl6X8iTUsShVAlnfjdFwvnM');
