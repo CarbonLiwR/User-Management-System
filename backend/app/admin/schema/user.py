@@ -23,13 +23,14 @@ class RegisterUserParam(AuthSchemaBase):
     nickname: str | None = None
     email: EmailStr = Field(..., examples=['user@example.com'])
 
+class AuthRegisterParam(RegisterUserParam):
+    captcha: str
 
 class AddUserParam(AuthSchemaBase):
     dept_id: int
     roles: list[int]
     nickname: str | None = None
     email: EmailStr = Field(..., examples=['user@example.com'])
-
 
 class UserInfoSchemaBase(SchemaBase):
     # dept_id: int | None = None
@@ -38,10 +39,8 @@ class UserInfoSchemaBase(SchemaBase):
     email: EmailStr = Field(..., examples=['user@example.com'])
     phone: CustomPhoneNumber | None = None
 
-
 class UpdateUserParam(UserInfoSchemaBase):
     pass
-
 
 class UpdateUserRoleParam(SchemaBase):
     roles: list[int]

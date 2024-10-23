@@ -19,10 +19,7 @@ axios.defaults.withCredentials = true;
 
 // 封装错误提示逻辑
 const showError = (mes: string) => {
-    message.error({
-        content: mes,
-        duration: 5000, // 5秒
-    });
+    message.error(mes, 3); // 第二个参数为持续时间，单位是秒
 };
 
 // 请求拦截器

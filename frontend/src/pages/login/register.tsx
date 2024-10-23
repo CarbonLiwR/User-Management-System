@@ -2,7 +2,7 @@ import {useCallback, useState, useEffect} from "react";
 import {Form, Input, Button, Checkbox, message, Row, Image} from "antd";
 import {useDispatch} from "react-redux";
 import MyIcon from "@/components/icon";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 import {saveUser, getLocalUser, saveToken} from "@/utils/index1";
 import {register} from "@/api/auth";
 import {useThemeToken} from "@/hooks";
@@ -12,7 +12,7 @@ import form from "@/pages/form";
 const IPT_RULE_NICKNAME = [{required: true, message: "请输入昵称"}];
 const IPT_RULE_USERNAME = [{required: true, message: "请输入用户名"}];
 const IPT_RULE_PASSWORD = [{required: true, message: "请输入密码"}];
-const IPT_RULE_EMAIL = [{required: true,  message: "请输入有效的电子邮箱"}];
+const IPT_RULE_EMAIL = [{required: true, message: "请输入有效的电子邮箱"}];
 const IPT_RULE_CAPTCHA = [{required: true, message: "请输入验证码"}];
 
 function RegisterPage() {
@@ -35,49 +35,49 @@ function RegisterPage() {
   }, []);
 
   const validateConfirmPassword = (_: any, value: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    const password = form.getFieldValue('password');
-    if (value && value !== password) {
-      reject("两次输入的密码不一致");
-    } else {
-      resolve();
-    }
-  });
-};
+    return new Promise((resolve, reject) => {
+      const password = form.getFieldValue('password');
+      if (value && value !== password) {
+        reject("两次输入的密码不一致");
+      } else {
+        resolve();
+      }
+    });
+  };
 
 
   const onFinish = useCallback((values: any) => {
-  console.log(values);
-  register(values) // 使用注册方法
-    .then((res) => {
-      const { data, msg, code } = res;
-      console.log(res);
-      if (code === 403 && !data) {
-        message.error("注册失败：用户已存在或不符合注册条件");
-        return;
-      }
-      // 假设注册成功后，需要保存用户信息并设置登录状态
-      const info = Object.assign({ isLogin: true }, data);
-      message.success(msg || "注册成功");
-      // 可能还需要保存用户信息到本地存储或全局状态等
-    })
-    .catch((error) => {
-      // 这里处理错误，例如打印到控制台或显示给用户
-      console.error(error);
-      if (error.response) {
-        // 服务器端返回的HTTP状态码和错误信息
-        const { status, data } = error.response;
-        const errorMsg = data.msg || '注册失败';
-        message.error(`${errorMsg}`);
-      } else if (error.request) {
-        // 请求已经发出，但没有收到响应
-        message.error('请求超时，请检查网络连接');
-      } else {
-        // 发生了触发请求错误的问题
-        message.error('注册请求错误，请重试');
-      }
-    });
-}, []);
+    console.log(values);
+    register(values) // 使用注册方法
+      .then((res) => {
+        const {data, msg, code} = res;
+        console.log(res);
+        if (code === 403 && !data) {
+          message.error("注册失败：用户已存在或不符合注册条件");
+          return;
+        }
+        // 假设注册成功后，需要保存用户信息并设置登录状态
+        const info = Object.assign({isLogin: true}, data);
+        message.success(msg || "注册成功");
+        // 可能还需要保存用户信息到本地存储或全局状态等
+      })
+      .catch((error) => {
+        // 这里处理错误，例如打印到控制台或显示给用户
+        console.error(error);
+        if (error.response) {
+          // 服务器端返回的HTTP状态码和错误信息
+          const {status, data} = error.response;
+          const errorMsg = data.msg || '注册失败';
+          message.error(`${errorMsg}`);
+        } else if (error.request) {
+          // 请求已经发出，但没有收到响应
+          message.error('请求超时，请检查网络连接');
+        } else {
+          // 发生了触发请求错误的问题
+          message.error('注册请求错误，请重试');
+        }
+      });
+  }, []);
 
   return (
     <div className="login-container">
@@ -113,12 +113,12 @@ function RegisterPage() {
           <Form.Item
             name="confirm"
             rules={[
-              { required: true, message: "请确认密码" },
-              { validator: validateConfirmPassword } // 使用 validator 函数
+              {required: true, message: "请确认密码"},
+              {validator: validateConfirmPassword} // 使用 validator 函数
             ]}
           >
             <Input
-              prefix={<MyIcon type="icon_locking" />}
+              prefix={<MyIcon type="icon_locking"/>}
               type="password"
               autoComplete="off"
               placeholder="确认密码"

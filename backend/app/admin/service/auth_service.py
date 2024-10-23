@@ -9,7 +9,7 @@ from backend.app.admin.conf import admin_settings
 from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
-from backend.app.admin.schema.user import AuthLoginParam, RegisterUserParam
+from backend.app.admin.schema.user import AuthLoginParam, AuthRegisterParam, RegisterUserParam
 from backend.app.admin.service.login_log_service import LoginLogService
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
@@ -117,8 +117,8 @@ class AuthService:
 
     @staticmethod
     async def register(
-            *, request: Request, response: Response, obj: RegisterUserParam,
-    ) -> GetLoginToken:
+            *, request: Request, obj: AuthRegisterParam,
+    ):
         async with async_db_session.begin() as db:
             try:
                 if not obj.password:
@@ -133,7 +133,15 @@ class AuthService:
                 email = await user_dao.check_email(db, obj.email)
                 if email:
                     raise errors.ForbiddenError(msg='邮箱已注册')
-                await user_dao.create(db, obj)
+                captcha_code = await redis_client.get(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+                if not captcha_code:
+                    raise errors.AuthorizationError(msg='验证码失效，请重新获取')
+                if captcha_code.lower() != obj.captcha.lower():
+                    raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
+                obj_dict = obj.dict(exclude={"captcha"})
+                user_param = RegisterUserParam(**obj_dict)
+                await user_dao.create(db, user_param)
+
             except errors.NotFoundError as e:
                 raise errors.NotFoundError(msg=e.msg)
 

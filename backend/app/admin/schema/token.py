@@ -24,3 +24,6 @@ class GetNewToken(AccessTokenBase):
 
 class GetLoginToken(AccessTokenBase):
     user: GetCurrentUserInfoDetail
+
+class GetRegisterToken(AccessTokenBase):
+    pass

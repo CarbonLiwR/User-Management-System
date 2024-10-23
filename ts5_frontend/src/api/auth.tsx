@@ -25,7 +25,7 @@ export interface RegisterData {
 }
 
 export interface RegisterRes {
-    data: never;
+    data: string;
     msg: string;
     code: number;
 }

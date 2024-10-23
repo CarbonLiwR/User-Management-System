@@ -8,6 +8,7 @@ import AdminRolePage from "../pages/admin/role";
 import AdminMenuPage from "../pages/admin/menu";
 import AdminUserPage from "../pages/admin/user";
 import AdminDeptPage from "../pages/admin/dept";
+import RegisterPage from "../pages/login/register.tsx";
 
 function AppRouter() {
     // 从 Redux 中获取用户信息
@@ -19,13 +20,14 @@ function AppRouter() {
     return (
         <Router>
             <Routes>
-                {/* 未登录用户会被重定向到登录页面 */}
+                {/* 未登录用户会被重定向到登录页面，除了登录和注册页面 */}
                 {!isLoggedIn && (
-                    <Route path="*" element={<Navigate to="/login" replace />} />
+                    <>
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
+                        <Route path="*" element={<Navigate to="/login" replace />} />
+                    </>
                 )}
-
-                {/* 登录页面 */}
-                <Route path="/login" element={<LoginPage />} />
 
                 {/* 受保护的页面，只有登录后才能访问 */}
                 {isLoggedIn && (

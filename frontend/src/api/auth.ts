@@ -15,7 +15,7 @@ export interface CaptchaRes {
   data: {
     data:{
       image_type: string;
-    image: string;
+      image: string;
     }
 
   };
@@ -43,7 +43,6 @@ export function getCaptcha(): Promise<CaptchaRes> {
 export function login(data: LoginData): Promise<LoginRes> {
   return axios.post('http://127.0.0.1:8000/api/v1/auth/login', data);
 }
-
 
 export function register(data: RegisterData): Promise<RegisterRes> {
     return axios.post('http://127.0.0.1:8000/api/v1/auth/register', data);

@@ -1,28 +1,38 @@
-import { useCallback, useState, useEffect } from "react";
-import { Form, Input, Button, Checkbox, message, Row, Image } from "antd";
-import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-import type { LoginData } from '../../api/auth';
-import { useDispatchUser } from '../../hooks';
+import {useCallback, useState, useEffect, useRef} from "react";
+import {Form, Input, Button, Checkbox, message, Row, Image} from "antd";
+import {Link, useNavigate} from "react-router-dom";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store";
+import type {LoginData} from '../../api/auth';
+import {useDispatchUser} from '../../hooks';
 import './index.css'
-const IPT_RULE_USERNAME = [{ required: true, message: "请输入用户名" }];
-const IPT_RULE_PASSWORD = [{ required: true, message: "请输入密码" }];
-const IPT_RULE_CAPTCHA = [{ required: true, message: "请输入验证码" }];
+import {EyeInvisibleOutlined, EyeOutlined} from "@ant-design/icons";
+
+const IPT_RULE_USERNAME = [{required: true, message: "请输入用户名"}];
+const IPT_RULE_PASSWORD = [{required: true, message: "请输入密码"}];
+const IPT_RULE_CAPTCHA = [{required: true, message: "请输入验证码"}];
 
 function LoginPage() {
     const [btnLoad, setBtnLoad] = useState(false);
 
     const navigate = useNavigate(); // 使用 useNavigate hook
     const captchaSrc = useSelector((state: RootState) => state.user.captcha);
-    const { login, fetchUser, getCaptcha } = useDispatchUser();
-
+    const {login, fetchUser, getCaptcha} = useDispatchUser();
+    const hasFetchedCaptcha = useRef(false);
     const refreshCaptcha = useCallback(() => {
         getCaptcha();
     }, [getCaptcha]);
+    const [passwordVisible, setPasswordVisible] = useState(false);
+    const togglePasswordVisibility = () => {
+        setPasswordVisible(!passwordVisible);
+    };
+
 
     useEffect(() => {
-        refreshCaptcha();
+        if (!hasFetchedCaptcha.current) {
+            refreshCaptcha();
+            hasFetchedCaptcha.current = true; // 仅请求一次
+        }
     }, [refreshCaptcha]);
 
     const onFinish = useCallback((values: LoginData) => {
@@ -53,24 +63,35 @@ function LoginPage() {
                     onFinish={onFinish}
                 >
                     <Form.Item name="username" rules={IPT_RULE_USERNAME}>
-                        <Input placeholder="账号:admin/user" />
+                        <Input placeholder="账号:admin/user"/>
                     </Form.Item>
                     <Form.Item name="password" rules={IPT_RULE_PASSWORD}>
                         <Input
-                            type="password"
+                            type={passwordVisible ? "text" : "password"}
                             autoComplete="off"
                             placeholder="密码:admin123/user123"
+                            suffix={
+                                passwordVisible ?
+                                    <EyeOutlined
+                                        onClick={togglePasswordVisibility}
+                                        style={{cursor: 'pointer', color: 'inherit'}}
+                                    /> :
+                                    <EyeInvisibleOutlined
+                                        onClick={togglePasswordVisibility}
+                                        style={{cursor: 'pointer', color: 'inherit'}}
+                                    />
+                            }
                         />
                     </Form.Item>
                     <Form.Item name="captcha" rules={IPT_RULE_CAPTCHA}>
                         <Row align="middle">
-                            <Input placeholder="请输入验证码" style={{ width: '60%', flex: 1 }} />
+                            <Input placeholder="请输入验证码" style={{width: '60%', flex: 1}}/>
                             <Image
                                 src={captchaSrc}
                                 preview={false}
                                 alt="captcha"
                                 onClick={refreshCaptcha}
-                                style={{ cursor: "pointer", height: "32px", width: "auto" }}
+                                style={{cursor: "pointer", height: "32px", width: "auto"}}
                             />
                         </Row>
                     </Form.Item>
