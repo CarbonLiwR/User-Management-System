@@ -1,32 +1,32 @@
+import React, { useEffect } from 'react';
 import { Modal, Form, Input, Select, Button, Switch } from 'antd';
-import React from 'react';
 
 const { Option } = Select;
 
-const CreateRoleModal = ({ visible, onCancel, onCreate }) => {
+const EditRoleModal = ({ visible, onCancel, onEdit, role }) => {
     const [form] = Form.useForm();
 
-    // 当点击确定时提交表单
+    useEffect(() => {
+        if (role) {
+            form.setFieldsValue(role); // 预填充表单数据
+        }
+    }, [role, form]);
+
     const handleOk = () => {
         form
             .validateFields()
             .then((values) => {
-                onCreate(values); // 调用父组件的创建方法
-                form.resetFields(); // 提交后重置表单
+                onEdit(values);
+                form.resetFields();
             })
             .catch((info) => {
                 console.log('Validate Failed:', info);
             });
     };
 
-    // 状态开关的处理函数，1代表开启，0代表禁用
-    const handleStatusChange = (checked: number) => {
-        form.setFieldsValue({ status: checked ? 1 : 0 });
-    };
-
     return (
         <Modal
-            title="新建角色"
+            title="编辑角色"
             open={visible}
             onCancel={onCancel}
             footer={[
@@ -38,45 +38,33 @@ const CreateRoleModal = ({ visible, onCancel, onCreate }) => {
                 </Button>,
             ]}
         >
-            <Form form={form} layout="vertical" name="create_role_form">
+            <Form form={form} layout="vertical">
                 <Form.Item
                     name="name"
                     label="角色名称"
                     rules={[{ required: true, message: '请输入角色名称' }]}
                 >
-                    <Input placeholder="请输入角色名称" />
+                    <Input />
                 </Form.Item>
-
                 <Form.Item
                     name="data_scope"
                     label="数据权限"
                     rules={[{ required: true, message: '请选择数据权限' }]}
                 >
-                    <Select placeholder="自定义数据权限">
+                    <Select>
                         <Option value={1}>全部数据权限</Option>
                         <Option value={2}>自定义数据权限</Option>
                     </Select>
                 </Form.Item>
-
-                <Form.Item
-                    name="status"
-                    label="状态"
-                    initialValue={1} // 默认值为开启
-                >
-                    <Switch
-                        checkedChildren="开启"
-                        unCheckedChildren="禁用"
-                        defaultChecked
-                        onChange={handleStatusChange}
-                    />
+                <Form.Item name="status" label="状态">
+                    <Switch checkedChildren="开启" unCheckedChildren="禁用" defaultChecked />
                 </Form.Item>
-
                 <Form.Item name="remark" label="备注">
-                    <Input.TextArea rows={4} placeholder="请输入备注" />
+                    <Input.TextArea rows={4} />
                 </Form.Item>
             </Form>
         </Modal>
     );
 };
 
-export default CreateRoleModal;
+export default EditRoleModal;

@@ -14,12 +14,13 @@ export interface HttpError {
 }
 
 // 设置全局 baseURL 和 withCredentials
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '';
+// axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '';
+axios.defaults.baseURL = 'http://127.0.0.1:8000/';
 axios.defaults.withCredentials = true;
 
 // 封装错误提示逻辑
 const showError = (mes: string) => {
-    message.error(mes, 3); // 第二个参数为持续时间，单位是秒
+    message.error(mes);
 };
 
 // 请求拦截器

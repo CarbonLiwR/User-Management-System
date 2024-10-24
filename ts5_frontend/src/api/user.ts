@@ -39,6 +39,7 @@ export interface SysUserListRes {
   items: SysUserRes[];
   total: number;
 }
+
 export interface SysUserDeptReq {
   depts: number[];
 }
@@ -90,11 +91,15 @@ export function getUser(username: string): Promise<SysUserRes> {
 }
 
 export function updateUserRole(username: string, data: SysUserRoleReq) {
-  return axios.put(`/api/v1/sys/users/${username}/role`, data);
+  const data1 = data.roles.map((role) => role.id);
+  const data2 = {roles: data1} as SysUserRoleReq;
+  return axios.put(`/api/v1/sys/users/${username}/role`, data2);
 }
 
 export function updateUserDept(username: string, data: SysUserDeptReq) {
-  return axios.put(`/api/v1/sys/users/${username}/dept`, data);
+  const data1 = data.depts.map((dept) => dept.id);
+  const data2 = {depts: data1} as SysUserDeptReq;
+  return axios.put(`/api/v1/sys/users/${username}/dept`, data2);
 }
 
 export function changeUserStatus(pk: number) {

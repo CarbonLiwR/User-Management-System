@@ -8,6 +8,9 @@ export interface UserState {
     is_staff: boolean;
     roles: string;
     depts: SysDeptRes[];
+    status: string;
+    captcha: string;
+    error: null
 }
 
 export type UserInfo = {

@@ -3,11 +3,15 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import { combineReducers } from 'redux';
 import userReducer from './userSlice.tsx';
-// import postsReducer from './postsReducer';
+import roleReducer from './roleSlice.tsx';
+import deptSlice from "./deptSlice.tsx";
+import menuSlice from "./menuSlice.tsx";
 
 const rootReducer = combineReducers({
     user: userReducer,
-    // posts: postsReducer
+    dept: deptSlice,
+    role: roleReducer,
+    menu: menuSlice,
 });
 
 
