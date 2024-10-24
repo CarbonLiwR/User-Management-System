@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import "./index.less";
+import {useNavigate} from "react-router-dom";
+
 
 const Theme: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
-  // const navigate = useNavigate(); // 使用 react-router-dom 的 useNavigate 进行页面跳转
+  const navigate = useNavigate(); // 使用 react-router-dom 的 useNavigate 进行页面跳转
 
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
-    // e.preventDefault(); // 阻止默认表单提交行为
-    // try {
-    //   navigate(`/result?q=${encodeURIComponent(searchQuery)}`);
-    // } catch (error) {
-    //   console.error('搜索失败:', error);
-    //   alert('搜索失败，请稍后再试。');
-    // }
-  };
+    e.preventDefault(); // 阻止默认表单提交行为
+    try {
+        navigate(`/worklog/result?q=${encodeURIComponent(searchQuery)}`);
+    } catch (error) {
+        console.error('搜索失败:', error);
+        alert('搜索失败，请稍后再试。');
+    }
+};
+
 
   return (
     <div className="search-container">

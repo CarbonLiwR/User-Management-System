@@ -1,36 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Input, Button, Select, Space, Typography, Alert } from 'antd';
+import React, {useEffect, useState} from 'react';
+import {Table, Input, Button, Select, Space, Typography, Alert} from 'antd';
 import axios from 'axios';
-import { UserOutlined } from '@ant-design/icons';
+import {useSelector} from "react-redux";
+import {RootState} from "../../../store";
 
-const { Option } = Select;
-const { Text } = Typography;
+const {Option} = Select;
+const {Text} = Typography;
 
 const WorkLogsShow = () => {
+    const currentuser = useSelector((state: RootState) => state.user);
+    console.log(currentuser);
     const [logs, setLogs] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [selectedGroup, setSelectedGroup] = useState<string>('个人');
-    const [currentuser, setCurrentUser] = useState<any>(null);
+    // const [currentuser, setCurrentUser] = useState<any>(null);
     const [userNames, setUserNames] = useState<Record<string, string>>({});
     const [groupNames, setGroupNames] = useState<Record<string, string>>({});
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [noLogsMessage, setNoLogsMessage] = useState<boolean>(false);
-
     useEffect(() => {
-        const fetchUserInfo = async () => {
-            // Replace with your API call to fetch user info
-            const userInfo = await axios.get('/api/user/info');
-            setCurrentUser(userInfo.data);
-        };
-
         const loadInitialData = async () => {
             try {
                 const logResponse = await axios.get(currentuser?.is_superuser ? '/api/v1/show/worklogs/all' : '/api/v1/show/worklogs/user');
-                setLogs(logResponse.data);
+                setLogs(logResponse);
+                // console.log(logResponse);
 
                 // Load user names and group names
-                const userIds = [...new Set(logResponse.data.map(log => log.user_uuid))];
-                const groupIds = [...new Set(logResponse.data.map(log => log.group_uuid))];
+                const userIds = [...new Set(logResponse.map(log => log.user_uuid))];
+                const groupIds = [...new Set(logResponse.map(log => log.group_uuid))];
 
                 const userNamePromises = userIds.map(uuid => fetchUserName(uuid));
                 const groupNamePromises = groupIds.map(id => fetchGroupNames(id));
@@ -41,13 +38,13 @@ const WorkLogsShow = () => {
             }
         };
 
-        fetchUserInfo().then(loadInitialData);
-    }, [currentuser]);
+        loadInitialData();
+    }, []);
 
     const fetchUserName = async (uuid: string) => {
         try {
             const response = await axios.get(`/api/v1/sys/users/uuid/${uuid}`);
-            setUserNames(prev => ({ ...prev, [uuid]: response.data.nickname }));
+            setUserNames(prev => ({...prev, [uuid]: response.nickname}));
         } catch (error) {
             console.error('Error fetching user name:', error);
         }
@@ -56,7 +53,7 @@ const WorkLogsShow = () => {
     const fetchGroupNames = async (id: string) => {
         try {
             const response = await axios.get(`/api/v1/sys/depts/${id}`);
-            setGroupNames(prev => ({ ...prev, [id]: response.data.name }));
+            setGroupNames(prev => ({...prev, [id]: response.name}));
         } catch (error) {
             console.error('Error fetching group names:', error);
         }
@@ -86,6 +83,7 @@ const WorkLogsShow = () => {
             title: '姓名',
             dataIndex: 'nickname',
             render: (text: string, record: any) => userNames[record.user_uuid] || '未知',
+            width: '5%',
         },
         {
             title: '时间',
@@ -95,12 +93,13 @@ const WorkLogsShow = () => {
         {
             title: '工作部门',
             dataIndex: 'group_name',
+            width: '7%',
             render: (text: string, record: any) => groupNames[record.group_uuid] || '未知',
         },
         {
             title: '工作日志',
             dataIndex: 'content',
-            render: (text: string) => <div dangerouslySetInnerHTML={{ __html: formatLogContent(text) }} />,
+            render: (text: string) => <div dangerouslySetInnerHTML={{__html: formatLogContent(text)}}/>,
         },
     ];
 
@@ -114,28 +113,26 @@ const WorkLogsShow = () => {
     return (
         <div>
             <div className="container">
-                <div className="search-container">
-                    <Input
-                        type="text"
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        placeholder="请输入搜索内容"
-                        onPressEnter={searchLogs}
-                        style={{ width: '80%', marginRight: '10px' }}
-                    />
-                    <Button onClick={searchLogs}>搜索</Button>
-                    <Select
-                        value={selectedGroup}
-                        onChange={setSelectedGroup}
-                        style={{ width: '100px', marginLeft: '10px' }}
-                    >
-                        <Option value="个人">个人</Option>
-                        {currentuser?.is_superuser && <Option value="全部">全部</Option>}
-                        {Object.entries(groupNames).map(([id, name]) => (
-                            <Option key={id} value={id}>{name}</Option>
-                        ))}
-                    </Select>
-                </div>
+                <Input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="请输入搜索内容"
+                    onPressEnter={searchLogs}
+                    style={{width: '80%', marginRight: '10px'}}
+                />
+                <Button onClick={searchLogs}>搜索</Button>
+                <Select
+                    value={selectedGroup}
+                    onChange={setSelectedGroup}
+                    style={{width: '100px', marginLeft: '10px'}}
+                >
+                    <Option value="个人">个人</Option>
+                    {currentuser?.is_superuser && <Option value="全部">全部</Option>}
+                    {Object.entries(groupNames).map(([id, name]) => (
+                        <Option key={id} value={id}>{name}</Option>
+                    ))}
+                </Select>
                 <div className="table-container">
                     <Table
                         columns={columns}
@@ -144,7 +141,7 @@ const WorkLogsShow = () => {
                         pagination={false}
                     />
                     {noLogsMessage && (
-                        <Alert message="暂未找到工作日志" type="info" style={{ marginTop: '20px' }} />
+                        <Alert message="暂未找到工作日志" type="info" style={{marginTop: '20px'}}/>
                     )}
                 </div>
             </div>

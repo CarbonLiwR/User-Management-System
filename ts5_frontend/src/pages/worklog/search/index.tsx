@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useCallback } from 'react';
-import "./index.less";
 import Theme from './theme';
 
 const particleCount = 300;
@@ -122,12 +121,13 @@ const SearchPage: React.FC = () => {
   }, [animate, setCanvasSize]);
 
   return (
-    <div className="main-container">
-      <canvas id="myCanvas" ref={canvasRef} />
-      <div style={{ position: 'relative', width: '100vw' }}>
-        <Theme />
+      <div className="main-container"
+           style={{position: 'relative', overflow: 'hidden', width: '80vw', height: '80vh'}}>
+        <canvas id="myCanvas" ref={canvasRef} style={{position: 'absolute', top: 0, left: 0}}/>
+        <div style={{position: 'relative', zIndex: 1}}> {/* 添加 zIndex 确保 Theme 显示在画布之上 */}
+          <Theme/>
+        </div>
       </div>
-    </div>
   );
 };
 
