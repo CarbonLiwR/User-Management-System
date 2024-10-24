@@ -5,6 +5,7 @@ import {
     fetchCaptcha,
     fetchUserInfo,
     fetchUserList,
+    fetchUserMenu,
     addUserThunk,
     updateUserThunk,
     deleteUserThunk,
@@ -25,6 +26,7 @@ const initialState: UserState = {
     is_staff: false,
     roles: '',
     depts: [],
+    menu: [],
     status: 'idle',  // 'idle', 'loading', 'succeeded', 'failed'
     error: null as unknown,
     userList: [],
@@ -85,6 +87,18 @@ const userSlice = createSlice({
                 Object.assign(state, action.payload);
             })
             .addCase(fetchUserInfo.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload ?? 'Failed to fetch user info';
+            });
+
+        // Handle fetching user info
+        builder
+            .addCase(fetchUserMenu.fulfilled, (state, action) => {
+                console.log(action.payload);
+                state.status = 'succeeded';
+                state.menu = action.payload;
+            })
+            .addCase(fetchUserMenu.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload ?? 'Failed to fetch user info';
             });

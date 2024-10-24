@@ -37,10 +37,10 @@ function AppRouter() {
                 {isLoggedIn && (
                     <Route path="/" element={<LayoutContainer />}>
                         {/* 默认首页 - 角色管理 */}
-                        <Route index element={<AdminUserPage />} />
+                        <Route index element={<WorklogSearchPage />} />
 
                         {/* 各个管理页面 */}
-                        <Route path="admin" element={<AdminRolePage />} />
+                        {/*<Route path="admin" element={<AdminRolePage />} />*/}
                         <Route path="admin/role" element={<AdminRolePage />} />
                         <Route path="admin/menu" element={<AdminMenuPage />} />
                         <Route path="admin/user" element={<AdminUserPage />} />

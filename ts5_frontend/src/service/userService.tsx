@@ -1,18 +1,23 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import {createAsyncThunk} from '@reduxjs/toolkit';
 import {
-    getUserInfo,
-    getUserList,
-    getUser,
     addUser,
-    updateUser,
-    deleteUser,
+    changeUserMulti,
+    changeUserStaff,
     changeUserStatus,
     changeUserSuper,
-    changeUserStaff,
-    changeUserMulti,
-    SysUserParams,
+    deleteUser,
+    getUser,
+    getUserInfo,
+    getUserList,
+    getUserMenuList,
     SysUserAddReq,
-    SysUserInfoReq, updateUserRole, updateUserDept, SysUserRoleReq, SysUserDeptReq
+    SysUserDeptReq,
+    SysUserInfoReq,
+    SysUserParams,
+    SysUserRoleReq,
+    updateUser,
+    updateUserDept,
+    updateUserRole
 } from '../api/user';
 import {
     CaptchaRes,
@@ -25,7 +30,7 @@ import {
     userLogin,
     userLogout
 } from "../api/auth.tsx";
-import {clearToken} from "../utils/auth.ts";  // 假设你在 API 中已经定义了这些函数
+import {clearToken} from "../utils/auth.ts"; // 假设你在 API 中已经定义了这些函数
 
 // 异步Thunk用于获取用户信息
 export const fetchUserInfo = createAsyncThunk(
@@ -51,6 +56,24 @@ export const fetchUserList = createAsyncThunk(
     async (params: SysUserParams, { rejectWithValue }) => {
         try {
             return await getUserList(params);
+        } catch (error: unknown) {
+            if (typeof error === 'object' && error !== null && 'response' in error) {
+                const err = error as { response: { data?: never } };
+                if (err.response && 'data' in err.response) {
+                    return rejectWithValue(err.response.data);
+                }
+            }
+            return rejectWithValue('Failed to fetch user list');
+        }
+    }
+);
+
+
+export const fetchUserMenu = createAsyncThunk(
+    'user/fetchUserMenu',
+    async (_, { rejectWithValue }) => {
+        try {
+            return await getUserMenuList();
         } catch (error: unknown) {
             if (typeof error === 'object' && error !== null && 'response' in error) {
                 const err = error as { response: { data?: never } };

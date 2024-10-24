@@ -152,6 +152,7 @@ const AdminRolePage = () => {
 
     const handleEditPermission = async (values: number[]) => {
         try {
+            console.log(values)
             await updateRoleMenus(currentRole.id, {menus: values});
             setEditModalVisible(false);
             fetchRoles(); // 刷新角色列表

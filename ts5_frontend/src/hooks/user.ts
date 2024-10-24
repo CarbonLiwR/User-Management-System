@@ -6,6 +6,7 @@ import {
     fetchUserInfo,
     fetchCaptcha,
     fetchUserList,
+    fetchUserMenu,
     addUserThunk,
     updateUserThunk,
     deleteUserThunk,
@@ -46,6 +47,10 @@ export function useDispatchUser() {
     // Fetch user list
     const fetchUsers = useCallback((params: SysUserParams) => {
         return dispatch(fetchUserList(params));  // Fetch users with parameters
+    }, [dispatch]);
+
+    const getUserMenu = useCallback(() => {
+        return dispatch(fetchUserMenu());  // Fetch users with parameters
     }, [dispatch]);
 
     // Add a new user
@@ -124,6 +129,7 @@ export function useDispatchUser() {
         toggleMultiLogin,
         setUserInfo,
         resetUserInfo,
+        getUserMenu,
         getCaptcha,
     };
 }
