@@ -69,6 +69,7 @@ def register_app():
     origins = [
         "http://localhost:3000",
         "http://localhost:5173",
+        "http://localhost:5174",
         # 其他允许的源可以在这里添加
     ]
 

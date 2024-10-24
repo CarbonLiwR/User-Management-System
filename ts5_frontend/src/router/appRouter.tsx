@@ -3,12 +3,16 @@ import { useSelector } from 'react-redux';
 import { RootState } from "../store";
 import { useMemo } from 'react';
 import LoginPage from "../pages/login/login";
+import RegisterPage from "../pages/login/register";
 import LayoutContainer from '../layout';
 import AdminRolePage from "../pages/admin/role";
 import AdminMenuPage from "../pages/admin/menu";
 import AdminUserPage from "../pages/admin/user";
 import AdminDeptPage from "../pages/admin/dept";
-import RegisterPage from "../pages/login/register.tsx";
+import WorklogSearchPage from "../pages/worklog/search";
+import WorklogShowPage from "../pages/worklog/show";
+import WorklogAddPage from "../pages/worklog/add";
+import WorklogResult from "../pages/worklog/result";
 
 function AppRouter() {
     // 从 Redux 中获取用户信息
@@ -41,6 +45,13 @@ function AppRouter() {
                         <Route path="admin/menu" element={<AdminMenuPage />} />
                         <Route path="admin/user" element={<AdminUserPage />} />
                         <Route path="admin/dept" element={<AdminDeptPage />} />
+
+                        <Route path="worklog" element={<WorklogSearchPage />} />
+                        <Route path="worklog/search" element={<WorklogSearchPage />} />
+                        <Route path="worklog/show" element={<WorklogShowPage />} />
+                        <Route path="worklog/add" element={<WorklogAddPage />} />
+                        <Route path="worklog/result" element={<WorklogResult />} />
+
                     </Route>
                 )}
             </Routes>

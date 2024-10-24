@@ -1,6 +1,6 @@
 import {Layout, Menu, Breadcrumb, Image} from 'antd';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { SettingOutlined, FileOutlined } from '@ant-design/icons';
+import { SettingOutlined, FileSearchOutlined } from '@ant-design/icons';
 import CustomHeader from "../components/customHeader";
 import logoImage from '../assets/images/favicon.ico';
 const { Header, Content, Footer, Sider } = Layout;
@@ -12,8 +12,11 @@ const breadcrumbNameMap: Record<string, string> = {
   '/admin/dept': '部门管理',
   '/admin/role': '角色管理',
   '/admin/menu': '菜单管理',
-  '/login-log': '登录日志',
-  '/operation-log': '操作日志',
+  '/worklog': '日志管理',
+  '/worklog/search': '搜索日志',
+  '/worklog/show': '查看日志',
+  '/worklog/add': '添加日志',
+
 };
 
 const LayoutContainer = () => {
@@ -54,13 +57,16 @@ const LayoutContainer = () => {
               {/*  <Link to="/admin/menu">菜单管理</Link>*/}
               {/*</Menu.Item>*/}
             </SubMenu>
-            <SubMenu key="sub2" icon={<FileOutlined/>} title="日志">
+            <SubMenu key="sub2" icon={<FileSearchOutlined />} title="日志管理">
               <Menu.Item key="5">
-                <Link to="/login-log">登录日志</Link>
+                <Link to="/worklog/search">搜索日志</Link>
               </Menu.Item>
               <Menu.Item key="6">
-                <Link to="/operation-log">操作日志</Link>
+                <Link to="/worklog/show">查看日志</Link>
               </Menu.Item>
+                <Menu.Item key="7">
+                    <Link to="/worklog/add">添加日志</Link>
+                </Menu.Item>
             </SubMenu>
           </Menu>
         </Sider>
