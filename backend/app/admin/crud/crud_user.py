@@ -101,13 +101,18 @@ class CRUDUser(CRUDPlus[User]):
         """
         salt = text_captcha(5)
         obj.password = get_hash_password(f'{obj.password}{salt}')
-        dict_obj = obj.model_dump(exclude={'roles'})
+        dict_obj = obj.model_dump(exclude={'roles', 'depts'})
         dict_obj.update({'salt': salt})
         new_user = self.model(**dict_obj)
         role_list = []
         for role_id in obj.roles:
             role_list.append(await db.get(Role, role_id))
         new_user.roles.extend(role_list)
+
+        dept_list = []
+        for dept_id in obj.depts:
+            dept_list.append(await db.get(Dept, dept_id))
+        new_user.depts.extend(dept_list)
         db.add(new_user)
 
     async def update_userinfo(self, db: AsyncSession, input_user: int, obj: UpdateUserParam) -> int:

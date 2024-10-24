@@ -9,9 +9,9 @@ import menuSlice from "./menuSlice.tsx";
 
 const rootReducer = combineReducers({
     user: userReducer,
-    dept: deptSlice,
-    role: roleReducer,
-    menu: menuSlice,
+    // dept: deptSlice,
+    // role: roleReducer,
+    // menu: menuSlice,
 });
 
 

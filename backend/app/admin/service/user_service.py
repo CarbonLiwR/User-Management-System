@@ -59,9 +59,10 @@ class UserService:
             email = await user_dao.check_email(db, obj.email)
             if email:
                 raise errors.ForbiddenError(msg='邮箱已注册')
-            dept = await dept_dao.get(db, obj.dept_id)
-            if not dept:
-                raise errors.NotFoundError(msg='部门不存在')
+            for dept_id in obj.depts:
+                dept = await dept_dao.get(db, dept_id)
+                if not dept:
+                    raise errors.NotFoundError(msg='部门不存在')
             for role_id in obj.roles:
                 role = await role_dao.get(db, role_id)
                 if not role:

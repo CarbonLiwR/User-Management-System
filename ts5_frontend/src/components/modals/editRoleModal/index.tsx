@@ -16,6 +16,7 @@ const EditRoleModal = ({ visible, onCancel, onEdit, role }) => {
         form
             .validateFields()
             .then((values) => {
+                console.log(values);
                 onEdit(values);
                 form.resetFields();
             })
