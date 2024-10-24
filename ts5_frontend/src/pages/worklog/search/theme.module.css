@@ -1,0 +1,137 @@
+.mainContainer {
+  position: relative;
+  overflow: hidden; /* 确保内容不溢出 */
+  width: 100vw;
+  height: 100vh; /* 确保容器占据整个视口高度 */
+}
+
+.canvas {
+  position: absolute; /* 确保 canvas 在容器中的位置是绝对的 */
+  top: 0;
+  left: 0;
+  width: 100%; /* canvas 填充容器 */
+  height: 100%; /* canvas 填充容器 */
+  pointer-events: none; /* 确保画布不干扰用户交互 */
+}
+
+.theme {
+  position: relative; /* 确保不受其他元素影响 */
+  z-index: 2; /* 确保在 canvas 之上 */
+}
+
+mainword {
+  text-align: center;
+  font-size: 72px;
+  background: linear-gradient(to right, #15ccff, #15ccff);
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 40px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+}
+
+.searchContainer {
+  align-content: center;
+  margin: auto;
+  display: block;
+  width: 60%;
+  position: relative;
+  z-index: 2;
+}
+
+.searchContainer form {
+  display: flex;
+  align-items: center;
+}
+
+.searchContainer input[type="text"],
+.searchContainer input[type="submit"] {
+  padding: 12px 24px;
+  border: 1px solid #5F6368;
+  background: #ecf0f1;
+  color: #34495e;
+  font-size: 16px;
+}
+
+.searchContainer input[type="text"] {
+  border-radius: 24px 0 0 24px;
+  flex-grow: 1;
+}
+
+.searchContainer input[type="text"]:focus {
+  border-color: #5F6368;
+  outline: none;
+}
+
+.searchContainer input[type="submit"] {
+  border-radius: 0 24px 24px 0;
+  border-left: none;
+}
+
+.searchContainer input[type="submit"]:hover {
+  background-color: #2c3e50;
+  color: #bdc3c7;
+}
+
+.bottomButton {
+  padding: 10px 13px;
+  border-color: #ecf0f1;
+  border-width: 1px;
+  background-color: #34495e;
+  color: #ecf0f1;
+  margin-inline: 10px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  width: auto;
+  user-select: none;
+}
+
+.bottomButton:hover {
+  background-color: #2c3e50;
+  color: #bdc3c7;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: center;
+}
+
+.bottomButton {
+  margin-inline: 5px;
+  padding: 10px 12px;
+  border-color: #ecf0f1;
+  border-width: 1px;
+  background-color: #34495e;
+  color: #ecf0f1;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  transition: width 0.5s ease, background-color 0.3s ease, color 0.3s ease;
+  width: 40px;
+  white-space: nowrap;
+}
+
+.bottomButton:hover {
+  background-color: #2c3e50;
+  color: #bdc3c7;
+  width: 120px;
+  padding-right: 20px;
+}
+
+.buttonText {
+  position: absolute;
+  margin-left: 10px;
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.bottomButton:hover .buttonText {
+  opacity: 1;
+  transform: translateX(0);
+}

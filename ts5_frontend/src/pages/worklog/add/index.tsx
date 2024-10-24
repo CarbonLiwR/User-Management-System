@@ -8,6 +8,36 @@ import Draggable from 'react-draggable';
 
 const {Option} = Select;
 
+const DraggableModal: React.FC<{
+    visible: boolean;
+    title: string;
+    onCancel: () => void;
+    children: React.ReactNode
+}> = ({visible, title, onCancel, children}) => {
+    const dragHandleRef = React.useRef<HTMLDivElement>(null); // 引用拖动句柄
+    return (
+        <Draggable>
+            <div>
+                <Modal
+                    visible={visible}
+                    title={
+                        <div className="drag-handle" ref={dragHandleRef}>
+                            {title}
+                        </div>
+                    }
+                    onCancel={onCancel}
+                    footer={null}
+                    mask={false}
+                    maskClosable={false}
+                    bodyStyle={{padding: 0}} // 去掉内边距
+                >
+                    {children}
+                </Modal>
+            </div>
+        </Draggable>
+    );
+};
+
 const WorklogAdd: React.FC = () => {
     const currentuser = useSelector((state: RootState) => state.user);
     const [groups, setGroups] = useState<any[]>([]);
@@ -34,39 +64,60 @@ const WorklogAdd: React.FC = () => {
     const token = getToken();
 
     useEffect(() => {
-    console.log('666'+groups); // 这里会在 groups 更新后执行
-}, [groups]);
+        const fetchGroups = async () => {
+            if (currentuser) {
+                console.log(currentuser);
+                const response = await axios.get(`http://localhost:8000/api/v1/sys/depts/${currentuser.id}/all`);
+                setGroups(response); // 确保使用 response.data
+                console.log(response);
 
+                if (response.length > 0) {
+                    setSelectedGroup(response[0].id);
+                    setStandardContent(response[0].worklogStandard); // 设置第一个组的标准内容
+                    console.log(response[0].id);
+                }
+            }
+        };
+        fetchGroups();
+    }, [currentuser]);
 
     useEffect(() => {
-    const fetchGroups = async () => {
-        if (currentuser) {
-            console.log(currentuser);
-            const response = await axios.get(`http://localhost:8000/api/v1/sys/depts/${currentuser.id}/all`);
-            setGroups(response.data); // 确保使用 response.data
-            console.log(response.data); // 在这里输出响应数据
-
-            if (response.data.length > 0) {
-                setSelectedGroup(response.data[0].id);
-                console.log(response.data[0].id);
-            }
+        // 根据选中的组更新标准内容
+        const selectedGroupData = groups.find(group => group.id === selectedGroup);
+        if (selectedGroupData) {
+            setStandardContent(selectedGroupData.worklogStandard);
         }
-    };
-    fetchGroups();
-}, [currentuser]);
+    }, [selectedGroup, groups]);
 
     const handleSubmitLog = async () => {
         if (!log) {
             message.error("请填写工作日志");
             return;
         }
-        // handleCheckLog();
+        await handleCheckLog();
+        console.log({modalContent});
+        const lines = modalContent.trim().split('\n');
+        const lastLine = lines[lines.length - 1].trim();
+        const percentageMatch = lastLine.match(/(\d+)%/);
+        if (percentageMatch) {
+            const percentage = parseInt(percentageMatch[1], 10);
+            if (percentage < 80) {
+                await handleRefuse();
+                return;
+            } else if (percentage < 90) {
+                const shouldSubmit = await handleConfirmation();
+                if (!shouldSubmit) {
+                    // 如果用户选择取消，则停止提交
+                    return;
+                }
+            }
+        }
+
 
         const logData = `姓名：${currentuser.nickname}\n时间：${currentDate}\n工作日志：${log}`;
         setLoading(true);
 
 
-        console.log('提交' + logData);
         // 提交日志
         try {
             const response = await axios.put('http://localhost:8000/api/v1/worklogs/submit', {
@@ -117,9 +168,23 @@ const WorklogAdd: React.FC = () => {
         }
     };
 
-    const handleConfirmation = () => {
-        setConfirmationVisible(false);
-        // 继续提交
+    const handleConfirmation = async () => {
+        return new Promise((resolve) => {
+            setConfirmationVisible(true);
+
+            const onConfirm = () => {
+                setConfirmationVisible(false);
+                resolve(true); // 确认提交
+            };
+
+            const onCancel = () => {
+                setConfirmationVisible(false);
+                resolve(false); // 取消提交
+            };
+
+            // 这里需要绑定 onConfirm 和 onCancel 到 Modal 按钮
+            return {onConfirm, onCancel};
+        });
     };
 
     const handleRefuse = () => {
@@ -162,39 +227,47 @@ const WorklogAdd: React.FC = () => {
                     <Button onClick={handleCheckLog} loading={checkLoading}>检查</Button>
                     <Button onClick={() => setLog('')}>清除</Button>
                     <Button onClick={() => setStandardVisible(true)}>查看标准</Button>
+                    {/*<Button onClick={() => setModalVisible(true)}>查看结果</Button>*/}
+                    {/*<Button onClick={() => setRefuseVisible(true)}>拒绝</Button>*/}
                 </Flex>
             </Flex>
 
-            <Modal
+            <DraggableModal
                 visible={standardVisible}
                 title="工作日志标准"
                 onCancel={() => setStandardVisible(false)}
-                footer={null}
-                mask={false}
-                maskClosable={false}
             >
                 <p>{standardContent}</p>
-            </Modal>
+            </DraggableModal>
 
-            <Modal
+            <DraggableModal
                 visible={modalVisible}
                 title="检查结果"
                 onCancel={() => setModalVisible(false)}
-                footer={null}
-                mask={false}
-                maskClosable={false}
             >
                 <p>{modalContent}</p>
-            </Modal>
+            </DraggableModal>
 
 
-            <Modal visible={confirmationVisible} title="确认" onCancel={() => setConfirmationVisible(false)}>
+            <Modal
+                visible={confirmationVisible}
+                title="确认"
+                onCancel={() => setConfirmationVisible(false)}
+                footer={[
+                    <Button key="confirm" type="primary" onClick={handleConfirmation}>
+                        确定
+                    </Button>,
+                    <Button key="cancel" onClick={() => setConfirmationVisible(false)}>取消</Button>,
+                ]}
+            >
                 <p>尚有需要添加的内容，是否继续提交？</p>
-                <Button onClick={handleConfirmation}>确定</Button>
-                <Button onClick={() => setConfirmationVisible(false)}>取消</Button>
             </Modal>
 
-            <Modal visible={refuseVisible} title="拒绝" onCancel={handleRefuse}>
+            <Modal
+                visible={refuseVisible} title="拒绝"
+                onCancel={handleRefuse}
+                footer={null}
+            >
                 <p>您的工作日志未达到80%符合指数，请继续修改</p>
                 <Button onClick={handleRefuse}>继续修改</Button>
             </Modal>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {useNavigate} from "react-router-dom";
+import styles from './theme.module.css'; // 导入 CSS 模块
 
 
 const Theme: React.FC = () => {
@@ -18,8 +19,8 @@ const Theme: React.FC = () => {
 
 
   return (
-    <div className="search-container">
-      <h1>技术寻人</h1>
+    <div className={styles.searchContainer}>
+      <mainword>技术寻人</mainword>
       <form id="searchForm" onSubmit={handleSearch}>
         <input
           type="text"
@@ -27,20 +28,16 @@ const Theme: React.FC = () => {
           placeholder="搜索日志..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)} // 使用 onChange 处理输入
-          style={{ marginBottom: 0 }}
+          className={styles.inputText} // 使用 CSS 模块类名
         />
         <input
           type="submit"
           id="searchButton"
           value="搜索"
           style={{ fontSize: '14.1px' }}
+          className={styles.searchButton} // 使用 CSS 模块类名
         />
       </form>
-      {/*<div className="examples">*/}
-      {/*  <div className="bottom-button">*/}
-      {/*    好的*/}
-      {/*  </div>*/}
-      {/*</div>*/}
     </div>
   );
 };

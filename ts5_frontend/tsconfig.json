@@ -5,6 +5,7 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
-    "types": ["node"] // 只有在全项目都在 Node 环境中运行时才这样做
+    "types": ["node"], // 只有在全项目都在 Node 环境中运行时才这样做
+
   }
 }
