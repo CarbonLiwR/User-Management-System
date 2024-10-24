@@ -40,7 +40,7 @@ function AppRouter() {
                         <Route index element={<WorklogSearchPage />} />
 
                         {/* 各个管理页面 */}
-                        <Route path="admin" element={<AdminRolePage />} />
+                        {/*<Route path="admin" element={<AdminRolePage />} />*/}
                         <Route path="admin/role" element={<AdminRolePage />} />
                         <Route path="admin/menu" element={<AdminMenuPage />} />
                         <Route path="admin/user" element={<AdminUserPage />} />

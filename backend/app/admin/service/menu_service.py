@@ -45,9 +45,12 @@ class MenuService:
     @staticmethod
     async def get_user_menu_tree(*,  request: Request) -> list[dict[str, Any]]:
         async with async_db_session() as db:
+            if request.user.is_superuser:
+                print(request.user.username)
+                menu_select = await menu_dao.get_all(db)
+                menu_tree = get_tree_data(menu_select)
+                return menu_tree
             roles = request.user.roles
-            print(request.user)
-            print(roles)
             menu_ids = []
             menu_tree = []
             if roles:
@@ -55,6 +58,7 @@ class MenuService:
                     menu_ids.extend([menu.id for menu in role.menus])
                 menu_select = await menu_dao.get_role_menus(db, request.user.is_superuser, menu_ids)
                 menu_tree = get_tree_data(menu_select)
+
             return menu_tree
 
     @staticmethod
