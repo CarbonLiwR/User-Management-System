@@ -71,7 +71,7 @@ export function querySysRoleDetail(pk: number): Promise<SysRoleRes> {
 }
 
 export function createSysRole(data: SysRoleReq) {
-  return axios.post('/api/v1/sys/roles', data);
+  return axios.post('http://127.0.0.1:8000/api/v1/sys/roles', data);
 }
 
 export function updateSysRole(pk: number, data: SysRoleReq) {
@@ -79,7 +79,7 @@ export function updateSysRole(pk: number, data: SysRoleReq) {
 }
 
 export function deleteSysRole(params: SysRoleDeleteParams) {
-  return axios.delete(`/api/v1/sys/roles`, {
+  return axios.delete(`http://127.0.0.1:8000/api/v1/sys/roles`, {
     params,
     paramsSerializer: (obj) => {
       return qs.stringify(obj);
@@ -88,5 +88,5 @@ export function deleteSysRole(params: SysRoleDeleteParams) {
 }
 
 export function updateSysRoleMenu(pk: number, data: SysRoleMenuReq) {
-  return axios.put(`/api/v1/sys/roles/${pk}/menu`, data);
+  return axios.put(`http://127.0.0.1:8000/api/v1/sys/roles/${pk}/menu`, data);
 }

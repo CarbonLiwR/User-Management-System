@@ -1,7 +1,8 @@
-import { Layout, Menu, Breadcrumb } from 'antd';
+import {Layout, Menu, Breadcrumb, Image} from 'antd';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { SettingOutlined, FileOutlined } from '@ant-design/icons';
-
+import CustomHeader from "../components/customHeader";
+import logoImage from '../assets/images/favicon.ico';
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 
@@ -31,10 +32,15 @@ const LayoutContainer = () => {
   return (
       <Layout style={{ minHeight: '100vh', backgroundColor: 'white' }}>
         <Sider collapsible theme="light">
-          <div className="logo" style={{ height: '32px', margin: '16px', background: 'rgba(255, 255, 255, 0.2)' }}>寻人
+          <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '64px'}}>
+            <Image
+                src={logoImage}
+                preview={false}
+                width="65px"
+            />
           </div>
           <Menu theme="light" mode="inline" defaultSelectedKeys={['1']}>
-            <SubMenu key="sub1" icon={<SettingOutlined />} title="系统管理">
+            <SubMenu key="sub1" icon={<SettingOutlined/>} title="系统管理">
               <Menu.Item key="1">
                 <Link to="/admin/user">用户管理</Link>
               </Menu.Item>
@@ -44,11 +50,11 @@ const LayoutContainer = () => {
               <Menu.Item key="3">
                 <Link to="/admin/role">角色管理</Link>
               </Menu.Item>
-              <Menu.Item key="4">
-                <Link to="/admin/menu">菜单管理</Link>
-              </Menu.Item>
+              {/*<Menu.Item key="4">*/}
+              {/*  <Link to="/admin/menu">菜单管理</Link>*/}
+              {/*</Menu.Item>*/}
             </SubMenu>
-            <SubMenu key="sub2" icon={<FileOutlined />} title="日志">
+            <SubMenu key="sub2" icon={<FileOutlined/>} title="日志">
               <Menu.Item key="5">
                 <Link to="/login-log">登录日志</Link>
               </Menu.Item>
@@ -60,11 +66,12 @@ const LayoutContainer = () => {
         </Sider>
 
         <Layout>
-          <Header style={{ background: '#fff', padding: 0 }} />
-          <Content style={{ margin: '16px 10px 16px 5px' }}>
-            <Breadcrumb style={{ margin: '5px 0' }}>
+
+          <CustomHeader/>
+          <Content style={{margin: '16px 10px 16px 5px'}}>
+            <Breadcrumb style={{margin: '5px 0'}}>
               <Breadcrumb.Item>
-                <Link to="/">主页</Link>
+              <Link to="/">主页</Link>
               </Breadcrumb.Item>
               {breadcrumbItems}
             </Breadcrumb>
