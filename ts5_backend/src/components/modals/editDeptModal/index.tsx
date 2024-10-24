@@ -55,10 +55,17 @@ const EditDeptModal = ({ visible, onCancel, onEdit, dept }) => {
                 >
                     <Input />
                 </Form.Item>
+                {/*<Form.Item*/}
+                {/*    name="phone"*/}
+                {/*    label="联系电话"*/}
+                {/*    // rules={[{ required: true, message: '请输入联系电话' }]}*/}
+                {/*>*/}
+                {/*    <Input />*/}
+                {/*</Form.Item>*/}
                 <Form.Item
-                    name="phone"
-                    label="联系电话"
-                    rules={[{ required: true, message: '请输入联系电话' }]}
+                    name="email"
+                    label="邮箱"
+                    rules={[{ required: true, message: '请输入邮箱' }]}
                 >
                     <Input />
                 </Form.Item>
@@ -68,13 +75,6 @@ const EditDeptModal = ({ visible, onCancel, onEdit, dept }) => {
                     valuePropName="checked"
                 >
                     <Switch checkedChildren="正常" unCheckedChildren="禁用" defaultChecked />
-                </Form.Item>
-                <Form.Item
-                    name="sort"
-                    label="排序"
-                    rules={[{ required: true, message: '请输入排序值' }]}
-                >
-                    <Input type="number" />
                 </Form.Item>
                 <Form.Item name="remark" label="备注">
                     <Input.TextArea rows={4} />

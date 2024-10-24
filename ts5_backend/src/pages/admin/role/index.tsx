@@ -19,7 +19,7 @@ const AdminRolePage = () => {
     const [drawerVisible, setDrawerVisible] = useState(false); // 控制权限设置的 drawer
     const [currentRole, setCurrentRole] = useState(null);
     const [permissions, setPermissions] = useState([]); // 存储所有权限
-    // const [selectedPermissions, setSelectedPermissions] = useState([]); // 存储当前角色的选中权限
+
 
     const { getRoleList, createNewRole, updateRoleInfo, removeRole, updateRoleMenus} = useDispatchRole(); // 从 hook 获取函数
     const { getMenuTree } = useDispatchMenu();  // 从menuHook获取权限菜单
@@ -265,8 +265,12 @@ const AdminRolePage = () => {
             <CreateRoleModal visible={modalVisible} onCancel={handleCancel} onCreate={handleCreateRole}/>
 
             {/* 编辑角色模态框 */}
-            <EditRoleModal visible={editModalVisible} onCancel={handleEditCancel} onEdit={handleEditRole}
-                           role={currentRole}/>
+            <EditRoleModal
+                visible={editModalVisible}
+                onCancel={handleEditCancel}
+                onEdit={handleEditRole}
+                role={currentRole}
+            />
 
             {/* 权限设置 Drawer */}
             <PermissionDrawer

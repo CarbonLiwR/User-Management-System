@@ -1,11 +1,17 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Modal, Form, Input, Select, Button } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
 const { Option } = Select;
 
-const AddUserModal = ({ visible, allRoles = [], allDepts = [], onCancel, onCreate }) => {
+const EditUserModal = ({ visible, onCancel, onCreate, user}) => {
     const [form] = Form.useForm();
+
+    useEffect(() => {
+        if (user) {
+            form.setFieldsValue(user); // 预填充表单数据
+        }
+    }, [user, form]);
 
     const handleOk = () => {
         form
@@ -21,7 +27,7 @@ const AddUserModal = ({ visible, allRoles = [], allDepts = [], onCancel, onCreat
 
     return (
         <Modal
-            title="添加用户"
+            title="更新用户"
             open={visible}
             onCancel={onCancel}
             footer={[
@@ -43,23 +49,6 @@ const AddUserModal = ({ visible, allRoles = [], allDepts = [], onCancel, onCreat
                 }}
             >
                 <Form.Item
-                    name="depts"
-                    label="部门"
-                    rules={[{ required: true, message: '请选择至少一个部门' }]}
-                >
-                    <Select
-                        mode="multiple"
-                        placeholder="请选择部门"
-                    >
-                        {allDepts.map((dept) => (
-                            <Option key={dept.id} value={dept.id}>
-                                {dept.name}
-                            </Option>
-                        ))}
-                    </Select>
-                </Form.Item>
-
-                <Form.Item
                     name="nickname"
                     label="用户名"
                     // rules={[{ required: true, message: '请输入用户名' }]}
@@ -76,19 +65,6 @@ const AddUserModal = ({ visible, allRoles = [], allDepts = [], onCancel, onCreat
                 </Form.Item>
 
                 <Form.Item
-                    name="password"
-                    label="密码"
-                    rules={[{ required: true, message: '请输入密码' }]}
-                >
-                    <Input.Password
-                        placeholder="请输入密码"
-                        iconRender={(visible) =>
-                            visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                        }
-                    />
-                </Form.Item>
-
-                <Form.Item
                     name="email"
                     label="邮箱"
                     rules={[
@@ -99,25 +75,9 @@ const AddUserModal = ({ visible, allRoles = [], allDepts = [], onCancel, onCreat
                     <Input placeholder="请输入邮箱" />
                 </Form.Item>
 
-                <Form.Item
-                    name="roles"
-                    label="角色"
-                    rules={[{ required: true, message: '请选择至少一个角色' }]}
-                >
-                    <Select
-                        mode="multiple"
-                        placeholder="请选择角色"
-                    >
-                        {allRoles.map((role) => (
-                            <Option key={role.id} value={role.id}>
-                                {role.name}
-                            </Option>
-                        ))}
-                    </Select>
-                </Form.Item>
             </Form>
         </Modal>
     );
 };
 
-export default AddUserModal;
+export default EditUserModal;

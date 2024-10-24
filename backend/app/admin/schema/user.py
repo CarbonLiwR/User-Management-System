@@ -25,7 +25,7 @@ class RegisterUserParam(AuthSchemaBase):
 
 
 class AddUserParam(AuthSchemaBase):
-    dept_id: int
+    depts: list[int]
     roles: list[int]
     nickname: str | None = None
     email: EmailStr = Field(..., examples=['user@example.com'])

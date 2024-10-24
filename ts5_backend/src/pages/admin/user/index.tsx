@@ -6,7 +6,8 @@ import AddUserModal from "../../../components/modals/addUserModal";
 import EditRolesModal from "../../../components/modals/editUserRolesModal";
 import EditDeptsModal from "../../../components/modals/editUserDeptsModal";
 import {useSelector} from "react-redux";
-import {RootState} from "../../../store";  // Import the new modal
+import {RootState} from "../../../store";
+import EditUserModal from "../../../components/modals/editUserModal";  // Import the new modal
 const { Option } = Select;
 
 const AdminUserPage = () => {
@@ -14,6 +15,7 @@ const AdminUserPage = () => {
     const [pagination, setPagination] = useState({ current: 1, pageSize: 20, total: 0 });
     const [loading, setLoading] = useState(false);
     const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
+    const [isEditUserModalVisible, setIsEditUserModalVisible] = useState(false);
     const [isEditRolesModalVisible, setIsEditRolesModalVisible] = useState(false);
     const [isEditDeptsModalVisible, setIsEditDeptsModalVisible] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
@@ -28,6 +30,15 @@ const AdminUserPage = () => {
 
     const showAddUserModal = () => {
         setIsAddUserModalVisible(true);
+    };
+
+    const showEditUserModal = (user) => {
+        setCurrentUser(user)
+        setIsEditUserModalVisible(true);
+    };
+
+    const handleCancelEditUser = () => {
+        setIsEditUserModalVisible(false);
     };
 
     const handleCancelAddUser = () => {
@@ -49,10 +60,16 @@ const AdminUserPage = () => {
         setIsEditDeptsModalVisible(false);
     };
 
-    const handleAddUser = (userData) => {
-        console.log('New User Data:', userData);
+    const handleAddUser = async (userData) => {
+        await addUser(userData);
         // Add your user creation logic here (e.g., API call)
         setIsAddUserModalVisible(false);
+    };
+
+    const handleEditUser = async (userData) => {
+        await updateUser(currentUser.username, userData);
+        // Add your user creation logic here (e.g., API call)
+        setIsEditUserModalVisible(false);
     };
 
     const handleEditRoles = async (roles: number[]) => {
@@ -136,6 +153,14 @@ const AdminUserPage = () => {
     const openEditDeptsModal = (user) => {
         setCurrentUser(user)
         setIsEditDeptsModalVisible(true); // Show the modal
+    };
+
+    const handleDelete = async (username: string) => {
+        try {
+            await deleteUser(username);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const columns = [
@@ -230,8 +255,8 @@ const AdminUserPage = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <a href="#">编辑</a>
-                    <a href="#">删除</a>
+                    <a href="#" onClick={() => showEditUserModal(record)}>编辑</a>
+                    <a href="#" onClick={() => handleDelete(record.username)}>删除</a>
                 </Space>
             ),
         },
@@ -293,8 +318,17 @@ const AdminUserPage = () => {
 
             <AddUserModal
                 visible={isAddUserModalVisible}
+                allRoles={roles}
+                allDepts={depts}
                 onCancel={handleCancelAddUser}
                 onCreate={handleAddUser}
+            />
+
+            <EditUserModal
+                visible={isEditUserModalVisible}
+                onCancel={handleCancelEditUser}
+                onCreate={handleEditUser}
+                user={currentUser}
             />
 
             {/* 编辑角色模态框 */}

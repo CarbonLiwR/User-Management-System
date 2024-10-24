@@ -3,7 +3,8 @@ import { Table, Button, Input, Select, Space, Tag, Divider, message } from 'antd
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import AddDeptModal from "../../../components/modals/addDeptModal";
 import { useDispatchDept } from '../../../hooks';
-import {fetchAllDepts} from "../../../service/deptService.tsx";  // 假设你已经有 useDispatchDept
+
+import EditDeptModal from "../../../components/modals/editDeptModal";  // 假设你已经有 useDispatchDept
 
 const { Option } = Select;
 
@@ -19,7 +20,9 @@ const AdminDeptPage = () => {
         status: undefined,
     });
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const { fetchAllDepartments, addDepartment, removeDepartment} = useDispatchDept();
+    const {fetchAllDepartments, addDepartment, removeDepartment, updateDepartment} = useDispatchDept();
+    const [editDeptModalVisible, setEditDeptModalVisible] = useState(false); // 编辑模态框的可见性
+    const [currentDept, setCurrentDept] = useState(null);
 
     useEffect(() => {
         loadDepts(); // 初次加载部门数据
@@ -90,9 +93,28 @@ const AdminDeptPage = () => {
             await addDepartment(values);
             message.success('部门创建成功');
             setIsModalVisible(false); // 关闭模态框
-            loadDepts(); // 重新加载部门列表
+            fetchAllDepartments();
         } catch (error) {
             message.error('部门创建失败');
+        }
+    };
+
+    const handleEditCancel = () => {
+        setEditDeptModalVisible(false);
+    };
+
+    const showDeptEditModal = (record: any) => {
+        setCurrentDept(record); // 设置当前编辑的角色
+        setEditDeptModalVisible(true); // 打开编辑模态框
+    };
+
+    const handleEditDept = async (values: any) => {
+        try {
+            await updateDepartment(currentDept.id, values);
+            setEditDeptModalVisible(false)
+            loadDepts();
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -106,11 +128,6 @@ const AdminDeptPage = () => {
             title: '负责人',
             dataIndex: 'leader',
             key: 'leader',
-        },
-        {
-            title: '联系电话',
-            dataIndex: 'phone',
-            key: 'phone',
         },
         {
             title: '邮箱',
@@ -130,7 +147,7 @@ const AdminDeptPage = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <a href="#">编辑</a>
+                    <a href="#" onClick={() => showDeptEditModal(record)}>编辑</a>
                     <a href="#" onClick={() => handleDeleteDept(record.id)}>删除</a>
                 </Space>
             ),
@@ -154,12 +171,6 @@ const AdminDeptPage = () => {
                     style={{ width: 200 }}
                     value={searchParams.leader}
                     onChange={(e) => setSearchParams({ ...searchParams, leader: e.target.value })}
-                />
-                <Input
-                    placeholder="请输入联系电话"
-                    style={{ width: 200 }}
-                    value={searchParams.phone}
-                    onChange={(e) => setSearchParams({ ...searchParams, phone: e.target.value })}
                 />
                 <Select
                     placeholder="状态"
@@ -202,6 +213,13 @@ const AdminDeptPage = () => {
                 visible={isModalVisible}
                 onCancel={handleCancel}
                 onCreate={handleAddDept}
+            />
+
+            <EditDeptModal
+                visible={editDeptModalVisible}
+                onCancel={handleEditCancel}
+                onEdit={handleEditDept}
+                dept={currentDept}
             />
         </div>
     );
