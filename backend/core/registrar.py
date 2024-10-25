@@ -33,9 +33,9 @@ async def register_init(app: FastAPI):
     :return:
     """
     # # 创建数据库表
-    print("Initializing model on startup...\n")
-    await initialize_model()
-    print("Model initialized on startup.\n")
+    # print("Initializing model on startup...\n")
+    # await initialize_model()
+    # print("Model initialized on startup.\n")
     await create_table()
     # 连接 redis
     await redis_client.open()

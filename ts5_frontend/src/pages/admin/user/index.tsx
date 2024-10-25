@@ -263,7 +263,7 @@ const AdminUserPage = () => {
     ];
 
     return (
-        <div>
+        <div style={{height: "100%", overflowY: 'auto'}}>
             <h2>用户管理</h2>
 
             {/* 搜索栏 */}
@@ -303,18 +303,21 @@ const AdminUserPage = () => {
             </Button>
 
             {/* 用户表格 */}
-            <Table
-                rowSelection={{
-                    selectedRowKeys,
-                    onChange: setSelectedRowKeys,
-                }}
-                columns={columns}
-                dataSource={users}
-                rowKey="uuid"
-                pagination={pagination}
-                loading={loading}
-                onChange={(pagination) => setPagination(pagination)}
-            />
+            <div>
+                <Table
+                    rowSelection={{
+                        selectedRowKeys,
+                        onChange: setSelectedRowKeys,
+                    }}
+                    columns={columns}
+                    dataSource={users}
+                    rowKey="uuid"
+                    pagination={pagination}
+                    loading={loading}
+                    onChange={(pagination) => setPagination(pagination)}
+                />
+            </div>
+
 
             <AddUserModal
                 visible={isAddUserModalVisible}

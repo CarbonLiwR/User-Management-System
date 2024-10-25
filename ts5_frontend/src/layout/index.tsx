@@ -96,7 +96,7 @@ const LayoutContainer = () => {
               </Breadcrumb.Item>
               {breadcrumbItems}
             </Breadcrumb>
-            <div style={{ padding: 12, background: '#fff', minHeight: 'calc(100vh - 160px)' }}>
+            <div style={{ padding: 12, background: '#fff', minHeight: 'calc(100vh - 160px)'}}>
               <Outlet />
             </div>
           </Content>

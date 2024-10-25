@@ -52,29 +52,14 @@ const CustomHeader = () => {
                     style={{width: 200}}
                 />
 
-                {/* 快捷按钮 */}
-                <Tooltip title="工具">
-                    <ToolOutlined style={{fontSize: 20}}/>
-                </Tooltip>
 
-                <Tooltip title="通知">
-                    <BellOutlined style={{fontSize: 20}}/>
-                </Tooltip>
-
-                <Tooltip title="全屏">
-                    <UserOutlined style={{fontSize: 20}}/>
-                </Tooltip>
-
-                <Tooltip title="设置">
-                    <SettingOutlined style={{fontSize: 20}}/>
-                </Tooltip>
 
                 {/* 头像 */}
                 <Dropdown menu={{items, onClick, style:{ marginTop: '10px' ,right:'-15px'}} }>
                     <a onClick={(e) => e.preventDefault()}>
                         <Space>
                             <Avatar
-                                src="https://www.example.com/user-avatar.png" // 替换为用户头像地址
+                                src="https://sapper3701-1316534880.cos.ap-nanjing.myqcloud.com/44330c73-c348-4cb8-b740-f5d1d32af983/f4944bc0-1008-4ad7-8fe8-6a96ca57a12a.png" // 替换为用户头像地址
                                 alt="用户头像"
                                 size="default"
                                 style={{cursor: 'pointer',marginBottom: '8px'}}
