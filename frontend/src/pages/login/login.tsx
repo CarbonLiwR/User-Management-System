@@ -1,4 +1,4 @@
-import {useCallback, useState, useEffect, useRef} from "react";
+import React, {useCallback, useState, useEffect, useRef} from "react";
 import {Form, Input, Button, Checkbox, message, Row, Image} from "antd";
 import {Link, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
@@ -6,7 +6,7 @@ import {RootState} from "../../store";
 import type {LoginData} from '../../api/auth';
 import {useDispatchUser} from '../../hooks';
 import './index.css'
-import {EyeInvisibleOutlined, EyeOutlined} from "@ant-design/icons";
+import {EyeInvisibleOutlined, EyeOutlined, UserOutlined,LockOutlined,CheckCircleOutlined} from "@ant-design/icons";
 
 const IPT_RULE_USERNAME = [{required: true, message: "请输入用户名"}];
 const IPT_RULE_PASSWORD = [{required: true, message: "请输入密码"}];
@@ -63,13 +63,20 @@ function LoginPage() {
                     onFinish={onFinish}
                 >
                     <Form.Item name="username" rules={IPT_RULE_USERNAME}>
-                        <Input placeholder="账号:admin/user"/>
+                        <Input
+                            prefix={<UserOutlined />}
+                            placeholder="请输入账号"
+                        />
+                        {/*<Input placeholder="账号:admin/user"/>*/}
                     </Form.Item>
                     <Form.Item name="password" rules={IPT_RULE_PASSWORD}>
                         <Input
                             type={passwordVisible ? "text" : "password"}
                             autoComplete="off"
-                            placeholder="密码:admin123/user123"
+                            // placeholder="密码:admin123/user123"
+                            placeholder="请输入密码"
+                            prefix={<LockOutlined />}
+
                             suffix={
                                 passwordVisible ?
                                     <EyeOutlined
@@ -85,7 +92,7 @@ function LoginPage() {
                     </Form.Item>
                     <Form.Item name="captcha" rules={IPT_RULE_CAPTCHA}>
                         <Row align="middle">
-                            <Input placeholder="请输入验证码" style={{width: '60%', flex: 1}}/>
+                            <Input prefix={<CheckCircleOutlined />} placeholder="请输入验证码" style={{width: '60%', flex: 1}}/>
                             <Image
                                 src={captchaSrc}
                                 preview={false}

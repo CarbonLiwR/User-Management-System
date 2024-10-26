@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useSelector } from 'react-redux';
 import { RootState } from "../store";
 import { useMemo } from 'react';
+import Homepage from "../pages/home";
 import LoginPage from "../pages/login/login";
 import RegisterPage from "../pages/login/register";
 import LayoutContainer from '../layout';
@@ -36,8 +37,7 @@ function AppRouter() {
                 {/* 受保护的页面，只有登录后才能访问 */}
                 {isLoggedIn && (
                     <Route path="/" element={<LayoutContainer />}>
-                        {/* 默认首页 - 角色管理 */}
-                        <Route index element={<WorklogSearchPage />} />
+                        <Route index element={<Homepage />} />
 
                         {/* 各个管理页面 */}
                         {/*<Route path="admin" element={<AdminRolePage />} />*/}

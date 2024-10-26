@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Input, Select, Space, Tag, Pagination, Switch, Divider, Modal, message } from 'antd';
-import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import React, {useState, useEffect} from 'react';
+import {Table, Button, Input, Select, Space, Tag, Pagination, Switch, Divider, Modal, message} from 'antd';
+import {SearchOutlined, PlusOutlined} from '@ant-design/icons';
 import {useDispatchRole, useDispatchUser, useDispatchDept} from '../../../hooks';
 import AddUserModal from "../../../components/modals/addUserModal";
 import EditRolesModal from "../../../components/modals/editUserRolesModal";
@@ -8,11 +8,11 @@ import EditDeptsModal from "../../../components/modals/editUserDeptsModal";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import EditUserModal from "../../../components/modals/editUserModal";  // Import the new modal
-const { Option } = Select;
+const {Option} = Select;
 
 const AdminUserPage = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 20, total: 0 });
+    const [pagination, setPagination] = useState({current: 1, pageSize: 20, total: 0});
     const [loading, setLoading] = useState(false);
     const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
     const [isEditUserModalVisible, setIsEditUserModalVisible] = useState(false);
@@ -24,8 +24,17 @@ const AdminUserPage = () => {
     const [depts, setDepts] = useState([]);
     const users = useSelector((state: RootState) => state.user.userList);
 
-    const { fetchUsers, changeStatus, toggleSuperuser, addUser, updateUser, deleteUser, updateUserRole, updateUserDept} = useDispatchUser();
-    const { getRoleList} = useDispatchRole();
+    const {
+        fetchUsers,
+        changeStatus,
+        toggleSuperuser,
+        addUser,
+        updateUser,
+        deleteUser,
+        updateUserRole,
+        updateUserDept
+    } = useDispatchUser();
+    const {getRoleList} = useDispatchRole();
     const {fetchAllDepartments} = useDispatchDept();
 
     const showAddUserModal = () => {
@@ -103,7 +112,7 @@ const AdminUserPage = () => {
                 fetchAllDepartments(params)
             ]);
             if (userResponse.payload) {
-                setPagination((prev) => ({ ...prev, total: userResponse.payload.total }));
+                setPagination((prev) => ({...prev, total: userResponse.payload.total}));
             }
             setRoles(roleResponse.payload.items);
             setDepts(deptResponse.payload);
@@ -115,7 +124,7 @@ const AdminUserPage = () => {
     };
 
     const onSearch = () => {
-        setPagination({ ...pagination, current: 1 });
+        setPagination({...pagination, current: 1});
         loadUsers();
     };
 
@@ -125,7 +134,7 @@ const AdminUserPage = () => {
             mobile: '',
             status: undefined,
         });
-        setPagination({ ...pagination, current: 1 });
+        setPagination({...pagination, current: 1});
         loadUsers();
     };
 
@@ -191,8 +200,19 @@ const AdminUserPage = () => {
             key: 'depts',
             render: (depts: { id: number; name: string }[], record) => (
                 <div
-                    style={{ display: 'flex', gap: '4px', cursor: 'pointer', backgroundColor: "darkgray", borderRadius: '4px', padding: '4px' }}
+                    style={{
+                        display: 'flex',
+                        gap: '4px',
+                        cursor: 'pointer',
+                        backgroundColor: '#f0f0f0', // 更改背景色
+                        borderRadius: '4px',
+                        padding: '4px',
+                        minHeight: '32px', // 设置固定高度
+                        transition: 'background-color 0.3s' // 添加渐变效果
+                    }}
                     onClick={() => openEditDeptsModal(record)}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#d3d3d3')} // hover背景色
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')} // 恢复背景色
                 >
                     {depts.map((dept) => (
                         <Tag key={dept.id} color="blue">
@@ -208,8 +228,19 @@ const AdminUserPage = () => {
             key: 'roles',
             render: (roles: { id: number; name: string }[], record) => (
                 <div
-                    style={{ display: 'flex', gap: '4px', cursor: 'pointer', backgroundColor: "darkgray", borderRadius: '4px', padding: '4px' }}
+                    style={{
+                        display: 'flex',
+                        gap: '4px',
+                        cursor: 'pointer',
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: '4px',
+                        padding: '4px',
+                        minHeight: '32px', // 设置固定高度
+                        transition: 'background-color 0.3s'
+                    }}
                     onClick={() => openEditRolesModal(record)}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#d3d3d3')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
                 >
                     {roles.map((role) => (
                         <Tag key={role.id} color="blue">
@@ -247,7 +278,8 @@ const AdminUserPage = () => {
             dataIndex: 'is_superuser',
             key: 'is_superuser',
             render: (is_superuser: number, record: never) => (
-                <Switch checkedChildren="开启" unCheckedChildren="关闭" checked={is_superuser} onChange={() => handleSuperChange(record.id)} />
+                <Switch checkedChildren="开启" unCheckedChildren="关闭" checked={is_superuser}
+                        onChange={() => handleSuperChange(record.id)}/>
             ),
         },
         {
@@ -267,38 +299,38 @@ const AdminUserPage = () => {
             <h2>用户管理</h2>
 
             {/* 搜索栏 */}
-            <Space style={{ marginBottom: 16 }}>
+            <Space style={{marginBottom: 16}}>
                 <Input
                     placeholder="请输入用户名"
-                    style={{ width: 200 }}
+                    style={{width: 200}}
                     value={searchParams.username}
-                    onChange={(e) => setSearchParams({ ...searchParams, username: e.target.value })}
+                    onChange={(e) => setSearchParams({...searchParams, username: e.target.value})}
                 />
                 <Input
                     placeholder="请输入手机号"
-                    style={{ width: 200 }}
+                    style={{width: 200}}
                     value={searchParams.mobile}
-                    onChange={(e) => setSearchParams({ ...searchParams, mobile: e.target.value })}
+                    onChange={(e) => setSearchParams({...searchParams, mobile: e.target.value})}
                 />
                 <Select
                     placeholder="状态"
-                    style={{ width: 120 }}
+                    style={{width: 120}}
                     value={searchParams.status}
-                    onChange={(value) => setSearchParams({ ...searchParams, status: value })}
+                    onChange={(value) => setSearchParams({...searchParams, status: value})}
                 >
                     <Option value={undefined}>全部</Option>
                     <Option value={1}>正常</Option>
                     <Option value={0}>禁用</Option>
                 </Select>
-                <Button type="primary" icon={<SearchOutlined />} onClick={onSearch}>
+                <Button type="primary" icon={<SearchOutlined/>} onClick={onSearch}>
                     搜索
                 </Button>
                 <Button onClick={handleReset}>重置</Button>
             </Space>
-            <Divider />
+            <Divider/>
 
             {/* 添加用户按钮 */}
-            <Button type="primary" icon={<PlusOutlined />} onClick={showAddUserModal} style={{ marginBottom: 16 }}>
+            <Button type="primary" icon={<PlusOutlined/>} onClick={showAddUserModal} style={{marginBottom: 16}}>
                 添加用户
             </Button>
 

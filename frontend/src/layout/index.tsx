@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Layout, Menu, Breadcrumb, Image } from 'antd';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { SettingOutlined, FileSearchOutlined } from '@ant-design/icons';
+import { SettingOutlined, FileSearchOutlined,HomeOutlined } from '@ant-design/icons';
 import CustomHeader from "../components/customHeader";
 import logoImage from '../assets/images/favicon.ico';
 import { useDispatchUser } from "../hooks";
@@ -12,6 +12,7 @@ const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 
 const breadcrumbNameMap: Record<string, string> = {
+  '/': '主页',
   '/admin': '系统管理',
   '/admin/user': '用户管理',
   '/admin/dept': '部门管理',
@@ -51,13 +52,13 @@ const LayoutContainer = () => {
     return menuItems.map((menuItem) => {
       if (menuItem.children && menuItem.children.length > 0 && ! menuItem.path) {
         return (
-            <SubMenu key={menuItem.path} icon={<SettingOutlined />} title={menuItem.title}>
+            <SubMenu key={menuItem.id} icon={<SettingOutlined />} title={menuItem.title}>
               {renderMenuItems(menuItem.children)}
             </SubMenu>
         );
       }
       return (
-          <Menu.Item key={menuItem.path}>
+          <Menu.Item key={menuItem.id}>
             <Link to={menuItem.path}>{menuItem.title}</Link>
           </Menu.Item>
       );
@@ -72,7 +73,10 @@ const LayoutContainer = () => {
           </div>
           <Menu theme="light" mode="inline" defaultSelectedKeys={['1']}>
             {/* 动态渲染菜单 */}
-            {renderMenuItems(menu)}
+            <Menu.Item icon={<HomeOutlined />} key="0">
+                <Link to="/">主页</Link>
+            </Menu.Item>
+
             <SubMenu key="sub2" icon={<FileSearchOutlined />} title="日志管理">
               <Menu.Item key="5">
                 <Link to="/worklog/search">搜索日志</Link>
@@ -84,6 +88,7 @@ const LayoutContainer = () => {
                 <Link to="/worklog/add">添加日志</Link>
               </Menu.Item>
             </SubMenu>
+            {renderMenuItems(menu)}
           </Menu>
         </Sider>
 
