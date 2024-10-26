@@ -214,7 +214,7 @@ const AdminRolePage = () => {
                 <Button type="primary" icon={<SearchOutlined/>} onClick={() => fetchRoles()}>
                     搜索
                 </Button>
-                <Button icon={<DeleteOutlined/>} danger onClick={() => {
+                <Button  onClick={() => {
                     setRoleName('');
                     setStatus(undefined);
                     fetchRoles();

@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Select } from 'antd';
+import React, {useState, useEffect} from 'react';
+import {Modal, Select} from 'antd';
 
-const { Option } = Select;
+const {Option} = Select;
 
-const EditDeptsModal = ({ visible, depts = [], allDepts = [], onCancel, onEdit }) => {
+const EditDeptsModal = ({visible, depts = [], allDepts = [], onCancel, onEdit}) => {
     const [selectedDepts, setSelectedDepts] = useState(depts.map((dept) => dept.name));
-
+    console.log(depts);
+    console.log(allDepts);
     // 当 props 中的 depts 变化时，更新本地状态
     useEffect(() => {
         setSelectedDepts(depts.map((dept) => dept.name));
+
     }, [depts]);
 
     const handleSave = () => {
@@ -27,7 +29,7 @@ const EditDeptsModal = ({ visible, depts = [], allDepts = [], onCancel, onEdit }
         >
             <Select
                 mode="multiple"
-                style={{ width: '100%' }}
+                style={{width: '100%'}}
                 placeholder="请选择部门"
                 value={selectedDepts}
                 onChange={(newDepts) => setSelectedDepts(newDepts)}  // 更新本地的部门选择

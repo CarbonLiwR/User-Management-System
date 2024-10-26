@@ -7,7 +7,7 @@ from fastapi.security import HTTPBasicCredentials
 from fastapi_limiter.depends import RateLimiter
 from starlette.background import BackgroundTasks
 
-from backend.app.admin.schema.user import RegisterUserParam, AuthRegisterParam
+from backend.app.admin.schema.user import RegisterUserParam, AuthRegisterParam, AuthResetPasswordParam
 from backend.app.admin.schema.token import GetSwaggerToken
 from backend.app.admin.schema.user import AuthLoginParam
 from backend.app.admin.service.auth_service import auth_service
@@ -45,6 +45,13 @@ async def user_register(request: Request,obj: AuthRegisterParam
     await auth_service.register(request=request, obj=obj)
     return response_base.success(data='注册成功')
 
+@router.put(
+    '/password/reset',
+    summary='密码重置',
+    dependencies=[Depends(RateLimiter(times=5, minutes=1))])
+async def forgetPassword(request: Request, obj: AuthResetPasswordParam) -> ResponseModel:
+    await auth_service.pwd_reset(request=request, obj=obj)
+    return response_base.success(data="密码重置成功")
 
 @router.post('/token/new', summary='创建新 token', dependencies=[DependsJwtAuth])
 async def create_new_token(request: Request, response: Response) -> ResponseModel:

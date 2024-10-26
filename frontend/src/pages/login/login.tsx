@@ -1,12 +1,12 @@
 import React, {useCallback, useState, useEffect, useRef} from "react";
-import {Form, Input, Button, Checkbox, message, Row, Image} from "antd";
+import {Form, Input, Button, Checkbox, message, Row, Image, Col} from "antd";
 import {Link, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import type {LoginData} from '../../api/auth';
 import {useDispatchUser} from '../../hooks';
 import './index.css'
-import {EyeInvisibleOutlined, EyeOutlined, UserOutlined,LockOutlined,CheckCircleOutlined} from "@ant-design/icons";
+import {EyeInvisibleOutlined, EyeOutlined, UserOutlined, LockOutlined, CheckCircleOutlined} from "@ant-design/icons";
 
 const IPT_RULE_USERNAME = [{required: true, message: "请输入用户名"}];
 const IPT_RULE_PASSWORD = [{required: true, message: "请输入密码"}];
@@ -64,7 +64,7 @@ function LoginPage() {
                 >
                     <Form.Item name="username" rules={IPT_RULE_USERNAME}>
                         <Input
-                            prefix={<UserOutlined />}
+                            prefix={<UserOutlined/>}
                             placeholder="请输入账号"
                         />
                         {/*<Input placeholder="账号:admin/user"/>*/}
@@ -75,7 +75,7 @@ function LoginPage() {
                             autoComplete="off"
                             // placeholder="密码:admin123/user123"
                             placeholder="请输入密码"
-                            prefix={<LockOutlined />}
+                            prefix={<LockOutlined/>}
 
                             suffix={
                                 passwordVisible ?
@@ -92,7 +92,8 @@ function LoginPage() {
                     </Form.Item>
                     <Form.Item name="captcha" rules={IPT_RULE_CAPTCHA}>
                         <Row align="middle">
-                            <Input prefix={<CheckCircleOutlined />} placeholder="请输入验证码" style={{width: '60%', flex: 1}}/>
+                            <Input prefix={<CheckCircleOutlined/>} placeholder="请输入验证码"
+                                   style={{width: '60%', flex: 1}}/>
                             <Image
                                 src={captchaSrc}
                                 preview={false}
@@ -103,10 +104,20 @@ function LoginPage() {
                         </Row>
                     </Form.Item>
                     <Form.Item>
-                        <Form.Item name="remember" valuePropName="checked" noStyle>
-                            <Checkbox>记住我</Checkbox>
-                        </Form.Item>
+                        <Row justify="space-between" align="middle">
+                            <Col>
+                                <Form.Item name="remember" valuePropName="checked" noStyle>
+                                    <Checkbox>记住我</Checkbox>
+                                </Form.Item>
+                            </Col>
+                            <Col>
+                                <Link to="/forget">
+                                    <span>忘记密码</span>
+                                </Link>
+                            </Col>
+                        </Row>
                     </Form.Item>
+
                     <Row justify="space-around">
                         <Button
                             type="primary"

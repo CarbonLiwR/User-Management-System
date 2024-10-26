@@ -14,7 +14,7 @@ from backend.app.admin.schema.user import (
     RegisterUserParam,
     UpdateUserParam,
     UpdateUserRoleParam,
-    UpdateUserDeptParam,
+    UpdateUserDeptParam, UpdateUserPwdParam,
 )
 from backend.common.security.jwt import get_hash_password
 from backend.utils.timezone import timezone
@@ -125,6 +125,23 @@ class CRUDUser(CRUDPlus[User]):
         :return:
         """
         return await self.update_model(db, input_user, obj)
+
+    @staticmethod
+    async def update_user_pwd(db: AsyncSession, input_user: str, new_password: str) -> None:
+        """
+        更新用户密码
+
+        :param db: 数据库会话
+        :param input_user: 用户对象
+        :param new_password: 新密码
+        :return: None
+        """
+        # 获取用户
+        user = await user_dao.get_by_username(db, input_user)  # 替换为你的用户数据访问对象
+        # 更新密码
+        user.password = new_password
+        db.add(user)
+        await db.commit()
 
     @staticmethod
     async def update_dept(db: AsyncSession, input_user: User, obj: UpdateUserDeptParam) -> None:

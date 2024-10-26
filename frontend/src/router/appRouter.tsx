@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import Homepage from "../pages/home";
 import LoginPage from "../pages/login/login";
 import RegisterPage from "../pages/login/register";
+import ForgetPasswordPage from "../pages/login/forget";
 import LayoutContainer from '../layout';
 import PersonalPage from "../pages/personal";
 import AdminRolePage from "../pages/admin/role";
@@ -31,6 +32,7 @@ function AppRouter() {
                     <>
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/register" element={<RegisterPage />} />
+                        <Route path="/forget" element={<ForgetPasswordPage />} />
                         <Route path="*" element={<Navigate to="/login" replace />} />
                     </>
                 )}

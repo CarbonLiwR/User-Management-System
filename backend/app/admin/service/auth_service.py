@@ -9,7 +9,7 @@ from backend.app.admin.conf import admin_settings
 from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
-from backend.app.admin.schema.user import AuthLoginParam, AuthRegisterParam, RegisterUserParam
+from backend.app.admin.schema.user import AuthLoginParam, AuthRegisterParam, RegisterUserParam, AuthResetPasswordParam
 from backend.app.admin.service.login_log_service import LoginLogService
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
@@ -20,7 +20,7 @@ from backend.common.security.jwt import (
     create_refresh_token,
     get_token,
     jwt_decode,
-    password_verify,
+    password_verify, get_hash_password,
 )
 from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
@@ -144,6 +144,30 @@ class AuthService:
 
             except errors.NotFoundError as e:
                 raise errors.NotFoundError(msg=e.msg)
+
+    @staticmethod
+    async def pwd_reset(*, request: Request, obj: AuthResetPasswordParam) -> int:
+        async with async_db_session.begin() as db:
+                # 验证验证码
+                captcha_code = await redis_client.get(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+                if not captcha_code:
+                    raise errors.AuthorizationError(msg='验证码失效，请重新获取')
+                if captcha_code.lower() != obj.captcha.lower():
+                    raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
+
+                # 检查密码
+                if not obj.password:
+                    raise errors.ForbiddenError(msg='密码为空')
+                user = await user_dao.get_by_username(db, obj.username)
+                if not user:
+                    raise errors.ForbiddenError(msg='用户不存在')
+                if not obj.email == user.email:
+                    raise errors.ForbiddenError(msg='邮箱验证错误')
+
+                # 更新密码
+                salt = user.salt
+                hashed_password = get_hash_password(f'{obj.password}{salt}')  # 假设你需要哈希密码
+                await user_dao.update_user_pwd(db, obj.username ,hashed_password)
 
 
     @staticmethod

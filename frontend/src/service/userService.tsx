@@ -20,13 +20,13 @@ import {
     updateUserRole
 } from '../api/user';
 import {
-    CaptchaRes,
+    CaptchaRes, forgetPwd,
     getCaptcha,
     LoginData,
     LoginRes,
     RegisterData,
     RegisterRes,
-    registerUser,
+    registerUser, ResetPasswordData,
     userLogin,
     userLogout
 } from "../api/auth.tsx";
@@ -341,3 +341,20 @@ export const fetchCaptcha = createAsyncThunk(
     }
 );
 
+// 异步Thunk用于修改密码
+export const updatePasswordThunk = createAsyncThunk(
+    'user/updatePassword',
+    async (ResetPassWordParams:ResetPasswordData, { rejectWithValue }) => {
+        try {
+            return await forgetPwd(ResetPassWordParams); // 调用忘记密码函数
+        } catch (error: unknown) {
+            if (typeof error === 'object' && error !== null && 'response' in error) {
+                const err = error as { response: { data?: never } };
+                if (err.response && 'data' in err.response) {
+                    return rejectWithValue(err.response.data);
+                }
+            }
+            return rejectWithValue('修改密码失败');
+        }
+    }
+);

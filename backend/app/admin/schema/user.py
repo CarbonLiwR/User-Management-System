@@ -3,6 +3,7 @@
 from datetime import datetime
 
 from pydantic import ConfigDict, EmailStr, Field, HttpUrl, model_validator
+from pymsgbox import password
 from typing_extensions import Self
 
 from backend.app.admin.schema.dept import GetDeptListDetails
@@ -27,6 +28,11 @@ class RegisterUserParam(AuthSchemaBase):
 class AuthRegisterParam(RegisterUserParam):
     captcha: str
 
+class AuthResetPasswordParam(SchemaBase):
+    username: str
+    email: str
+    password: str
+    captcha:str
 
 class AddUserParam(AuthSchemaBase):
     depts: list[int]
@@ -39,10 +45,13 @@ class UserInfoSchemaBase(SchemaBase):
     username: str
     nickname: str
     email: EmailStr = Field(..., examples=['user@example.com'])
-    phone: CustomPhoneNumber | None = None
+    # phone: CustomPhoneNumber | None = None
 
 class UpdateUserParam(UserInfoSchemaBase):
     pass
+
+class UpdateUserPwdParam(UserInfoSchemaBase):
+    password: str
 
 class UpdateUserRoleParam(SchemaBase):
     roles: list[int]

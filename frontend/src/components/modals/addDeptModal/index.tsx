@@ -1,22 +1,35 @@
-import React from 'react';
-import { Modal, Form, Input, Select } from 'antd';
+import React, {useEffect, useState} from 'react';
+import {Modal, Form, Input, Select} from 'antd';
 
-const { Option } = Select;
+const {Option} = Select;
 
-const AddDeptModal = ({ visible, onCancel, onCreate }) => {
+const AddDeptModal = ({visible, onCancel, onCreate,allUsers = [],users = [],onEdit}) => {
     const [form] = Form.useForm();
+    const [selectedUsers, setSelectedUsers] = useState(users.map((user) => user.name));
+    console.log(allUsers);
+    console.log(users);
+    useEffect(() => {
+        setSelectedUsers(users.map((user) => user.name));
+        console.log(users);
+    }, []);
 
     // 提交表单数据
-    const handleSubmit = () => {
-        form
-            .validateFields()
-            .then((values) => {
-                onCreate(values);
-                form.resetFields(); // 重置表单
-            })
-            .catch((info) => {
-                console.log('Validate Failed:', info);
-            });
+    // const handleSubmit = () => {
+    //     form
+    //         .validateFields()
+    //         .then((values) => {
+    //             onCreate(values);
+    //             form.resetFields(); // 重置表单
+    //         })
+    //         .catch((info) => {
+    //             console.log('Validate Failed:', info);
+    //         });
+    // };
+     const handleSubmit = () => {
+        const selectedUser = allUsers
+            .filter((user) => selectedUsers.includes(user.name))  // 根据名称筛选
+        // .map((role) => role.id);  // 只获取 id
+        onEdit(selectedUser);
     };
 
     return (
@@ -35,28 +48,28 @@ const AddDeptModal = ({ visible, onCancel, onCreate }) => {
                 <Form.Item
                     label="部门名称"
                     name="name"
-                    rules={[{ required: true, message: '请输入部门名称' }]}
+                    rules={[{required: true, message: '请输入部门名称'}]}
                 >
-                    <Input placeholder="请输入部门名称" />
+                    <Input placeholder="请输入部门名称"/>
                 </Form.Item>
                 <Form.Item
                     label="负责人"
                     name="leader"
                 >
-                    <Input placeholder="请输入负责人" />
-                </Form.Item>
-                <Form.Item
-                    label="联系电话"
-                    name="phone"
-                >
-                    <Input placeholder="请输入联系电话" />
-                </Form.Item>
-                <Form.Item
-                    label="邮箱"
-                    name="email"
-                    rules={[{ type: 'email', message: '请输入正确的邮箱' }]}
-                >
-                    <Input placeholder="请输入邮箱" />
+                    <Select
+                        mode="multiple"
+                        style={{width: '100%'}}
+                        placeholder="请选择负责人"
+                        value={selectedUsers}
+                        onChange={(newUsers) => setSelectedUsers(newUsers)}
+                    >
+                        {allUsers.map((user) => (
+                            <Option key={user.id} value={user.name}>
+                                {user.name}
+                            </Option>
+                        ))}
+
+                    </Select>
                 </Form.Item>
                 <Form.Item
                     label="状态"

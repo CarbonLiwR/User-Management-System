@@ -48,13 +48,19 @@ const EditDeptModal = ({ visible, onCancel, onEdit, dept }) => {
                 >
                     <Input />
                 </Form.Item>
-                <Form.Item
-                    name="leader"
-                    label="负责人"
-                    rules={[{ required: true, message: '请输入负责人姓名' }]}
-                >
-                    <Input />
-                </Form.Item>
+                <Select
+                mode="multiple"
+                style={{ width: '100%' }}
+                placeholder="请选择负责人">
+
+                </Select>
+                {/*<Form.Item*/}
+                {/*    name="leader"*/}
+                {/*    label="负责人"*/}
+                {/*    rules={[{ required: true, message: '请输入负责人姓名' }]}*/}
+                {/*>*/}
+                {/*    <Input />*/}
+                {/*</Form.Item>*/}
                 {/*<Form.Item*/}
                 {/*    name="phone"*/}
                 {/*    label="联系电话"*/}
@@ -62,13 +68,13 @@ const EditDeptModal = ({ visible, onCancel, onEdit, dept }) => {
                 {/*>*/}
                 {/*    <Input />*/}
                 {/*</Form.Item>*/}
-                <Form.Item
-                    name="email"
-                    label="邮箱"
-                    rules={[{ required: true, message: '请输入邮箱' }]}
-                >
-                    <Input />
-                </Form.Item>
+                {/*<Form.Item*/}
+                {/*    name="email"*/}
+                {/*    label="邮箱"*/}
+                {/*    rules={[{ required: true, message: '请输入邮箱' }]}*/}
+                {/*>*/}
+                {/*    <Input />*/}
+                {/*</Form.Item>*/}
                 <Form.Item
                     name="status"
                     label="状态"
@@ -76,9 +82,9 @@ const EditDeptModal = ({ visible, onCancel, onEdit, dept }) => {
                 >
                     <Switch checkedChildren="正常" unCheckedChildren="禁用" defaultChecked />
                 </Form.Item>
-                <Form.Item name="remark" label="备注">
-                    <Input.TextArea rows={4} />
-                </Form.Item>
+                {/*<Form.Item name="remark" label="备注">*/}
+                {/*    <Input.TextArea rows={4} />*/}
+                {/*</Form.Item>*/}
             </Form>
         </Modal>
     );

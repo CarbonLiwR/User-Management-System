@@ -90,7 +90,6 @@ const AdminUserPage = () => {
 
     const [searchParams, setSearchParams] = useState({
         username: '',
-        mobile: '',
         status: undefined,
     });
 
@@ -131,11 +130,10 @@ const AdminUserPage = () => {
     const handleReset = () => {
         setSearchParams({
             username: '',
-            mobile: '',
             status: undefined,
         });
-        setPagination({...pagination, current: 1});
-        loadUsers();
+        setPagination({...pagination, current: 1}); // 重置当前页为1
+        loadUsers(); // 重新加载用户数据
     };
 
     const handleStatusChange = async (userId: number) => {
@@ -256,11 +254,6 @@ const AdminUserPage = () => {
             key: 'email',
         },
         {
-            title: '手机号',
-            dataIndex: 'mobile',
-            key: 'mobile',
-        },
-        {
             title: '状态',
             dataIndex: 'status',
             key: 'status',
@@ -305,12 +298,6 @@ const AdminUserPage = () => {
                     style={{width: 200}}
                     value={searchParams.username}
                     onChange={(e) => setSearchParams({...searchParams, username: e.target.value})}
-                />
-                <Input
-                    placeholder="请输入手机号"
-                    style={{width: 200}}
-                    value={searchParams.mobile}
-                    onChange={(e) => setSearchParams({...searchParams, mobile: e.target.value})}
                 />
                 <Select
                     placeholder="状态"

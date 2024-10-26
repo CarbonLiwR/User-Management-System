@@ -16,7 +16,7 @@ const AdminDeptPage = () => {
     const [searchParams, setSearchParams] = useState({
         name: '',
         leader: '',
-        phone: '',
+        // phone: '',
         status: undefined,
     });
     const [isModalVisible, setIsModalVisible] = useState(false);

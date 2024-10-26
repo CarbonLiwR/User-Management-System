@@ -19,7 +19,7 @@ class Dept(Base):
     sort: Mapped[int] = mapped_column(default=0, comment='排序')
     worklogStandard: Mapped[str | None] = mapped_column(Text(), default=None, comment='工作日志标准')
     leader: Mapped[str | None] = mapped_column(String(20), default=None, comment='负责人')
-    phone: Mapped[str | None] = mapped_column(String(11), default=None, comment='手机')
+    # phone: Mapped[str | None] = mapped_column(String(11), default=None, comment='手机')
     email: Mapped[str | None] = mapped_column(String(50), default=None, comment='邮箱')
     status: Mapped[int] = mapped_column(default=1, comment='部门状态(0停用 1正常)')
     del_flag: Mapped[bool] = mapped_column(default=False, comment='删除标志（0删除 1存在）')
