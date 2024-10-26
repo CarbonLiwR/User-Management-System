@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Layout, Menu, Breadcrumb, Image } from 'antd';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { SettingOutlined, FileSearchOutlined,HomeOutlined } from '@ant-design/icons';
+import {SettingOutlined, FileSearchOutlined, HomeOutlined, UserOutlined} from '@ant-design/icons';
 import CustomHeader from "../components/customHeader";
 import logoImage from '../assets/images/favicon.ico';
 import { useDispatchUser } from "../hooks";
@@ -13,6 +13,7 @@ const { SubMenu } = Menu;
 
 const breadcrumbNameMap: Record<string, string> = {
   '/': '主页',
+  '/personal': '个人中心',
   '/admin': '系统管理',
   '/admin/user': '用户管理',
   '/admin/dept': '部门管理',
@@ -75,6 +76,9 @@ const LayoutContainer = () => {
             {/* 动态渲染菜单 */}
             <Menu.Item icon={<HomeOutlined />} key="0">
                 <Link to="/">主页</Link>
+            </Menu.Item>
+            <Menu.Item icon={<UserOutlined />} key="1">
+                <Link to="/personal">个人中心</Link>
             </Menu.Item>
 
             <SubMenu key="sub2" icon={<FileSearchOutlined />} title="日志管理">

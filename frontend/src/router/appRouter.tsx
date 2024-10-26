@@ -6,6 +6,7 @@ import Homepage from "../pages/home";
 import LoginPage from "../pages/login/login";
 import RegisterPage from "../pages/login/register";
 import LayoutContainer from '../layout';
+import PersonalPage from "../pages/personal";
 import AdminRolePage from "../pages/admin/role";
 import AdminMenuPage from "../pages/admin/menu";
 import AdminUserPage from "../pages/admin/user";
@@ -40,6 +41,8 @@ function AppRouter() {
                         <Route index element={<Homepage />} />
 
                         {/* 各个管理页面 */}
+                        <Route path="personal" element={<PersonalPage />} />
+
                         {/*<Route path="admin" element={<AdminRolePage />} />*/}
                         <Route path="admin/role" element={<AdminRolePage />} />
                         <Route path="admin/menu" element={<AdminMenuPage />} />

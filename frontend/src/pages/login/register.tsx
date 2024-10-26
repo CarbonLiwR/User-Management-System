@@ -6,7 +6,15 @@ import {getCaptcha, RegisterRes} from '../../api/auth';
 import {useDispatch} from 'react-redux';
 import {register as registerThunk} from "../../service/userService.tsx";
 import './index.css';
-import {EyeInvisibleOutlined, EyeOutlined,SmileOutlined,UserOutlined,MailOutlined,CheckCircleOutlined,LockOutlined} from '@ant-design/icons';
+import {
+    EyeInvisibleOutlined,
+    EyeOutlined,
+    SmileOutlined,
+    UserOutlined,
+    MailOutlined,
+    CheckCircleOutlined,
+    LockOutlined
+} from '@ant-design/icons';
 
 const IPT_RULE_NICKNAME = [{required: true, message: "请输入昵称"}];
 const IPT_RULE_USERNAME: Rule[] = [
@@ -79,7 +87,7 @@ function RegisterPage() {
     }, [refreshCaptcha]);
 
 
-    const validateConfirmPassword = (_: any, value: string): Promise<void> => {
+    const validateConfirmPassword = (_: { required?: boolean }, value: string): Promise<void> => {
         return new Promise((resolve, reject) => {
             const password = form.getFieldValue('password');
             if (value && value !== password) {
@@ -92,7 +100,6 @@ function RegisterPage() {
 
     const onFinish = useCallback(async (values: any) => {
         console.log(values);
-
         const resultAction = await dispatch(registerThunk(values)) as { payload: RegisterRes, error?: any };
 
         if (registerThunk.fulfilled.match(resultAction)) {
@@ -118,22 +125,22 @@ function RegisterPage() {
                     <br/>
 
                     <Form.Item name="nickname" rules={IPT_RULE_NICKNAME}>
-                        <Input prefix={<SmileOutlined />} placeholder="昵称"/>
+                        <Input prefix={<SmileOutlined/>} placeholder="昵称"/>
                     </Form.Item>
 
                     <Form.Item name="username" rules={IPT_RULE_USERNAME}>
-                        <Input prefix={<UserOutlined />} autoComplete="off" placeholder="账号"/>
+                        <Input prefix={<UserOutlined/>} autoComplete="off" placeholder="账号"/>
                     </Form.Item>
 
                     <Form.Item name="email" rules={IPT_RULE_EMAIL}>
-                        <Input prefix={ <MailOutlined />} placeholder="电子邮箱"/>
+                        <Input prefix={<MailOutlined/>} placeholder="电子邮箱"/>
                     </Form.Item>
 
                     <Form.Item name="password" rules={IPT_RULE_PASSWORD}>
                         <Input
                             type={passwordVisible ? "text" : "password"}
                             autoComplete="off"
-                            prefix={<LockOutlined />}
+                            prefix={<LockOutlined/>}
                             placeholder="密码"
                             suffix={
                                 passwordVisible ?
@@ -160,7 +167,7 @@ function RegisterPage() {
                             type={confirmPasswordVisible ? "text" : "password"}
                             autoComplete="off"
                             placeholder="确认密码"
-                            prefix={<LockOutlined />}
+                            prefix={<LockOutlined/>}
                             suffix={
                                 confirmPasswordVisible ?
                                     <EyeOutlined
@@ -177,7 +184,8 @@ function RegisterPage() {
 
                     <Form.Item name="captcha" rules={IPT_RULE_CAPTCHA}>
                         <Row align="middle">
-                            <Input prefix={<CheckCircleOutlined />} placeholder="请输入验证码" style={{width: '60%', flex: 1}}/>
+                            <Input prefix={<CheckCircleOutlined/>} placeholder="请输入验证码"
+                                   style={{width: '60%', flex: 1}}/>
                             <Image
                                 src={captchaSrc}
                                 preview={false}
