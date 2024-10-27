@@ -1,7 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from "../store";
-import { useMemo } from 'react';
+import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
+import {useSelector} from 'react-redux';
+import {RootState} from "../store";
+import {useMemo} from 'react';
 import Homepage from "../pages/home";
 import LoginPage from "../pages/login/login";
 import RegisterPage from "../pages/login/register";
@@ -27,35 +27,38 @@ function AppRouter() {
     return (
         <Router>
             <Routes>
+                <Route path="/forget" element={<ForgetPasswordPage/>}/>
+                <Route path="/login" element={<LoginPage/>}/>
+                
+
                 {/* 未登录用户会被重定向到登录页面，除了登录和注册页面 */}
                 {!isLoggedIn && (
                     <>
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/register" element={<RegisterPage />} />
-                        <Route path="/forget" element={<ForgetPasswordPage />} />
-                        <Route path="*" element={<Navigate to="/login" replace />} />
+                        <Route path="/login" element={<LoginPage/>}/>
+                        <Route path="/register" element={<RegisterPage/>}/>
+                        <Route path="*" element={<Navigate to="/login" replace/>}/>
                     </>
                 )}
 
                 {/* 受保护的页面，只有登录后才能访问 */}
                 {isLoggedIn && (
-                    <Route path="/" element={<LayoutContainer />}>
-                        <Route index element={<Homepage />} />
+                    <Route path="/" element={<LayoutContainer/>}>
+                        <Route index element={<Homepage/>}/>
 
                         {/* 各个管理页面 */}
-                        <Route path="personal" element={<PersonalPage />} />
+                        <Route path="personal" element={<PersonalPage/>}/>
 
                         {/*<Route path="admin" element={<AdminRolePage />} />*/}
-                        <Route path="admin/role" element={<AdminRolePage />} />
-                        <Route path="admin/menu" element={<AdminMenuPage />} />
-                        <Route path="admin/user" element={<AdminUserPage />} />
-                        <Route path="admin/dept" element={<AdminDeptPage />} />
+                        <Route path="admin/role" element={<AdminRolePage/>}/>
+                        <Route path="admin/menu" element={<AdminMenuPage/>}/>
+                        <Route path="admin/user" element={<AdminUserPage/>}/>
+                        <Route path="admin/dept" element={<AdminDeptPage/>}/>
 
-                        <Route path="worklog" element={<WorklogSearchPage />} />
-                        <Route path="worklog/search" element={<WorklogSearchPage />} />
-                        <Route path="worklog/show" element={<WorklogShowPage />} />
-                        <Route path="worklog/add" element={<WorklogAddPage />} />
-                        <Route path="worklog/result" element={<WorklogResult />} />
+                        <Route path="worklog" element={<WorklogSearchPage/>}/>
+                        <Route path="worklog/search" element={<WorklogSearchPage/>}/>
+                        <Route path="worklog/show" element={<WorklogShowPage/>}/>
+                        <Route path="worklog/add" element={<WorklogAddPage/>}/>
+                        <Route path="worklog/result" element={<WorklogResult/>}/>
 
                     </Route>
                 )}

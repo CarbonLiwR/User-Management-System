@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Input, Select, Space, Tag, Divider, message } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import AddDeptModal from "../../../components/modals/addDeptModal";
-import { useDispatchDept } from '../../../hooks';
+import {useDispatchDept, useDispatchUser} from '../../../hooks';
 
 import EditDeptModal from "../../../components/modals/editDeptModal";  // 假设你已经有 useDispatchDept
 
@@ -13,6 +13,8 @@ const AdminDeptPage = () => {
     const [pagination, setPagination] = useState({ current: 1, pageSize: 20, total: 0 });
     const [loading, setLoading] = useState(false);
     const [depts, setDepts] = useState([]); // 存储部门数据
+    const [users, setUsers] = useState([]); // 存储用户数据
+    const [currentuser, setCurrentUser] = useState(null);
     const [searchParams, setSearchParams] = useState({
         name: '',
         leader: '',
@@ -20,35 +22,46 @@ const AdminDeptPage = () => {
         status: undefined,
     });
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const { fetchUsers } = useDispatchUser();
     const {fetchAllDepartments, addDepartment, removeDepartment, updateDepartment} = useDispatchDept();
     const [editDeptModalVisible, setEditDeptModalVisible] = useState(false); // 编辑模态框的可见性
     const [currentDept, setCurrentDept] = useState(null);
 
     useEffect(() => {
         loadDepts(); // 初次加载部门数据
+        console.log(users);
     }, [pagination.current, pagination.pageSize]);
 
-    // 动态加载部门数据
-    const loadDepts = async (page = 1, pageSize = 20) => {
-        setLoading(true);
-        const params = {
-            ...searchParams,
-            page,
-            size: pageSize,
-        };
-
-        try {
-            const result = await fetchAllDepartments(params);
-            if (result.payload) {
-                setDepts(result.payload); // 设置部门数据
-                setPagination((prev) => ({ ...prev, total: result.payload.total })); // 更新分页
-            }
-        } catch (error) {
-            console.error('Failed to load departments:', error);
-        } finally {
-            setLoading(false);
-        }
+    const loadDepts = async () => {
+    setLoading(true);
+    const params = {
+        ...searchParams,
+        page: pagination.current,
+        size: pagination.pageSize,
     };
+
+    try {
+        const [userResponse, deptResponse] = await Promise.all([
+            fetchUsers(params),
+            fetchAllDepartments(params),
+        ]);
+
+        if (userResponse.payload) {
+            setPagination((prev) => ({ ...prev, total: userResponse.payload.total })); // 更新分页
+            // 你可以在这里设置用户数据，如果需要的话
+            setUsers(userResponse.payload.items); // 假设你有一个状态来存储用户
+        }
+
+        if (deptResponse.payload) {
+            setDepts(deptResponse.payload); // 设置部门数据
+        }
+    } catch (error) {
+        console.error('Failed to load users and departments:', error);
+    } finally {
+        setLoading(false);
+    }
+};
+
 
     // 处理搜索
     const onSearch = () => {
@@ -211,11 +224,13 @@ const AdminDeptPage = () => {
             {/* 新增部门的模态框 */}
             <AddDeptModal
                 visible={isModalVisible}
+                users={users}
                 onCancel={handleCancel}
                 onCreate={handleAddDept}
             />
 
             <EditDeptModal
+                users={users}
                 visible={editDeptModalVisible}
                 onCancel={handleEditCancel}
                 onEdit={handleEditDept}

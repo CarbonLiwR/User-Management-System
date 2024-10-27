@@ -1,24 +1,35 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Select, Button, Switch } from 'antd';
 
 const { Option } = Select;
 
-const EditDeptModal = ({ visible, onCancel, onEdit, dept }) => {
+const EditDeptModal = ({ visible, onCancel, onEdit, dept, users = [] }) => {
     const [form] = Form.useForm();
+    const [selectedUser, setSelectedUser] = useState(undefined); // 默认值为空
 
     // 如果传入了部门信息，预填充表单数据
     useEffect(() => {
         if (dept) {
-            form.setFieldsValue(dept);
+            setSelectedUser(dept.leader || undefined); // 设置为部门负责人的昵称，若没有则为undefined
+            form.setFieldsValue({
+                name: dept.name,
+                status: dept.status
+            }); // 预填充其他表单数据
         }
-    }, [dept, form]);
+    }, [dept]);
 
     // 点击确定按钮时，表单校验成功则提交数据
     const handleOk = () => {
         form
             .validateFields()
             .then((values) => {
-                onEdit(values);
+                const selectedUserData = users.find((user) => user.nickname === selectedUser); // 查找选中的用户信息
+                const dataToSubmit = {
+                    ...values,
+                    leader: selectedUser, // 负责人昵称
+                    email: selectedUserData ? selectedUserData.email : '', // 负责人邮箱
+                };
+                onEdit(dataToSubmit);
                 form.resetFields();
             })
             .catch((info) => {
@@ -48,33 +59,26 @@ const EditDeptModal = ({ visible, onCancel, onEdit, dept }) => {
                 >
                     <Input />
                 </Form.Item>
-                <Select
-                mode="multiple"
-                style={{ width: '100%' }}
-                placeholder="请选择负责人">
-
-                </Select>
-                {/*<Form.Item*/}
-                {/*    name="leader"*/}
-                {/*    label="负责人"*/}
-                {/*    rules={[{ required: true, message: '请输入负责人姓名' }]}*/}
-                {/*>*/}
-                {/*    <Input />*/}
-                {/*</Form.Item>*/}
-                {/*<Form.Item*/}
-                {/*    name="phone"*/}
-                {/*    label="联系电话"*/}
-                {/*    // rules={[{ required: true, message: '请输入联系电话' }]}*/}
-                {/*>*/}
-                {/*    <Input />*/}
-                {/*</Form.Item>*/}
-                {/*<Form.Item*/}
-                {/*    name="email"*/}
-                {/*    label="邮箱"*/}
-                {/*    rules={[{ required: true, message: '请输入邮箱' }]}*/}
-                {/*>*/}
-                {/*    <Input />*/}
-                {/*</Form.Item>*/}
+                <Form.Item
+                    label="负责人"
+                    rules={[{ required: true, message: '请选择负责人' }]}
+                >
+                    <Select
+                        style={{ width: '100%' }}
+                        placeholder="请选择负责人"
+                        value={selectedUser}
+                        onChange={(newUsers) => {
+                            setSelectedUser(newUsers);
+                        }}
+                    >
+                        <Option value="">无</Option>
+                        {users.map((user) => (
+                            <Option key={user.id} value={user.nickname}>
+                                {user.nickname}
+                            </Option>
+                        ))}
+                    </Select>
+                </Form.Item>
                 <Form.Item
                     name="status"
                     label="状态"
@@ -82,9 +86,6 @@ const EditDeptModal = ({ visible, onCancel, onEdit, dept }) => {
                 >
                     <Switch checkedChildren="正常" unCheckedChildren="禁用" defaultChecked />
                 </Form.Item>
-                {/*<Form.Item name="remark" label="备注">*/}
-                {/*    <Input.TextArea rows={4} />*/}
-                {/*</Form.Item>*/}
             </Form>
         </Modal>
     );

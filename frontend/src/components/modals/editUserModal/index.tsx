@@ -85,9 +85,6 @@ const EditUserModal = ({ visible, onCancel, onCreate, user}) => {
                 >
                     <Input placeholder="请输入邮箱" />
                 </Form.Item>
-
-
-
             </Form>
         </Modal>
     );

@@ -85,7 +85,7 @@ function ForgetPwdPage() {
     return (
         <div className="login-container">
             <div className="wrapper">
-                <div className="title">忘记密码</div>
+                <div className="title">修改密码</div>
 
                 <Form form={form} className="login-form" onFinish={onFinish}>
                     <Row justify="start">
