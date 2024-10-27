@@ -64,6 +64,7 @@ const EditDeptModal = ({ visible, onCancel, onEdit, dept, users = [] }) => {
                     rules={[{ required: true, message: '请选择负责人' }]}
                 >
                     <Select
+                        showSearch
                         style={{ width: '100%' }}
                         placeholder="请选择负责人"
                         value={selectedUser}
@@ -71,7 +72,7 @@ const EditDeptModal = ({ visible, onCancel, onEdit, dept, users = [] }) => {
                             setSelectedUser(newUsers);
                         }}
                     >
-                        <Option value="">无</Option>
+                        <Option value="">空</Option>
                         {users.map((user) => (
                             <Option key={user.id} value={user.nickname}>
                                 {user.nickname}

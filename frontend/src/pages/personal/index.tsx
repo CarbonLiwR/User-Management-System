@@ -55,6 +55,7 @@ const Personal: React.FC = () => {
     return (
         <div>
             <EditUserModal
+                changeUsername={false}
                 visible={isEditUserModalVisible}
                 onCancel={handleCancelEditUser}
                 onCreate={handleEditUser}

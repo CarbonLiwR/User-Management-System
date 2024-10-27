@@ -1,10 +1,7 @@
-import React, {useEffect} from 'react';
-import { Modal, Form, Input, Select, Button } from 'antd';
-import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import React, { useEffect } from 'react';
+import { Modal, Form, Input, Button } from 'antd';
 
-const { Option } = Select;
-
-const EditUserModal = ({ visible, onCancel, onCreate, user}) => {
+const EditUserModal = ({ visible, onCancel, onCreate, user, changeUsername }) => {
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -56,24 +53,15 @@ const EditUserModal = ({ visible, onCancel, onCreate, user}) => {
                     <Input placeholder="请输入昵称" />
                 </Form.Item>
 
-                <Form.Item
-                    name="username"
-                    label="用户名"
-                    rules={[{ required: true, message: '请输入用户名' }]}
-                >
-                    <Input placeholder="请输入用户名" />
-                </Form.Item>
-
-                {/*<Form.Item*/}
-                {/*    name="password"*/}
-                {/*    label="密码"*/}
-                {/*    rules={[*/}
-                {/*        { required: false, message: '请输入密码' },*/}
-                {/*        { type: "string", message: '请输入有效的密码' },*/}
-                {/*    ]}*/}
-                {/*>*/}
-                {/*    <Input placeholder="请输入密码" />*/}
-                {/*</Form.Item>*/}
+                {changeUsername && ( // 条件渲染用户名输入框
+                    <Form.Item
+                        name="username"
+                        label="用户名"
+                        rules={[{ required: true, message: '请输入用户名' }]}
+                    >
+                        <Input placeholder="请输入用户名" />
+                    </Form.Item>
+                )}
 
                 <Form.Item
                     name="email"

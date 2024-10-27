@@ -347,6 +347,7 @@ const AdminUserPage = () => {
             />
 
             <EditUserModal
+                changeUsername={true}
                 visible={isEditUserModalVisible}
                 onCancel={handleCancelEditUser}
                 onCreate={handleEditUser}

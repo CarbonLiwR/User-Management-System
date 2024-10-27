@@ -54,6 +54,31 @@ const IPT_RULE_EMAIL: Rule[] = [
 ];
 const IPT_RULE_CAPTCHA = [{required: true, message: "请输入验证码"}];
 
+function generateUsername() {
+    let username = '';
+    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    const numbers = '0123456789';
+    const lettersLength = letters.length;
+    const numbersLength = numbers.length;
+
+    // 生成第一个字母（大写）
+    username += letters.charAt(Math.floor(Math.random() * lettersLength)).toUpperCase();
+
+    // 生成后面三个字母（小写）
+    for (let i = 0; i < 3; i++) {
+        username += letters.charAt(Math.floor(Math.random() * lettersLength));
+    }
+
+    // 生成后四位数字
+    for (let i = 0; i < 4; i++) {
+        username += numbers.charAt(Math.floor(Math.random() * numbersLength));
+    }
+
+    return username;
+}
+
+
+
 function RegisterPage() {
     const [form] = Form.useForm();
     const [captchaSrc, setCaptchaSrc] = useState("");
@@ -86,6 +111,11 @@ function RegisterPage() {
         }
     }, [refreshCaptcha]);
 
+    useEffect(() => {
+        // 生成用户名并设置到表单中
+        const generatedUsername = generateUsername();
+        form.setFieldsValue({username: generatedUsername});
+    }, [form]);
 
     const validateConfirmPassword = (_: { required?: boolean }, value: string): Promise<void> => {
         return new Promise((resolve, reject) => {
@@ -96,6 +126,11 @@ function RegisterPage() {
                 resolve();
             }
         });
+    };
+    const handleReset = () => {
+        form.resetFields(); // 清空表单
+        const generatedUsername = generateUsername(); // 生成新的用户名
+        form.setFieldsValue({username: generatedUsername}); // 设置新的用户名到表单
     };
 
     const onFinish = useCallback(async (values: any) => {
@@ -129,7 +164,7 @@ function RegisterPage() {
                     </Form.Item>
 
                     <Form.Item name="username" rules={IPT_RULE_USERNAME}>
-                        <Input prefix={<UserOutlined/>} autoComplete="off" placeholder="账号"/>
+                        <Input prefix={<UserOutlined/>} autoComplete="off" placeholder="账号" readOnly />
                     </Form.Item>
 
                     <Form.Item name="email" rules={IPT_RULE_EMAIL}>
@@ -200,7 +235,7 @@ function RegisterPage() {
                         <Button type="primary" htmlType="submit" className="login-form-button">
                             注册
                         </Button>
-                        <Button htmlType="reset">重置</Button>
+                        <Button onClick={handleReset}>重置</Button>
                     </Row>
                 </Form>
             </div>

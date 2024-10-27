@@ -62,6 +62,7 @@ const AddDeptModal = ({visible, onCancel, onCreate, users = []}) => {
                     name={['leader', 'email']}
                 >
                     <Select
+                        showSearch
                         style={{width: '100%'}}
                         placeholder="请选择负责人"
                         value={selectedUser}
