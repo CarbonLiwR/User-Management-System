@@ -19,10 +19,6 @@ const breadcrumbNameMap: Record<string, string> = {
   '/admin/dept': '部门管理',
   '/admin/role': '角色管理',
   '/admin/menu': '菜单管理',
-  '/worklog': '日志管理',
-  '/worklog/search': '搜索日志',
-  '/worklog/show': '查看日志',
-  '/worklog/add': '添加日志',
 };
 
 const LayoutContainer = () => {
@@ -73,24 +69,13 @@ const LayoutContainer = () => {
       <Image src={logoImage} preview={false} width="65px" />
     </div>
     <Menu theme="light" mode="inline" defaultSelectedKeys={['0']}>
-      {/* 动态渲染菜单 */}
       <Menu.Item icon={<HomeOutlined />} key="0">
         <Link to="/">主页</Link>
       </Menu.Item>
       <Menu.Item icon={<UserOutlined />} key="1">
         <Link to="/personal">个人中心</Link>
       </Menu.Item>
-      <SubMenu key="sub2" icon={<FileSearchOutlined />} title="日志管理">
-        <Menu.Item key="5">
-          <Link to="/worklog/search">搜索日志</Link>
-        </Menu.Item>
-        <Menu.Item key="6">
-          <Link to="/worklog/show">查看日志</Link>
-        </Menu.Item>
-        <Menu.Item key="7">
-          <Link to="/worklog/add">添加日志</Link>
-        </Menu.Item>
-      </SubMenu>
+      {/* 动态渲染菜单 */}
       {renderMenuItems(menu)}
     </Menu>
   </Sider>

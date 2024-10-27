@@ -31,7 +31,7 @@ export interface SysDeptReq {
   name: string;
   parent_id?: number;
   sort?: number;
-  worklogStandard?: string;
+  // worklogStandard?: string;
   leader?: string;
   phone?: string;
   email?: string;

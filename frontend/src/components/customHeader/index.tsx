@@ -40,7 +40,7 @@ const CustomHeader = () => {
                 {/*    alt="Logo"*/}
                 {/*    style={{ width: 40, height: 40, marginRight: 16 }}*/}
                 {/*/>*/}
-                <h2 style={{margin: 0}}>技术寻人系统</h2>
+                <h2 style={{margin: 0}}>用户管理系统</h2>
             </div>
 
             {/* 右侧：搜索框、快捷按钮 */}
