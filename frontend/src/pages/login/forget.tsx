@@ -16,7 +16,18 @@ import {
 } from '@ant-design/icons';
 
 const IPT_RULE_USERNAME: Rule[] = [{required: true, message: "请输入用户名"}];
-const IPT_RULE_PASSWORD: Rule[] = [{required: true, message: "请输入密码"}];
+const IPT_RULE_PASSWORD: Rule[] = [
+    {required: true, message: "请输入密码"},
+    {min: 8, message: "密码至少为 8 位"},
+    {
+        pattern: /(?=.*[a-z])(?=.*\d)/,
+        message: "密码必须包含至少一个小写字母和一个数字",
+    },
+    {
+        max: 20,
+        message: "密码不能超过 20 位",
+    },
+];
 const IPT_RULE_EMAIL: Rule[] = [
     {required: true, message: "请输入有效的电子邮箱"},
     {type: 'email', message: "请输入有效的邮箱格式"},
@@ -67,8 +78,8 @@ function ForgetPwdPage() {
         });
     };
 
+
     const onFinish = useCallback(async (values: any) => {
-        console.log(values);
         const resultAction = await dispatch(updatePasswordThunk(values)) as { payload: RegisterRes, error?: any };
 
         if (updatePasswordThunk.fulfilled.match(resultAction)) {

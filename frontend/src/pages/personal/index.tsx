@@ -1,15 +1,21 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Button, Card, Splitter, Row, Col} from 'antd';
+import {Avatar, Button, Card, Splitter, Row, Col, message} from 'antd';
 import EditUserModal from "../../components/modals/editUserModal";
 import {updateUser} from "../../api/user.ts";
 import {useNavigate} from "react-router-dom";
 import {useDispatchUser} from "../../hooks";
+import EditPasswordModal from "../../components/modals/editPasswordModal";
+import {useDispatch} from 'react-redux';
+import {updatePasswordThunk} from "../../service/userService.tsx";
+import {RegisterRes} from "../../api/auth.tsx";
 
 const Personal: React.FC = () => {
     const { fetchUser } = useDispatchUser();
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [isEditUserModalVisible, setIsEditUserModalVisible] = useState(false);
+    const [isEditPasswordModalVisible, setIsEditPasswordModalVisible] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const loadUser = async () => { // 将 loadUser 提取到外部
         const user = await fetchUser();
@@ -33,6 +39,25 @@ const Personal: React.FC = () => {
     const handleCancelEditUser = () => {
         setIsEditUserModalVisible(false);
     };
+
+    const showEditPasswordModal = () => {
+        setIsEditPasswordModalVisible(true);
+    }
+
+    const handleEditPassword = async (passwordData: any) => {
+        const resultAction = await dispatch(updatePasswordThunk(passwordData)) as { payload: RegisterRes, error?: any };
+
+        if (updatePasswordThunk.fulfilled.match(resultAction)) {
+            const {data} = resultAction.payload; // 确保从 payload 中提取 msg
+            message.success(data || "密码修改成功", 3);
+            navigate('/login'); // 添加这一行以使用 navigate
+        }
+        setIsEditPasswordModalVisible(false);
+    }
+
+    const handleCancelEditPassword = () => {
+        setIsEditPasswordModalVisible(false);
+    }
 
     const data = currentUser ? [
         {
@@ -62,6 +87,13 @@ const Personal: React.FC = () => {
                 user={currentUser}
             />
 
+            <EditPasswordModal
+                visible={isEditPasswordModalVisible}
+                onCancel={handleCancelEditPassword}
+                onCreate={handleEditPassword}
+                user={currentUser}
+            />
+
             <Splitter style={{height: "80vh", boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'}}>
                 <Splitter.Panel defaultSize="35%" min="20%" max="50%" style={{textAlign: 'center'}}>
                     <Card title="用户信息">
@@ -88,7 +120,7 @@ const Personal: React.FC = () => {
                     </Button>
                     <Button
                         style={{position: "relative", bottom: "-30vh"}}
-                        onClick={() => navigate('/forget')}
+                        onClick={showEditPasswordModal}
                     >
                         修改密码
                     </Button>
