@@ -77,9 +77,9 @@ async def update_user(request: Request, username: Annotated[str, Path(...)], obj
 
 @router.put(
     '/{username}/dept',
-    summary='更新用户部门',
+    summary='编辑用户部门',
     dependencies=[
-        Depends(RequestPermission('sys:user:dept:edit')),
+        Depends(RequestPermission('sys:user:dept')),
         DependsRBAC,
     ],
 )
@@ -94,7 +94,7 @@ async def update_user_dept(
     '/{username}/role',
     summary='更新用户角色',
     dependencies=[
-        Depends(RequestPermission('sys:user:role:edit')),
+        Depends(RequestPermission('sys:user:role')),
         DependsRBAC,
     ],
 )
@@ -167,8 +167,8 @@ async def multi_set(request: Request, pk: Annotated[int, Path(...)]) -> Response
 
 @router.delete(
     path='/{username}',
-    summary='用户注销',
-    description='用户注销 != 用户登出，注销之后用户将从数据库删除',
+    summary='删除用户',
+    description='',
     dependencies=[
         Depends(RequestPermission('sys:user:del')),
         DependsRBAC,

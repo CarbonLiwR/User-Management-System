@@ -86,7 +86,7 @@ const PermissionDrawer = ({visible, onCancel, onEdit, permission, allPermission}
 
     const handleOk = () => {
         const filteredKeys = addParentKeys(checkedKeys);
-        console.log(filteredKeys);
+        // console.log(filteredKeys);
         onEdit(filteredKeys);
         onCancel();
     };

@@ -9,7 +9,6 @@ const AddDeptModal = ({visible, onCancel, onCreate, users = []}) => {
 
     useEffect(() => {
         setSelectedUser(users.map((user) => user.nickname));
-        console.log(selectedUser);
     }, [users]);
 
     // 提交表单数据
@@ -70,7 +69,6 @@ const AddDeptModal = ({visible, onCancel, onCreate, users = []}) => {
                             const selectedUserData = users.find((user) => user.nickname === newUsers);
                             if (selectedUserData) {
                                 setSelectedUser(newUsers);
-                                console.log('Selected User:', selectedUserData); // 输出选中的用户信息
                             }
                         }}
                     >

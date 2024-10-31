@@ -61,7 +61,7 @@ class ServerError(BaseExceptionMixin):
     code = StandardResponseCode.HTTP_500
 
     def __init__(
-        self, *, msg: str = 'Internal Server Error', data: Any = None, background: BackgroundTask | None = None
+        self, *, msg: str = '服务器错误', data: Any = None, background: BackgroundTask | None = None
     ):
         super().__init__(msg=msg, data=data, background=background)
 
@@ -69,19 +69,19 @@ class ServerError(BaseExceptionMixin):
 class GatewayError(BaseExceptionMixin):
     code = StandardResponseCode.HTTP_502
 
-    def __init__(self, *, msg: str = 'Bad Gateway', data: Any = None, background: BackgroundTask | None = None):
+    def __init__(self, *, msg: str = '错误网关', data: Any = None, background: BackgroundTask | None = None):
         super().__init__(msg=msg, data=data, background=background)
 
 
 class AuthorizationError(BaseExceptionMixin):
     code = StandardResponseCode.HTTP_401
 
-    def __init__(self, *, msg: str = 'Permission Denied', data: Any = None, background: BackgroundTask | None = None):
+    def __init__(self, *, msg: str = '权限不足', data: Any = None, background: BackgroundTask | None = None):
         super().__init__(msg=msg, data=data, background=background)
 
 
 class TokenError(HTTPError):
     code = StandardResponseCode.HTTP_401
 
-    def __init__(self, *, msg: str = 'Not Authenticated', headers: dict[str, Any] | None = None):
+    def __init__(self, *, msg: str = '未认证', headers: dict[str, Any] | None = None):
         super().__init__(code=self.code, msg=msg, headers=headers or {'WWW-Authenticate': 'Bearer'})

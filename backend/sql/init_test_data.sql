@@ -14,7 +14,7 @@ VALUES  (1, '系统管理', 'admin', 0, 6, 'IconSettings', '', 0, null, null, 1,
         (10, '新增', '', 0, 0, null, null, 2, null, 'sys:role:add', 1, 1, 1, null, 9, '2024-01-07 11:58:37', null),
         (11, '编辑', '', 0, 0, null, null, 2, null, 'sys:role:edit', 1, 1, 1, null, 9, '2024-01-07 11:58:52', null),
         (12, '删除', '', 0, 0, null, null, 2, null, 'sys:role:del', 1, 1, 1, null, 9, '2024-01-07 11:59:07', null),
-        (13, '编辑角色菜单', '', 0, 0, null, null, 2, null, 'sys:role:menu:edit', 1, 1, 1, null, 9, '2024-01-07 01:59:39', null),
+        (13, '设置角色权限', '', 0, 0, null, null, 2, null, 'sys:role:menu:edit', 1, 1, 1, null, 9, '2024-01-07 01:59:39', null),
 
 INSERT INTO fba.sys_role (id, name, data_scope, status, remark, created_time, updated_time)
 VALUES (1, '超级管理权限', 1, 1, null, '2024-10-27 17:17:17', null);

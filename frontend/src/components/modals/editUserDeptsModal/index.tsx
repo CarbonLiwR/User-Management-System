@@ -5,8 +5,6 @@ const {Option} = Select;
 
 const EditDeptsModal = ({visible, depts = [], allDepts = [], onCancel, onEdit}) => {
     const [selectedDepts, setSelectedDepts] = useState(depts.map((dept) => dept.name));
-    console.log(depts);
-    console.log(allDepts);
     // 当 props 中的 depts 变化时，更新本地状态
     useEffect(() => {
         setSelectedDepts(depts.map((dept) => dept.name));

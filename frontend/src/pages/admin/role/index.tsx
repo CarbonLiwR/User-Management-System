@@ -109,14 +109,20 @@ const AdminRolePage = () => {
 
     // 处理新建角色
     const handleCreateRole = async (values: any) => {
-        try {
-            await createNewRole(values);
-            setModalVisible(false);
-            fetchRoles(); // 刷新角色列表
-        } catch (error) {
-            console.error(error);
+        const response = await createNewRole(values);
+        setModalVisible(false); // 关闭模态框
+
+        // 检查是否返回了拒绝状态
+        if (response.type === 'role/createRole/rejected') {
+            // 如果返回的是拒绝状态，手动处理错误
+            message.error('角色创建失败');
+            return; // 退出函数
         }
+        message.success('角色创建成功');
+
+        fetchRoles(); // 刷新角色列表
     };
+
 
     // 显示新建模态框
     const showModal = () => {
@@ -141,25 +147,34 @@ const AdminRolePage = () => {
 
     // 处理编辑角色的更新
     const handleEditRole = async (values: any) => {
-        try {
-            await updateRoleInfo(currentRole.id, values);
-            setEditModalVisible(false);
-            fetchRoles(); // 刷新角色列表
-        } catch (error) {
-            console.error(error);
+        const response = await updateRoleInfo(currentRole.id, values);
+
+        setEditModalVisible(false); // 关闭模态框
+
+        // 检查是否返回了拒绝状态
+        if (response.type === 'role/updateRole/rejected') {
+            // 如果返回的是拒绝状态，手动处理错误
+            message.error('角色更新失败');
+            return; // 退出函数
         }
+        message.success('角色更新成功');
+        fetchRoles(); // 刷新角色列表
     };
 
+
     const handleEditPermission = async (values: number[]) => {
-        try {
-            // console.log(values)
-            await updateRoleMenus(currentRole.id, {menus: values});
-            message.success('权限设置成功');
-            setEditModalVisible(false);
-            fetchRoles(); // 刷新角色列表
-        } catch (error) {
-            console.error(error);
+        const response = await updateRoleMenus(currentRole.id, {menus: values});
+        console.log(response);
+        setEditModalVisible(false); // 关闭模态框
+
+        // 检查是否返回了拒绝状态
+        if (response.type === 'role/updateRoleMenu/rejected') {
+            // 如果返回的是拒绝状态，手动处理错误
+            message.error('权限更新失败');
+            return; // 退出函数
         }
+        message.success('权限更新成功');
+        fetchRoles(); // 刷新角色列表
     };
 
 
@@ -177,14 +192,19 @@ const AdminRolePage = () => {
 
     // 处理删除角色
     const handleDelete = async () => {
-        try {
-            await removeRole({pk: selectedRowKeys as number[]});
-            setSelectedRowKeys([]);
-            fetchRoles();
-        } catch (error) {
-            console.error(error);
+        const response = await removeRole({pk: selectedRowKeys as number[]});
+        setSelectedRowKeys([]); // 清空选中的行
+
+        // 检查是否返回了拒绝状态
+        if (response.type === 'role/deleteRole/rejected') {
+            // 如果返回的是拒绝状态，手动处理错误
+            message.error('角色删除失败');
+            return; // 退出函数
         }
+        message.success('角色删除成功');
+        fetchRoles(); // 刷新角色列表
     };
+
 
     // 分页变化时调用
     const handlePaginationChange = (page: number, pageSize: number) => {

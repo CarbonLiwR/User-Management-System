@@ -1,12 +1,13 @@
-import React, {useCallback, useState, useEffect, useRef} from "react";
+import {useCallback, useState, useEffect, useRef} from "react";
 import {Form, Input, Button, Checkbox, message, Row, Image, Col} from "antd";
 import {Link, useNavigate} from "react-router-dom";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import type {LoginData} from '../../api/auth';
 import {useDispatchUser} from '../../hooks';
 import './index.css'
 import {EyeInvisibleOutlined, EyeOutlined, UserOutlined, LockOutlined, CheckCircleOutlined} from "@ant-design/icons";
+import {setInfo} from "../../store/userSlice.tsx";
 
 const IPT_RULE_USERNAME = [{required: true, message: "请输入用户名"}];
 const IPT_RULE_PASSWORD = [{required: true, message: "请输入密码"}];
@@ -14,6 +15,7 @@ const IPT_RULE_CAPTCHA = [{required: true, message: "请输入验证码"}];
 
 function LoginPage() {
     const [btnLoad, setBtnLoad] = useState(false);
+    const dispatch = useDispatch();
 
     const navigate = useNavigate(); // 使用 useNavigate hook
     const captchaSrc = useSelector((state: RootState) => state.user.captcha);
@@ -40,16 +42,20 @@ function LoginPage() {
         login(values)
             .unwrap()
             .then(() => {
-                fetchUser().unwrap().then(() => {
-                    message.success('登录成功');
-                    navigate('/'); // 登录成功后跳转首页
-                });
+                return fetchUser().unwrap();
+            })
+            .then((userInfo) => {
+                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                dispatch(setInfo(userInfo));
+                navigate('/'); // 跳转到首页
             })
             .catch((error) => {
                 setBtnLoad(false);
+                console.error("Login error:", error);
                 message.error(error.message || '登录失败，请重试');
             });
-    }, [login, fetchUser, navigate]);
+    }, [login, fetchUser, dispatch, navigate]);
+
 
     return (
         <div className="login-container">

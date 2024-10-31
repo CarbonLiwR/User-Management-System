@@ -69,6 +69,7 @@ class Settings(BaseSettings):
     TOKEN_REQUEST_PATH_EXCLUDE: list[str] = [  # JWT / RBAC 白名单
         f'{FASTAPI_API_V1_PATH}/auth/login',
         f'{FASTAPI_API_V1_PATH}/auth/captcha',
+        f'{FASTAPI_API_V1_PATH}/auth/register',
         f'{FASTAPI_API_V1_PATH}/sys/users/register',
         f'{FASTAPI_API_V1_PATH}/sys/users/reset_password',
         f'{FASTAPI_API_V1_PATH}/show/worklogs/show',

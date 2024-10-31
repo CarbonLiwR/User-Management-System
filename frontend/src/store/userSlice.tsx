@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {
     loginUser,
     logout,
@@ -14,8 +14,8 @@ import {
     changeUserStaffThunk,
     changeUserMultiThunk, updateUserRoleThunk, updateUserDeptThunk
 } from '../service/userService';  // Assuming you have created these Thunks
-import { setToken, clearToken } from '../utils/auth';
-import { UserState} from "../types";
+import {setToken, clearToken} from '../utils/auth';
+import {UserState} from "../types";
 
 const initialState: UserState = {
     username: '',
@@ -39,13 +39,13 @@ const userSlice = createSlice({
     reducers: {
         // 部分更新用户信息
         setInfo: (state, action: PayloadAction<Partial<UserState>>) => {
-            return { ...state, ...action.payload }; // 部分更新用户状态
+            return {...state, ...action.payload}; // 部分更新用户状态
         },
 
         // 重置用户信息
         resetInfo: (state) => {
             clearToken(); // Clear the token upon reset
-            return { ...initialState };
+            return {...initialState};
         },
     },
     extraReducers: (builder) => {
@@ -55,6 +55,7 @@ const userSlice = createSlice({
                 state.status = 'succeeded';
                 setToken(action.payload.access_token); // Set token in storage
                 Object.assign(state, action.payload.user);
+                localStorage.setItem('userInfo', JSON.stringify(action.payload.user));
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.status = 'failed';
@@ -65,9 +66,14 @@ const userSlice = createSlice({
         builder
             .addCase(logout.fulfilled, (state) => {
                 state.status = 'succeeded';
-                state = initialState;
-                clearToken(); // Clear token on logout
+                clearToken(); // 清除 token
+                clearUserInfo(); // 清除 localStorage 中的用户信息
+                return initialState;
             });
+
+        const clearUserInfo = () => {
+            localStorage.removeItem('userInfo');
+        };
 
         // Handle captcha fetching
         builder
@@ -94,7 +100,6 @@ const userSlice = createSlice({
         // Handle fetching user info
         builder
             .addCase(fetchUserMenu.fulfilled, (state, action) => {
-                console.log(action.payload);
                 state.status = 'succeeded';
                 state.menu = action.payload;
             })
@@ -132,7 +137,7 @@ const userSlice = createSlice({
                 state.status = 'succeeded';
                 const updatedUserIndex = state.userList.findIndex(user => user.username === action.meta.arg.username);
                 if (updatedUserIndex >= 0) {
-                    state.userList[updatedUserIndex] = { ...state.userList[updatedUserIndex], ...action.meta.arg.data };
+                    state.userList[updatedUserIndex] = {...state.userList[updatedUserIndex], ...action.meta.arg.data};
                 }
             })
             .addCase(updateUserThunk.rejected, (state, action) => {
@@ -147,7 +152,7 @@ const userSlice = createSlice({
                 console.log("action.meta", action.meta)
                 const updatedUserIndex = state.userList.findIndex(user => user.username === action.meta.arg.username);
                 if (updatedUserIndex >= 0) {
-                    state.userList[updatedUserIndex] = { ...state.userList[updatedUserIndex], ...action.meta.arg.data };
+                    state.userList[updatedUserIndex] = {...state.userList[updatedUserIndex], ...action.meta.arg.data};
                 }
             })
             .addCase(updateUserRoleThunk.rejected, (state, action) => {
@@ -161,7 +166,7 @@ const userSlice = createSlice({
                 state.status = 'succeeded';
                 const updatedUserIndex = state.userList.findIndex(user => user.username === action.meta.arg.username);
                 if (updatedUserIndex >= 0) {
-                    state.userList[updatedUserIndex] = { ...state.userList[updatedUserIndex], ...action.meta.arg.data };
+                    state.userList[updatedUserIndex] = {...state.userList[updatedUserIndex], ...action.meta.arg.data};
                 }
             })
             .addCase(updateUserDeptThunk.rejected, (state, action) => {
@@ -196,7 +201,7 @@ const userSlice = createSlice({
                 state.status = 'succeeded';
                 const updatedUser = state.userList.find(user => user.id === action.meta.arg);
                 if (updatedUser) {
-                    updatedUser.is_superuser = ! updatedUser.is_superuser;  // Toggle superuser
+                    updatedUser.is_superuser = !updatedUser.is_superuser;  // Toggle superuser
                 }
             });
 
@@ -222,6 +227,6 @@ const userSlice = createSlice({
     },
 });
 
-export const { resetInfo, setInfo } = userSlice.actions;
+export const {resetInfo, setInfo} = userSlice.actions;
 
 export default userSlice.reducer;

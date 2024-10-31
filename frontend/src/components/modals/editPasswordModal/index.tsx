@@ -25,7 +25,7 @@ const EditUserModal = ({visible, onCancel, onCreate, user}) => {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false); // 添加确认密码可见性状态
     const [captchaSrc, setCaptchaSrc] = useState("");
-    console.log(user);
+    // console.log(user);
     const refreshCaptcha = useCallback(async () => {
         try {
             const captcha = await getCaptcha();

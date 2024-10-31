@@ -64,29 +64,52 @@ const AdminUserPage = () => {
 
     const handleEditDepts = (depts) => {
         updateUserDept(currentUser.username, {depts: depts}).then(() => {
-            message.success('成功更新用户角色！！！');
+            message.success('成功更新用户部门！！！');
         })
         setIsEditDeptsModalVisible(false);
     };
 
     const handleAddUser = async (userData) => {
         await addUser(userData);
+
         // Add your user creation logic here (e.g., API call)
         setIsAddUserModalVisible(false);
     };
 
     const handleEditUser = async (userData) => {
-        await updateUser(currentUser.username, userData);
-        // Add your user creation logic here (e.g., API call)
-        setIsEditUserModalVisible(false);
+        const response = await updateUser(currentUser.username, userData);
+        console.log(response);
+
+        // 检查是否返回了拒绝状态
+        if (response.type === 'user/updateUser/rejected') {
+            message.error('用户编辑失败');
+            return; // 退出函数
+        }
+
+        setIsEditUserModalVisible(false); // 关闭编辑用户模态框
+        // 这里可以添加刷新用户列表的逻辑，例如调用 fetchUsers()
     };
 
+
     const handleEditRoles = async (roles: number[]) => {
-        updateUserRole(currentUser.username, {roles: roles}).then(() => {
-            message.success('成功更新用户角色！！！');
-        })
-        setIsEditRolesModalVisible(false);
+        try {
+            const response = await updateUserRole(currentUser.username, {roles});
+
+            // 检查是否返回了拒绝状态
+            if (response.type === 'user/updateUserRole/rejected') {
+                message.error('更新用户角色失败');
+                return; // 退出函数
+            }
+
+            message.success('成功更新用户角色');
+            setIsEditRolesModalVisible(false); // 关闭编辑角色模态框
+            // 可以在这里调用刷新用户角色的逻辑，例如 fetchUserRoles()
+        } catch (error) {
+            console.error(error);
+            message.error('更新用户角色时发生错误');
+        }
     };
+
 
     const [searchParams, setSearchParams] = useState({
         username: '',
