@@ -46,8 +46,7 @@ class UserService:
     @staticmethod
     async def add(*, request: Request, obj: AddUserParam) -> None:
         async with async_db_session.begin() as db:
-            # superuser_verify(request)
-            print("ojbk")
+            superuser_verify(request)
             username = await user_dao.get_by_username(db, obj.username)
             if username:
                 raise errors.ForbiddenError(msg='用户已注册')

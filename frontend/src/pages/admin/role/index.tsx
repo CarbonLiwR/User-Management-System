@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {Table, Button, Input, Select, Space, Alert, Tag, Pagination, Divider, message} from 'antd';
-import { SearchOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useDispatchRole, useDispatchMenu} from '../../../hooks'; // 使用自定义 hook
+import {SearchOutlined, PlusOutlined, DeleteOutlined} from '@ant-design/icons';
+import {useDispatchRole, useDispatchMenu} from '../../../hooks'; // 使用自定义 hook
 import CreateRoleModal from "../../../components/modals/createRoleModal";
 import EditRoleModal from "../../../components/modals/editRoleModal";
 import PermissionDrawer from "../../../components/modals/permissionDrawer";  // 引入权限设置抽屉
 
 
-const { Option } = Select;
+const {Option} = Select;
 
 const AdminRolePage = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 20, total: 0 });
+    const [pagination, setPagination] = useState({current: 1, pageSize: 20, total: 0});
     const [roleName, setRoleName] = useState('');
     const [status, setStatus] = useState<string | undefined>(undefined);
     const [modalVisible, setModalVisible] = useState(false);
@@ -21,8 +21,8 @@ const AdminRolePage = () => {
     const [permissions, setPermissions] = useState([]); // 存储所有权限
 
 
-    const { getRoleList, createNewRole, updateRoleInfo, removeRole, updateRoleMenus} = useDispatchRole(); // 从 hook 获取函数
-    const { getMenuTree } = useDispatchMenu();  // 从menuHook获取权限菜单
+    const {getRoleList, createNewRole, updateRoleInfo, removeRole, updateRoleMenus} = useDispatchRole(); // 从 hook 获取函数
+    const {getMenuTree} = useDispatchMenu();  // 从menuHook获取权限菜单
     const [loading, setLoading] = useState(false);
     const [roles, setRoles] = useState([]);
 
@@ -41,7 +41,7 @@ const AdminRolePage = () => {
                 getMenuTree(),           // 获取所有权限菜单
             ]);
             setRoles(roleResponse.payload.items);
-            setPagination({ current: page, pageSize, total: roleResponse.payload.total });
+            setPagination({current: page, pageSize, total: roleResponse.payload.total});
             setPermissions(menuResponse.payload);  // 存储所有权限菜单
         } finally {
             setLoading(false);
@@ -164,10 +164,9 @@ const AdminRolePage = () => {
 
 
     // 显示权限设置 Drawer
-    const showPermissionDrawer = (record: any) => {
+    const showPermissionDrawer = async (record) => {
         setCurrentRole(record);
-        console.log("当前角色yes666"+JSON.stringify(record));
-        // setSelectedPermissions(record.menus.map(menu => menu.id.toString())); // 设置当前角色的选中权限
+        await fetchRoles(); // 确保角色数据加载完毕
         setDrawerVisible(true); // 打开 Drawer
     };
 
@@ -179,7 +178,7 @@ const AdminRolePage = () => {
     // 处理删除角色
     const handleDelete = async () => {
         try {
-            await removeRole({ pk: selectedRowKeys as number[] });
+            await removeRole({pk: selectedRowKeys as number[]});
             setSelectedRowKeys([]);
             fetchRoles();
         } catch (error) {
@@ -189,7 +188,7 @@ const AdminRolePage = () => {
 
     // 分页变化时调用
     const handlePaginationChange = (page: number, pageSize: number) => {
-        setPagination({ ...pagination, current: page, pageSize });
+        setPagination({...pagination, current: page, pageSize});
         fetchRoles(page, pageSize);
     };
 
@@ -217,7 +216,7 @@ const AdminRolePage = () => {
                 <Button type="primary" icon={<SearchOutlined/>} onClick={() => fetchRoles()}>
                     搜索
                 </Button>
-                <Button  onClick={() => {
+                <Button onClick={() => {
                     setRoleName('');
                     setStatus(undefined);
                     fetchRoles();

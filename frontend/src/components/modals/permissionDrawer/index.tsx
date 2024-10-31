@@ -31,23 +31,21 @@ const PermissionDrawer = ({visible, onCancel, onEdit, permission, allPermission}
     const [searchValue, setSearchValue] = useState('');
     const [filteredTreeData, setFilteredTreeData] = useState([]);
     const [parentMap, setParentMap] = useState(new Map());
-    console.log("xianzai"+JSON.stringify(permission))
+
 
     useEffect(() => {
         if (permission?.menus) {
             const {treeData, parentMap} = formatMenusToTreeData(allPermission);
             setTreeData(treeData);
-            console.log(parentMap)
             setParentMap(parentMap);
-            console.log("parentmap"+JSON.stringify(parentMap));
 
             const leafChecked = permission.menus.map(menu => menu.id);
-            console.log(leafChecked);
-            const  q=removeParentKeys(leafChecked);
-            console.log(q);
+            const q = removeParentKeys(leafChecked);
+
             setCheckedKeys(q); // 初始设置前先调用
         }
-    }, [visible===true]);
+    }, [permission, allPermission]); // 添加依赖项
+
 
     // 处理选中的权限变化
     const onCheck = (checkedKeysValue) => {

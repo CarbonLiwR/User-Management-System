@@ -17,25 +17,7 @@ import {
 } from '@ant-design/icons';
 
 const IPT_RULE_NICKNAME = [{required: true, message: "请输入昵称"}];
-const IPT_RULE_USERNAME: Rule[] = [
-    {required: true, message: "请输入用户名"},
-    {min: 8, message: "用户名至少为 8 位"},
-    {
-        pattern: /^[a-zA-Z0-9!@#$%^&*()_+=[\]{};':"\\|,.<>?`~]*$/,
-        message: "用户名只能包含字母、数字和常见符号",
-    },
-    {
-        validator: async (_, value) => {
-            if (value) {
-                const letterCount = (value.match(/[a-zA-Z]/g) || []).length;
-                if (letterCount < 5) {
-                    return Promise.reject(new Error("用户名必须包含至少 5 个字母"));
-                }
-            }
-            return Promise.resolve();
-        },
-    },
-];
+const IPT_RULE_USERNAME: Rule[] = [{required: true, message: "请输入用户名"}];
 const IPT_RULE_PASSWORD: Rule[] = [
     {required: true, message: "请输入密码"},
     {min: 8, message: "密码至少为 8 位"},
