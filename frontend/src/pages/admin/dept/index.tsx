@@ -104,7 +104,6 @@ const AdminDeptPage = () => {
     const handleAddDept = async (values: any) => {
         try {
             await addDepartment(values);
-            message.success('部门创建成功');
             setIsModalVisible(false); // 关闭模态框
             fetchAllDepartments();
         } catch (error) {

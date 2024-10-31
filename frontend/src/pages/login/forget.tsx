@@ -4,7 +4,7 @@ import {Rule} from 'antd/es/form'; // 引入 Rule 类型
 import {Link, useNavigate} from "react-router-dom";
 import {getCaptcha, RegisterRes} from '../../api/auth';
 import {useDispatch} from 'react-redux';
-import {register as registerThunk, updatePasswordThunk} from "../../service/userService.tsx";
+import {updatePasswordThunk} from "../../service/userService.tsx";
 import './index.css';
 import {
     EyeInvisibleOutlined,

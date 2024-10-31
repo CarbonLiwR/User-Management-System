@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Input, Select, Space, Alert, Tag, Pagination, Divider } from 'antd';
+import {Table, Button, Input, Select, Space, Alert, Tag, Pagination, Divider, message} from 'antd';
 import { SearchOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useDispatchRole, useDispatchMenu} from '../../../hooks'; // 使用自定义 hook
 import CreateRoleModal from "../../../components/modals/createRoleModal";
@@ -152,8 +152,9 @@ const AdminRolePage = () => {
 
     const handleEditPermission = async (values: number[]) => {
         try {
-            console.log(values)
+            // console.log(values)
             await updateRoleMenus(currentRole.id, {menus: values});
+            message.success('权限设置成功');
             setEditModalVisible(false);
             fetchRoles(); // 刷新角色列表
         } catch (error) {
@@ -161,9 +162,11 @@ const AdminRolePage = () => {
         }
     };
 
+
     // 显示权限设置 Drawer
     const showPermissionDrawer = (record: any) => {
         setCurrentRole(record);
+        console.log("当前角色yes666"+JSON.stringify(record));
         // setSelectedPermissions(record.menus.map(menu => menu.id.toString())); // 设置当前角色的选中权限
         setDrawerVisible(true); // 打开 Drawer
     };

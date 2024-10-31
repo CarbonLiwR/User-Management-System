@@ -19,7 +19,7 @@ from backend.app.admin.schema.user import (
     UpdateUserDeptParam,
 )
 from backend.common.exception import errors
-from backend.common.security.jwt import get_hash_password, get_token, password_verify, superuser_verify
+from backend.common.security.jwt import get_hash_password, get_token, password_verify, superuser_verify, user_verify
 from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
 from backend.database.db_redis import redis_client
@@ -46,7 +46,8 @@ class UserService:
     @staticmethod
     async def add(*, request: Request, obj: AddUserParam) -> None:
         async with async_db_session.begin() as db:
-            superuser_verify(request)
+            # superuser_verify(request)
+            print("ojbk")
             username = await user_dao.get_by_username(db, obj.username)
             if username:
                 raise errors.ForbiddenError(msg='用户已注册')
@@ -109,9 +110,9 @@ class UserService:
     @staticmethod
     async def update(*, request: Request, username: str, obj: UpdateUserParam) -> int:
         async with async_db_session.begin() as db:
-            if not request.user.is_superuser:
-                if request.user.username != username:
-                    raise errors.ForbiddenError(msg='你只能修改自己的信息')
+            # if not request.user.is_superuser:
+            #     if request.user.username != username:
+            #         raise errors.ForbiddenError(msg='你只能修改自己的信息')
             input_user = await user_dao.get_with_relation(db, username=username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -134,9 +135,9 @@ class UserService:
     @staticmethod
     async def update_depts(*, request: Request, username: str, obj: UpdateUserDeptParam) -> None:
         async with async_db_session.begin() as db:
-            if not request.user.is_superuser:
-                if request.user.username != username:
-                    raise errors.AuthorizationError
+            # if not request.user.is_superuser:
+            #     if request.user.username != username:
+            #         raise errors.AuthorizationError
             input_user = await user_dao.get_with_relation(db, username=username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -151,9 +152,14 @@ class UserService:
     @staticmethod
     async def update_roles(*, request: Request, username: str, obj: UpdateUserRoleParam) -> None:
         async with async_db_session.begin() as db:
-            if not request.user.is_superuser:
-                if request.user.username != username:
-                    raise errors.AuthorizationError
+            # 得到当前用户的权限/menu
+            # 当前功能在不在这个menu
+            # if / not in menu
+
+            # 封装function (user, current_function)
+            # if not request.user.is_superuser:
+            #     if request.user.username != username:
+            #         raise errors.AuthorizationError
             input_user = await user_dao.get_with_relation(db, username=username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')
@@ -170,9 +176,9 @@ class UserService:
     @staticmethod
     async def update_avatar(*, request: Request, username: str, avatar: AvatarParam) -> int:
         async with async_db_session.begin() as db:
-            if not request.user.is_superuser:
-                if request.user.username != username:
-                    raise errors.AuthorizationError
+            # if not request.user.is_superuser:
+            #     if request.user.username != username:
+            #         raise errors.AuthorizationError
             input_user = await user_dao.get_by_username(db, username)
             if not input_user:
                 raise errors.NotFoundError(msg='用户不存在')

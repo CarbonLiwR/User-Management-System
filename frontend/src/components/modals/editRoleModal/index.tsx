@@ -8,6 +8,7 @@ const EditRoleModal = ({ visible, onCancel, onEdit, role }) => {
 
     useEffect(() => {
         if (role) {
+            // console.log(role);
             form.setFieldsValue(role); // 预填充表单数据
         }
     }, [role, form]);
@@ -16,7 +17,6 @@ const EditRoleModal = ({ visible, onCancel, onEdit, role }) => {
         form
             .validateFields()
             .then((values) => {
-                console.log(values);
                 onEdit(values);
                 form.resetFields();
             })

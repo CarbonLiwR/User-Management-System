@@ -79,7 +79,8 @@ class Settings(BaseSettings):
     JWT_USER_REDIS_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7
 
     # Permission (RBAC)
-    PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'casbin'
+    # PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'casbin'
+    PERMISSION_MODE: Literal['casbin', 'role-menu'] = 'role-menu'
     PERMISSION_REDIS_PREFIX: str = 'fba:permission'
 
     # RBAC

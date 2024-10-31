@@ -45,7 +45,7 @@ class MenuService:
     @staticmethod
     async def get_user_menu_tree(*,  request: Request) -> list[dict[str, Any]]:
         async with async_db_session() as db:
-            print(request.user)
+            # print(request.user)
             if request.user.is_superuser:
                 print(request.user.username)
                 menu_select = await menu_dao.get_all(db)

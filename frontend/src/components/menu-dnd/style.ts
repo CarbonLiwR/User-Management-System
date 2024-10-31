@@ -1,4 +1,4 @@
-import { ThemeToken } from '@/types';
+import { ThemeToken } from '../../types';
 import { createStyles } from 'antd-style';
 export default createStyles(({ css }, token: ThemeToken) => ({
   dndDody: css`

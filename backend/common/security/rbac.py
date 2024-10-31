@@ -77,6 +77,7 @@ class RBAC:
         if data_scope:
             return
         user_uuid = request.user.uuid
+
         if settings.PERMISSION_MODE == 'role-menu':
             # 角色菜单权限校验
             path_auth_perm = getattr(request.state, 'permission', None)
@@ -88,8 +89,12 @@ class RBAC:
             allow_perms = []
             for role in user_roles:
                 for menu in role.menus:
+                    # if menu.status == StatusType.enable:
+                    #     allow_perms.extend(menu.perms.split(','))
                     if menu.status == StatusType.enable:
-                        allow_perms.extend(menu.perms.split(','))
+                        if menu.perms:  # 检查 perms 是否为 None 或空字符串
+                            allow_perms.extend(menu.perms.split(','))
+
             if path_auth_perm not in allow_perms:
                 raise AuthorizationError
         else:

@@ -1,9 +1,21 @@
 import React from 'react';
 import { Modal, Form, Input, Select, Button } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import {Rule} from "antd/es/form";
 
 const { Option } = Select;
-
+const IPT_RULE_PASSWORD: Rule[] = [
+    {required: true, message: "请输入密码"},
+    {min: 8, message: "密码至少为 8 位"},
+    {
+        pattern: /(?=.*[a-z])(?=.*\d)/,
+        message: "密码必须包含至少一个小写字母和一个数字",
+    },
+    {
+        max: 20,
+        message: "密码不能超过 20 位",
+    },
+];
 const AddUserModal = ({ visible, allRoles = [], allDepts = [], onCancel, onCreate }) => {
     const [form] = Form.useForm();
 
@@ -61,7 +73,7 @@ const AddUserModal = ({ visible, allRoles = [], allDepts = [], onCancel, onCreat
 
                 <Form.Item
                     name="nickname"
-                    label="用户名"
+                    label="昵称"
                     // rules={[{ required: true, message: '请输入用户名' }]}
                 >
                     <Input placeholder="请输入昵称" />
@@ -78,7 +90,7 @@ const AddUserModal = ({ visible, allRoles = [], allDepts = [], onCancel, onCreat
                 <Form.Item
                     name="password"
                     label="密码"
-                    rules={[{ required: true, message: '请输入密码' }]}
+                    rules={IPT_RULE_PASSWORD}
                 >
                     <Input.Password
                         placeholder="请输入密码"

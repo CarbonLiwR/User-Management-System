@@ -1,4 +1,4 @@
-import { useThemeToken } from "@/hooks"
+import { useThemeToken } from "../../hooks"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import useStyle from "./style"
 export type CloseType = "all" | "right" | "left" | "current"

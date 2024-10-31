@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Drawer, Tree, Button, Space, Input } from 'antd';
+import React, {useEffect, useState} from 'react';
+import {Drawer, Tree, Button, Space, Input} from 'antd';
 
 // 将 menus 转换为适合 antd Tree 使用的数据格式并生成 parentMap
 const formatMenusToTreeData = (menus) => {
@@ -7,63 +7,54 @@ const formatMenusToTreeData = (menus) => {
 
     const buildTree = (list, parent = null) => {
         return list.map((item) => {
-            // 将当前项的父节点存入 parentMap
             if (parent !== null) {
                 parentMap.set(item.id, parent);
             }
             return {
                 title: item.title,
-                key: item.id, // key 必须是字符串
-                children: item.children ? buildTree(item.children, item.id) : [], // 如果有 children 递归处理
+                key: item.id,
+                children: item.children ? buildTree(item.children, item.id) : [],
             };
         });
     };
 
     return {
         treeData: buildTree(menus),
-        parentMap, // 返回 parentMap 以便在后续操作中使用
+        parentMap,
     };
 };
 
-// 判断是否为叶子节点
-const isLeafNode = (menu, allPermission) => {
-    // 查找该节点是否有子节点
-    const found = allPermission.find(item => item.id === menu.id);
-    return !found || !found.children || found.children.length === 0;
-};
-
-const PermissionDrawer = ({ visible, onCancel, onEdit, permission, allPermission }) => {
-    const [checkedKeys, setCheckedKeys] = useState<string[]>([]); // 存储选中的权限
-    const [expandedKeys, setExpandedKeys] = useState<string[]>([]); // 存储展开的节点
-    const [treeData, setTreeData] = useState([]); // 存储转换后的树形菜单数据
-    const [searchValue, setSearchValue] = useState(''); // 搜索值
+const PermissionDrawer = ({visible, onCancel, onEdit, permission, allPermission}) => {
+    const [checkedKeys, setCheckedKeys] = useState<string[]>([]);
+    const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
+    const [treeData, setTreeData] = useState([]);
+    const [searchValue, setSearchValue] = useState('');
     const [filteredTreeData, setFilteredTreeData] = useState([]);
-    const [parentMap, setParentMap] = useState(new Map()); // 存储每个节点的父节点
+    const [parentMap, setParentMap] = useState(new Map());
+    console.log("xianzai"+JSON.stringify(permission))
 
-    // 筛选出叶子节点
-    const filterLeafNodes = (menus, allPermission) => {
-        return menus.filter(menu => isLeafNode(menu, allPermission));
-    };
-
-    // 当传入的 permission (menus) 变化时更新 checkedKeys 和 treeData
     useEffect(() => {
         if (permission?.menus) {
-            const { treeData, parentMap } = formatMenusToTreeData(allPermission);
-            setTreeData(treeData); // 设置菜单数据
-            setParentMap(parentMap); // 设置父子映射关系
+            const {treeData, parentMap} = formatMenusToTreeData(allPermission);
+            setTreeData(treeData);
+            console.log(parentMap)
+            setParentMap(parentMap);
+            console.log("parentmap"+JSON.stringify(parentMap));
 
-            // 筛选出叶子节点
-            const leafChecked = filterLeafNodes(permission.menus, allPermission).map(menu => menu.id);
-            setCheckedKeys(leafChecked);
+            const leafChecked = permission.menus.map(menu => menu.id);
+            console.log(leafChecked);
+            const  q=removeParentKeys(leafChecked);
+            console.log(q);
+            setCheckedKeys(q); // 初始设置前先调用
         }
-    }, [permission, allPermission]);
+    }, [visible===true]);
 
     // 处理选中的权限变化
     const onCheck = (checkedKeysValue) => {
-        setCheckedKeys(checkedKeysValue);
+        setCheckedKeys(removeParentKeys(checkedKeysValue)); // 每次更新前调用
     };
 
-    // 递归添加父节点
+
     const addParentKeys = (keys) => {
         const newCheckedKeys = new Set(keys); // 使用 Set 防止重复
         keys.forEach((key) => {
@@ -74,47 +65,36 @@ const PermissionDrawer = ({ visible, onCancel, onEdit, permission, allPermission
                 parent = parentMap.get(parent);
             }
         });
-        return [...newCheckedKeys];
+        return [...newCheckedKeys]; // 返回包含父节点的最终列表
     };
 
-    // 提交权限更改，递归添加父节点
+
+    const removeParentKeys = (keys) => {
+        const keysSet = new Set(keys);
+        const keysToRemove = new Set();
+
+        keys.forEach(key => {
+            let parent = parentMap.get(key);
+            while (parent) {
+                if (keysSet.has(parent)) {
+                    keysToRemove.add(parent);
+                }
+                parent = parentMap.get(parent);
+            }
+        });
+
+        return keys.filter(key => !keysToRemove.has(key));
+    };
+
     const handleOk = () => {
-        const finalCheckedKeys = addParentKeys(checkedKeys);
-        onEdit(finalCheckedKeys); // 调用父组件的 onEdit 回调，保存权限
-        onCancel(); // 关闭 Drawer
+        const filteredKeys = addParentKeys(checkedKeys);
+        console.log(filteredKeys);
+        onEdit(filteredKeys);
+        onCancel();
     };
 
-    // 展开所有节点
-    const handleExpandAll = () => {
-        const allKeys = treeData.flatMap((item) => {
-            const childKeys = item.children?.map((child) => child.key) || [];
-            return [item.key, ...childKeys];
-        });
-        setExpandedKeys(allKeys);
-    };
-
-    // 收起所有节点
-    const handleCollapseAll = () => {
-        setExpandedKeys([]);
-    };
-
-    // 处理全选
-    const handleSelectAll = () => {
-        const allKeys = treeData.flatMap((item) => {
-            const childKeys = item.children?.map((child) => child.key) || [];
-            return [item.key, ...childKeys];
-        });
-        setCheckedKeys(allKeys);
-    };
-
-    // 处理取消全选
-    const handleDeselectAll = () => {
-        setCheckedKeys([]);
-    };
-
-    // 处理搜索过滤
     const handleSearch = (e) => {
-        const { value } = e.target;
+        const {value} = e.target;
         setSearchValue(value);
 
         if (value) {
@@ -138,6 +118,26 @@ const PermissionDrawer = ({ visible, onCancel, onEdit, permission, allPermission
         }
     };
 
+    const handleSelectAll = () => {
+        const allLeafKeys = [];
+
+        const findAllLeafNodes = (data) => {
+            data.forEach((item) => {
+                // 如果当前节点没有子节点，则将其添加到选中的键中
+                if (!item.children || item.children.length === 0) {
+                    allLeafKeys.push(item.key);
+                } else {
+                    // 递归查找子节点
+                    findAllLeafNodes(item.children);
+                }
+            });
+        };
+
+        findAllLeafNodes(treeData);
+        setCheckedKeys(allLeafKeys); // 更新选中的权限
+    };
+
+
     return (
         <Drawer
             title="权限设置"
@@ -145,23 +145,18 @@ const PermissionDrawer = ({ visible, onCancel, onEdit, permission, allPermission
             open={visible}
             onClose={onCancel}
             footer={
-                <div style={{ textAlign: 'right' }}>
+                <div style={{textAlign: 'right'}}>
                     <Space>
                         <Button onClick={onCancel}>取消</Button>
-                        <Button type="primary" onClick={handleOk}>
-                            确定
-                        </Button>
+                        <Button type="primary" onClick={handleOk}>确定</Button>
                     </Space>
                 </div>
             }
         >
-            <Space style={{ marginBottom: 16 }}>
-                <Button onClick={handleDeselectAll}>取消全选</Button>
-                <Button onClick={handleSelectAll}>全选</Button>
-                <Button onClick={expandedKeys.length ? handleCollapseAll : handleExpandAll}>
-                    {expandedKeys.length ? '收起' : '展开'}
-                </Button>
-                <Input.Search placeholder="菜单筛选" value={searchValue} onChange={handleSearch} style={{ width: 200 }} />
+            <Space style={{marginBottom: 16}}>
+                <Button onClick={() => setCheckedKeys([])}>取消全选</Button>
+                <Button onClick={() => handleSelectAll()}>全选</Button>
+                <Input.Search placeholder="菜单筛选" value={searchValue} onChange={handleSearch} style={{width: 200}}/>
             </Space>
             <Tree
                 checkable

@@ -1,8 +1,7 @@
-import React from 'react';
 import {Layout, Input, Avatar,Dropdown,  Space} from 'antd';
 import {SearchOutlined} from '@ant-design/icons';
 import type {MenuProps} from 'antd'
-import {useDispatchUser} from "../../hooks/user";
+import {useDispatchUser} from "../../hooks";
 
 
 const {Header} = Layout;

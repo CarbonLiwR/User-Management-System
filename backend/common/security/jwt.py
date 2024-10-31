@@ -201,6 +201,24 @@ def superuser_verify(request: Request) -> bool:
     :return:
     """
     superuser = request.user.is_superuser
-    if not superuser or not request.user.is_staff:
-        raise AuthorizationError
+    print("好好好"+request.user)
+    if not superuser:
+        user_verify(request)
     return superuser
+
+
+def user_verify(request: Request) -> bool:
+    """
+    Verify the current user permissions through token
+
+    :param request:
+    :return:
+    """
+    user = request.user
+    print("芝士"+user)
+    if not user.is_staff:
+        print("飞起来")
+        raise AuthorizationError
+    print("装b")
+    return True
+

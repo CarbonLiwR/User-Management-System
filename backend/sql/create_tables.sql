@@ -33,16 +33,6 @@ CREATE TABLE `sys_casbin_rule`
   COLLATE = utf8mb4_0900_ai_ci;
 
 
-CREATE TABLE sys_user_dept (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
-    user_id INTEGER NOT NULL COMMENT '用户ID',
-    dept_id INTEGER NOT NULL COMMENT '部门ID',
-    UNIQUE KEY (user_id, dept_id),
-    FOREIGN KEY (user_id) REFERENCES sys_user (id) ON DELETE CASCADE,
-    FOREIGN KEY (dept_id) REFERENCES sys_dept (id) ON DELETE CASCADE
-);
-
-
 
 -- sys_dict_data: table
 CREATE TABLE `sys_dict_data`
@@ -184,6 +174,7 @@ CREATE TABLE `sys_menu`
 CREATE TABLE `sys_opera_log`
 (
     `id`           int          NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `trace_id`     varchar(32)  NOT NULL COMMENT '请求跟踪ID',
     `username`     varchar(20) DEFAULT NULL COMMENT '用户名',
     `method`       varchar(20)  NOT NULL COMMENT '请求类型',
     `title`        varchar(255) NOT NULL COMMENT '操作模块',
@@ -318,6 +309,17 @@ CREATE TABLE `sys_user_role`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
+
+
+
+CREATE TABLE sys_user_dept (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    user_id INTEGER NOT NULL COMMENT '用户ID',
+    dept_id INTEGER NOT NULL COMMENT '部门ID',
+    UNIQUE KEY (user_id, dept_id),
+    FOREIGN KEY (user_id) REFERENCES sys_user (id) ON DELETE CASCADE,
+    FOREIGN KEY (dept_id) REFERENCES sys_dept (id) ON DELETE CASCADE
+);
 
 -- sys_user_social: table
 CREATE TABLE `sys_user_social`
