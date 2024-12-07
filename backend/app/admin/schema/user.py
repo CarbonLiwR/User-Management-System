@@ -10,42 +10,57 @@ from backend.app.admin.schema.dept import GetDeptListDetails
 from backend.app.admin.schema.role import GetRoleListDetails
 from backend.common.enums import StatusType
 from backend.common.schema import CustomPhoneNumber, SchemaBase
-
+from typing import Optional,Union, List
 
 class AuthSchemaBase(SchemaBase):
     username: str
-    password: str | None
+    password: Optional[str]
 
 
 class AuthLoginParam(AuthSchemaBase):
     captcha: str
-
+    username_iv: str  # 添加 iv 字段
+    password_iv: str  # 添加 iv 字段
+    captcha_iv: str  # 添加 iv 字段
 class RegisterUserParam(AuthSchemaBase):
-    nickname: str | None = None
-    email: EmailStr = Field(..., examples=['user@example.com'])
+    nickname: str
+    email: str
 
 
-class AuthRegisterParam(RegisterUserParam):
+class AuthRegisterParam(SchemaBase):
+    username: str
+    password: str
+    nickname: str
+    email: str
     captcha: str
+    username_iv: str  # 添加 iv 字段
+    nickname_iv: str
+    password_iv: str  # 添加 iv 字段
+    captcha_iv: str  # 添加 iv 字段
+    email_iv: str
 
 class AuthResetPasswordParam(SchemaBase):
     username: str
     email: str
     password: str
     captcha:str
+    username_iv: str  # 添加 iv 字段
+    password_iv: str  # 添加 iv 字段
+    email_iv: str
+    captcha_iv: str  # 添加 iv 字段
 
 class AddUserParam(AuthSchemaBase):
     depts: list[int]
     roles: list[int]
-    nickname: str | None = None
+    nickname: Optional[str] = None
     email: EmailStr = Field(..., examples=['user@example.com'])
 
 class UserInfoSchemaBase(SchemaBase):
-    # dept_id: int | None = None
+    # dept_id: Optional[int] = None
     username: str
     nickname: str
     email: EmailStr = Field(..., examples=['user@example.com'])
-    # phone: CustomPhoneNumber | None = None
+    # phone: Optional[CustomPhoneNumber] = None
 
 class UpdateUserParam(UserInfoSchemaBase):
     pass
@@ -67,13 +82,13 @@ class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
     uuid: str
-    avatar: str | None = None
+    avatar: Optional[str] = None
     status: StatusType = Field(default=StatusType.enable)
     is_superuser: bool
     is_staff: bool
     is_multi_login: bool
     join_time: datetime = None
-    last_login_time: datetime | None = None
+    last_login_time: Optional[datetime] = None
 
 
 class GetUserInfoListDetails(GetUserInfoNoRelationDetail):
@@ -87,8 +102,8 @@ class GetUserInfoListDetails(GetUserInfoNoRelationDetail):
 class GetCurrentUserInfoDetail(GetUserInfoListDetails):
     model_config = ConfigDict(from_attributes=True)
 
-    depts: list[GetDeptListDetails] | list[str] | None = None
-    roles: list[GetRoleListDetails] | list[str] | None = None
+    depts: Optional[Union[List[GetDeptListDetails], List[str]]] = None
+    roles: Optional[Union[List[GetRoleListDetails], List[str]]] = None
 
     @model_validator(mode='after')
     def handel(self) -> Self:
