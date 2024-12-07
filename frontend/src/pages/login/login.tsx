@@ -8,8 +8,9 @@ import {useDispatchUser} from '../../hooks';
 import './index.css'
 import {EyeInvisibleOutlined, EyeOutlined, UserOutlined, LockOutlined, CheckCircleOutlined} from "@ant-design/icons";
 import {setInfo} from "../../store/userSlice.tsx";
+import CryptoJS from 'crypto-js'; // 引入 CryptoJS 库 加密模块
 
-const IPT_RULE_USERNAME = [{required: true, message: "请输入用户名"}];
+const IPT_RULE_USERNAME = [{required: true, message: "请输入账号"}];
 const IPT_RULE_PASSWORD = [{required: true, message: "请输入密码"}];
 const IPT_RULE_CAPTCHA = [{required: true, message: "请输入验证码"}];
 
@@ -36,10 +37,37 @@ function LoginPage() {
             hasFetchedCaptcha.current = true; // 仅请求一次
         }
     }, [refreshCaptcha]);
+    // AES 加密函数
+    function encryptData(data, secretKey) {
+        const iv = CryptoJS.lib.WordArray.random(16);  // 随机生成 16 字节的 IV
+        const encrypted = CryptoJS.AES.encrypt(data, secretKey, { iv: iv });  // 使用 AES CBC 模式加密数据
+        // 返回 IV 和密文（Base64 编码）
+        return {
+            iv: iv.toString(CryptoJS.enc.Base64),
+            ciphertext: encrypted.ciphertext.toString(CryptoJS.enc.Base64)
+        };
+    }
 
     const onFinish = useCallback((values: LoginData) => {
         setBtnLoad(true);
-        login(values)
+        const secretKeyBase64 = "G8ZyYyZ0Xf5x5f6uZrwf6ft4gD0pniYAkHp/Y6f4Pv4=";  // Base64 编码的密钥
+        const secretKey = CryptoJS.enc.Base64.parse(secretKeyBase64);  // 解码为字节数组
+        // 对数据进行加密
+        const encryptedUsername = encryptData(values.username, secretKey);
+        const encryptedPassword = encryptData(values.password, secretKey);
+        const encryptedCaptcha = encryptData(values.captcha, secretKey);
+
+        // 发送请求时，只发送加密后的数据，包含 iv 和 ciphertext
+        const encryptedLoginData = {
+            username: encryptedUsername.ciphertext,
+            username_iv: encryptedUsername.iv,
+            password: encryptedPassword.ciphertext,
+            password_iv: encryptedPassword.iv,
+            captcha: encryptedCaptcha.ciphertext,
+            captcha_iv: encryptedCaptcha.iv,
+        };
+
+        login(encryptedLoginData)
             .unwrap()
             .then(() => {
                 return fetchUser().unwrap();
@@ -47,7 +75,7 @@ function LoginPage() {
             .then((userInfo) => {
                 localStorage.setItem('userInfo', JSON.stringify(userInfo));
                 dispatch(setInfo(userInfo));
-                navigate('/'); // 跳转到首页
+                navigate('/lwr/dashboard'); // 跳转到首页
             })
             .catch((error) => {
                 setBtnLoad(false);
@@ -60,7 +88,8 @@ function LoginPage() {
     return (
         <div className="login-container">
             <div className="wrapper">
-                <div className="title">管理系统登录</div>
+                <Button onClick={() => navigate('/lwr')} style={{position:"fixed",top:"10px",left:"10px",border:"none"}}>&lt;返回首页</Button>
+                <div className="title">技术寻人系统登录</div>
                 <Form
                     className="login-form"
                     initialValues={{
@@ -117,7 +146,7 @@ function LoginPage() {
                                 </Form.Item>
                             </Col>
                             <Col>
-                                <Link to="/forget">
+                                <Link to="/lwr/forget">
                                     <span>忘记密码</span>
                                 </Link>
                             </Col>
@@ -133,7 +162,7 @@ function LoginPage() {
                         >
                             登录
                         </Button>
-                        <Link to="/register">
+                        <Link to="/lwr/register">
                             <Button>注册</Button>
                         </Link>
                     </Row>
