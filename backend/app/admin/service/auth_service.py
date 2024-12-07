@@ -26,17 +26,40 @@ from backend.core.conf import settings
 from backend.database.db_mysql import async_db_session
 from backend.database.db_redis import redis_client
 from backend.utils.timezone import timezone
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+import base64
+from fastapi import HTTPException
+from typing import Any
+# 设置密钥，前端和后端需要一致
+SECRET_KEY = base64.b64decode("G8ZyYyZ0Xf5x5f6uZrwf6ft4gD0pniYAkHp/Y6f4Pv4=")  # 从 Base64 解码
 
+BLOCK_SIZE = AES.block_size
 
+# 解密函数
+# 解密函数
+def decrypt_data(encrypted_data: str, iv_base64: str) -> str:
+    try:
+        # 解码 IV 和密文
+        iv = base64.b64decode(iv_base64)
+        ciphertext = base64.b64decode(encrypted_data)
+
+        # 使用 AES 解密
+        cipher = AES.new(SECRET_KEY, AES.MODE_CBC, iv)
+        decrypted_data = unpad(cipher.decrypt(ciphertext), BLOCK_SIZE).decode('utf-8')
+
+        return decrypted_data
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Decryption failed: {str(e)}")
 class AuthService:
     @staticmethod
     async def swagger_login(*, obj: HTTPBasicCredentials) -> tuple[str, User]:
         async with async_db_session.begin() as db:
             current_user = await user_dao.get_by_username(db, obj.username)
             if not current_user:
-                raise errors.NotFoundError(msg='用户名或密码有误')
+                raise errors.NotFoundError(msg='账号或密码有误')
             elif not password_verify(f'{obj.password}{current_user.salt}', current_user.password):
-                raise errors.AuthorizationError(msg='用户名或密码有误')
+                raise errors.AuthorizationError(msg='账号或密码有误')
             elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
             access_token = await create_access_token(str(current_user.id), current_user.is_multi_login)
@@ -49,13 +72,18 @@ class AuthService:
     ) -> GetLoginToken:
         async with async_db_session.begin() as db:
             try:
+                # 解密前端加密的字段
+                obj.username = decrypt_data(obj.username, obj.username_iv)  # 使用传来的 IV 和密文解密
+                obj.password = decrypt_data(obj.password, obj.password_iv)  # 使用传来的 IV 和密文解密
+                obj.captcha = decrypt_data(obj.captcha, obj.captcha_iv)  # 使用传来的 IV 和密文解密
+
                 current_user = await user_dao.get_by_username(db, obj.username)
                 if not current_user:
-                    raise errors.NotFoundError(msg='用户名或密码有误')
+                    raise errors.NotFoundError(msg='账号或密码有误')
                 user_uuid = current_user.uuid
                 username = current_user.username
                 if not password_verify(obj.password + current_user.salt, current_user.password):
-                    raise errors.AuthorizationError(msg='用户名或密码有误')
+                    raise errors.AuthorizationError(msg='账号或密码有误')
                 elif not current_user.status:
                     raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
                 captcha_code = await redis_client.get(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
@@ -121,6 +149,12 @@ class AuthService:
     ):
         async with async_db_session.begin() as db:
             try:
+                obj.username = decrypt_data(obj.username, obj.username_iv)  # 使用传来的 IV 和密文解密
+                obj.email = decrypt_data(obj.email, obj.email_iv)
+                obj.password = decrypt_data(obj.password, obj.password_iv)  # 使用传来的 IV 和密文解密
+                obj.captcha = decrypt_data(obj.captcha, obj.captcha_iv)  # 使用传来的 IV 和密文解密
+                obj.nickname = decrypt_data(obj.nickname, obj.nickname_iv)  # 使用传来的 IV 和密文解密
+
                 if not obj.password:
                     raise errors.ForbiddenError(msg='密码为空')
                 username = await user_dao.get_by_username(db, obj.username)
@@ -148,14 +182,19 @@ class AuthService:
     @staticmethod
     async def pwd_reset(*, request: Request, obj: AuthResetPasswordParam) -> int:
         async with async_db_session.begin() as db:
-                # 验证验证码
+            try:
+                obj.username = decrypt_data(obj.username, obj.username_iv)  # 使用传来的 IV 和密文解密
+                obj.email = decrypt_data(obj.email, obj.email_iv)
+                obj.password = decrypt_data(obj.password, obj.password_iv)  # 使用传来的 IV 和密文解密
+                obj.captcha = decrypt_data(obj.captcha, obj.captcha_iv)  # 使用传来的 IV 和密文解密
+                    # 验证验证码
                 captcha_code = await redis_client.get(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
                 if not captcha_code:
                     raise errors.AuthorizationError(msg='验证码失效，请重新获取')
                 if captcha_code.lower() != obj.captcha.lower():
                     raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
 
-                # 检查密码
+                    # 检查密码
                 if not obj.password:
                     raise errors.ForbiddenError(msg='密码为空')
                 user = await user_dao.get_by_username(db, obj.username)
@@ -164,10 +203,14 @@ class AuthService:
                 if not obj.email == user.email:
                     raise errors.ForbiddenError(msg='邮箱验证错误')
 
-                # 更新密码
+                    # 更新密码
                 salt = user.salt
                 hashed_password = get_hash_password(f'{obj.password}{salt}')  # 假设你需要哈希密码
                 await user_dao.update_user_pwd(db, obj.username ,hashed_password)
+
+            except errors.NotFoundError as e:
+                raise errors.NotFoundError(msg=e.msg)
+
 
 
     @staticmethod
@@ -184,7 +227,7 @@ class AuthService:
         async with async_db_session() as db:
             current_user = await user_dao.get(db, user_id)
             if not current_user:
-                raise errors.NotFoundError(msg='用户名或密码有误')
+                raise errors.NotFoundError(msg='账号或密码有误')
             elif not current_user.status:
                 raise errors.AuthorizationError(msg='用户已被锁定, 请联系统管理员')
             current_token = get_token(request)
