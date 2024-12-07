@@ -6,6 +6,7 @@ import {getCaptcha, RegisterRes} from '../../api/auth';
 import {useDispatch} from 'react-redux';
 import {updatePasswordThunk} from "../../service/userService.tsx";
 import './index.css';
+import CryptoJS from 'crypto-js'; // 引入 CryptoJS 库 加密模块
 import {
     EyeInvisibleOutlined,
     EyeOutlined,
@@ -14,8 +15,9 @@ import {
     CheckCircleOutlined,
     LockOutlined
 } from '@ant-design/icons';
+import type {ResetPasswordData} from '../../api/auth';
 
-const IPT_RULE_USERNAME: Rule[] = [{required: true, message: "请输入用户名"}];
+const IPT_RULE_USERNAME: Rule[] = [{required: true, message: "请输入账号"}];
 const IPT_RULE_PASSWORD: Rule[] = [
     {required: true, message: "请输入密码"},
     {min: 8, message: "密码至少为 8 位"},
@@ -66,7 +68,16 @@ function ForgetPwdPage() {
         }
     }, [refreshCaptcha]);
 
-
+    // AES 加密函数
+    function encryptData(data, secretKey) {
+        const iv = CryptoJS.lib.WordArray.random(16);  // 随机生成 16 字节的 IV
+        const encrypted = CryptoJS.AES.encrypt(data, secretKey, { iv: iv });  // 使用 AES CBC 模式加密数据
+        // 返回 IV 和密文（Base64 编码）
+        return {
+            iv: iv.toString(CryptoJS.enc.Base64),
+            ciphertext: encrypted.ciphertext.toString(CryptoJS.enc.Base64)
+        };
+    }
     const validateConfirmPassword = (_: { required?: boolean }, value: string): Promise<void> => {
         return new Promise((resolve, reject) => {
             const password = form.getFieldValue('password');
@@ -79,13 +90,33 @@ function ForgetPwdPage() {
     };
 
 
-    const onFinish = useCallback(async (values: any) => {
-        const resultAction = await dispatch(updatePasswordThunk(values)) as { payload: RegisterRes, error?: any };
+    const onFinish = useCallback(async (values: ResetPasswordData) => {
+        const secretKeyBase64 = "G8ZyYyZ0Xf5x5f6uZrwf6ft4gD0pniYAkHp/Y6f4Pv4=";  // Base64 编码的密钥
+        const secretKey = CryptoJS.enc.Base64.parse(secretKeyBase64);  // 解码为字节数组
+        // 对数据进行加密
+        const encryptedUsername = encryptData(values.username, secretKey);
+        const encryptedUEmail = encryptData(values.email, secretKey);
+        const encryptedPassword = encryptData(values.password, secretKey);
+        const encryptedCaptcha = encryptData(values.captcha, secretKey);
+        // 发送请求时，只发送加密后的数据，包含 iv 和 ciphertext
+        const encryptedResetData = {
+            username: encryptedUsername.ciphertext,
+            username_iv: encryptedUsername.iv,
+            email:encryptedUEmail.ciphertext,
+            email_iv:encryptedUEmail.iv,
+            password: encryptedPassword.ciphertext,
+            password_iv: encryptedPassword.iv,
+            captcha: encryptedCaptcha.ciphertext,
+            captcha_iv: encryptedCaptcha.iv,
+        };
+
+        const resultAction = await dispatch(updatePasswordThunk(encryptedResetData)) as { payload: RegisterRes, error?: any };
+
 
         if (updatePasswordThunk.fulfilled.match(resultAction)) {
             const {data} = resultAction.payload; // 确保从 payload 中提取 msg
             message.success(data || "密码修改成功", 3);
-            navigate('/login'); // 添加这一行以使用 navigate
+            navigate('/lwr/login'); // 添加这一行以使用 navigate
         } else {
             // message.error('注册请求错误，请重试');
         }
@@ -100,12 +131,12 @@ function ForgetPwdPage() {
 
                 <Form form={form} className="login-form" onFinish={onFinish}>
                     <Row justify="start">
-                        <Link to={"/login"}>&lt;<span> </span>返回登录</Link>
+                        <Link to={"/lwr/login"}>&lt;<span> </span>返回登录</Link>
                     </Row>
                     <br/>
 
                     <Form.Item name="username" rules={IPT_RULE_USERNAME}>
-                        <Input prefix={<UserOutlined/>} autoComplete="off" placeholder="用户名"/>
+                        <Input prefix={<UserOutlined/>} autoComplete="off" placeholder="账号"/>
                     </Form.Item>
 
                     <Form.Item name="email" rules={IPT_RULE_EMAIL}>
