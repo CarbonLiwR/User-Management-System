@@ -15,9 +15,11 @@ import {
     CheckCircleOutlined,
     LockOutlined
 } from '@ant-design/icons';
+import CryptoJS from 'crypto-js'; // 引入 CryptoJS 库 加密模块
+import type {RegisterData} from '../../api/auth';
 
 const IPT_RULE_NICKNAME = [{required: true, message: "请输入昵称"}];
-const IPT_RULE_USERNAME: Rule[] = [{required: true, message: "请输入用户名"}];
+const IPT_RULE_USERNAME: Rule[] = [{required: true, message: "请输入账号"}];
 const IPT_RULE_PASSWORD: Rule[] = [
     {required: true, message: "请输入密码"},
     {min: 8, message: "密码至少为 8 位"},
@@ -94,7 +96,7 @@ function RegisterPage() {
     }, [refreshCaptcha]);
 
     useEffect(() => {
-        // 生成用户名并设置到表单中
+        // 生成账号并设置到表单中
         const generatedUsername = generateUsername();
         form.setFieldsValue({username: generatedUsername});
     }, [form]);
@@ -111,18 +113,49 @@ function RegisterPage() {
     };
     const handleReset = () => {
         form.resetFields(); // 清空表单
-        const generatedUsername = generateUsername(); // 生成新的用户名
-        form.setFieldsValue({username: generatedUsername}); // 设置新的用户名到表单
+        const generatedUsername = generateUsername(); // 生成新的账号
+        form.setFieldsValue({username: generatedUsername}); // 设置新的账号到表单
     };
+    // AES 加密函数
+    function encryptData(data, secretKey) {
+        const iv = CryptoJS.lib.WordArray.random(16);  // 随机生成 16 字节的 IV
+        const encrypted = CryptoJS.AES.encrypt(data, secretKey, { iv: iv });  // 使用 AES CBC 模式加密数据
+        // 返回 IV 和密文（Base64 编码）
+        return {
+            iv: iv.toString(CryptoJS.enc.Base64),
+            ciphertext: encrypted.ciphertext.toString(CryptoJS.enc.Base64)
+        };
+    }
+    const onFinish = useCallback(async (values:RegisterData) => {
 
-    const onFinish = useCallback(async (values: any) => {
-        console.log(values);
-        const resultAction = await dispatch(registerThunk(values)) as { payload: RegisterRes, error?: any };
+        const secretKeyBase64 = "G8ZyYyZ0Xf5x5f6uZrwf6ft4gD0pniYAkHp/Y6f4Pv4=";  // Base64 编码的密钥
+        const secretKey = CryptoJS.enc.Base64.parse(secretKeyBase64);  // 解码为字节数组
+        // 对数据进行加密
+        const encryptedUsername = encryptData(values.username, secretKey);
+        const encryptedNickname = encryptData(values.nickname, secretKey);
+        const encryptedEmail = encryptData(values.email, secretKey);
+        const encryptedPassword = encryptData(values.password, secretKey);
+        const encryptedCaptcha = encryptData(values.captcha, secretKey);
+        // 发送请求时，只发送加密后的数据，包含 iv 和 ciphertext
+        const encryptedRegisterData = {
+            username: encryptedUsername.ciphertext,
+            username_iv: encryptedUsername.iv,
+            nickname:encryptedNickname.ciphertext,
+            nickname_iv:encryptedNickname.iv,
+            email:encryptedEmail.ciphertext,
+            email_iv:encryptedEmail.iv,
+            password: encryptedPassword.ciphertext,
+            password_iv: encryptedPassword.iv,
+            captcha: encryptedCaptcha.ciphertext,
+            captcha_iv: encryptedCaptcha.iv,
+        };
+
+        const resultAction = await dispatch(registerThunk(encryptedRegisterData)) as { payload: RegisterRes, error?: any };
 
         if (registerThunk.fulfilled.match(resultAction)) {
             const {data} = resultAction.payload; // 确保从 payload 中提取 msg
             message.success(data || "注册成功", 3);
-            navigate('/login'); // 添加这一行以使用 navigate
+            navigate('/lwr/login'); // 添加这一行以使用 navigate
         } else {
             // message.error('注册请求错误，请重试');
         }
@@ -133,11 +166,11 @@ function RegisterPage() {
     return (
         <div className="login-container">
             <div className="wrapper">
-                <div className="title">管理系统注册</div>
+                <div className="title">技术寻人系统注册</div>
 
                 <Form form={form} className="login-form" onFinish={onFinish}>
                     <Row justify="start">
-                        <Link to={"/login"}>&lt;<span> </span>已有账号，去登录</Link>
+                        <Link to={"/lwr/login"}>&lt;<span> </span>已有账号，去登录</Link>
                     </Row>
                     <br/>
 
