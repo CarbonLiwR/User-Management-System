@@ -94,7 +94,7 @@ const LayoutContainer = () => {
       </div>
     </Content>
     <Footer style={{ textAlign: 'center', padding: '5px' }}>
-      Teach 4 Tech ©2024 Created by jxselab
+      User Management System ©2024 Created by jxselab
     </Footer>
   </Layout>
 </Layout>

@@ -116,7 +116,7 @@ function ForgetPwdPage() {
         if (updatePasswordThunk.fulfilled.match(resultAction)) {
             const {data} = resultAction.payload; // 确保从 payload 中提取 msg
             message.success(data || "密码修改成功", 3);
-            navigate('/lwr/login'); // 添加这一行以使用 navigate
+            navigate('/login'); // 添加这一行以使用 navigate
         } else {
             // message.error('注册请求错误，请重试');
         }
@@ -131,7 +131,7 @@ function ForgetPwdPage() {
 
                 <Form form={form} className="login-form" onFinish={onFinish}>
                     <Row justify="start">
-                        <Link to={"/lwr/login"}>&lt;<span> </span>返回登录</Link>
+                        <Link to={"/login"}>&lt;<span> </span>返回登录</Link>
                     </Row>
                     <br/>
 

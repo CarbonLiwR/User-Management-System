@@ -17,6 +17,7 @@
     "antd": "^5.21.5",
     "antd-style": "^3.7.1",
     "axios": "^1.7.7",
+    "crypto-js": "^4.2.0",
     "dnd-kit": "^0.0.2",
     "mitt": "^3.0.1",
     "query-string": "^9.1.1",

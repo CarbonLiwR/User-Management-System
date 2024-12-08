@@ -75,7 +75,7 @@ function LoginPage() {
             .then((userInfo) => {
                 localStorage.setItem('userInfo', JSON.stringify(userInfo));
                 dispatch(setInfo(userInfo));
-                navigate('/lwr/dashboard'); // 跳转到首页
+                navigate('/'); // 跳转到首页
             })
             .catch((error) => {
                 setBtnLoad(false);
@@ -88,7 +88,7 @@ function LoginPage() {
     return (
         <div className="login-container">
             <div className="wrapper">
-                <Button onClick={() => navigate('/lwr')} style={{position:"fixed",top:"10px",left:"10px",border:"none"}}>&lt;返回首页</Button>
+                <Button onClick={() => navigate('/')} style={{position:"fixed",top:"10px",left:"10px",border:"none"}}>&lt;返回首页</Button>
                 <div className="title">技术寻人系统登录</div>
                 <Form
                     className="login-form"
@@ -146,7 +146,7 @@ function LoginPage() {
                                 </Form.Item>
                             </Col>
                             <Col>
-                                <Link to="/lwr/forget">
+                                <Link to="/forget">
                                     <span>忘记密码</span>
                                 </Link>
                             </Col>
@@ -162,7 +162,7 @@ function LoginPage() {
                         >
                             登录
                         </Button>
-                        <Link to="/lwr/register">
+                        <Link to="/register">
                             <Button>注册</Button>
                         </Link>
                     </Row>

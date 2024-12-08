@@ -53,7 +53,11 @@ const EditUserModal = ({ visible, onCancel, onCreate, user, changeUsername }) =>
                     <Input placeholder="请输入昵称" />
                 </Form.Item>
 
-                {changeUsername && ( // 条件渲染用户名输入框
+                {!changeUsername ? (
+                    <Form.Item name="username" style={{ display: 'none' }}>
+                        <Input type="hidden" />
+                    </Form.Item>
+                ) : (
                     <Form.Item
                         name="username"
                         label="用户名"

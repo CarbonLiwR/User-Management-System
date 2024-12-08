@@ -96,9 +96,9 @@ function RegisterPage() {
     }, [refreshCaptcha]);
 
     useEffect(() => {
-        // 生成账号并设置到表单中
-        const generatedUsername = generateUsername();
-        form.setFieldsValue({username: generatedUsername});
+        // 系统自动生成账号并设置到表单中
+        // const generatedUsername = generateUsername();
+        // form.setFieldsValue({username: generatedUsername});
     }, [form]);
 
     const validateConfirmPassword = (_: { required?: boolean }, value: string): Promise<void> => {
@@ -155,7 +155,7 @@ function RegisterPage() {
         if (registerThunk.fulfilled.match(resultAction)) {
             const {data} = resultAction.payload; // 确保从 payload 中提取 msg
             message.success(data || "注册成功", 3);
-            navigate('/lwr/login'); // 添加这一行以使用 navigate
+            navigate('/login'); // 添加这一行以使用 navigate
         } else {
             // message.error('注册请求错误，请重试');
         }
@@ -170,7 +170,7 @@ function RegisterPage() {
 
                 <Form form={form} className="login-form" onFinish={onFinish}>
                     <Row justify="start">
-                        <Link to={"/lwr/login"}>&lt;<span> </span>已有账号，去登录</Link>
+                        <Link to={"/login"}>&lt;<span> </span>已有账号，去登录</Link>
                     </Row>
                     <br/>
 
@@ -179,7 +179,7 @@ function RegisterPage() {
                     </Form.Item>
 
                     <Form.Item name="username" rules={IPT_RULE_USERNAME}>
-                        <Input prefix={<UserOutlined/>} autoComplete="off" placeholder="账号" readOnly />
+                        <Input prefix={<UserOutlined/>} autoComplete="off" placeholder="账号"  />
                     </Form.Item>
 
                     <Form.Item name="email" rules={IPT_RULE_EMAIL}>
