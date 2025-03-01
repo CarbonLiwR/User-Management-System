@@ -175,13 +175,17 @@ function RegisterPage() {
         if (registerThunk.fulfilled.match(resultAction)) {
             const {data} = resultAction.payload; // 确保从 payload 中提取 msg
             message.success(data || "注册成功", 3);
-            navigate('/sso/login'); // 添加这一行以使用 navigate
+            if(isLocked){
+                navigate('/sso/login'); // 添加这一行以使用 navigate
+            }else{
+                navigate('/login'); // 添加这一行以使用 navigate
+            }
 
         } else {
             message.error('注册请求错误，请重试');
         }
 
-    }, [dispatch, navigate]);
+    }, [dispatch, navigate,isLocked]);
 
 
     return (
@@ -271,7 +275,7 @@ function RegisterPage() {
                         <Button type="primary" htmlType="submit" className="login-form-button">
                             注册
                         </Button>
-                        <Button onClick={handleReset}>重置</Button>
+                        <Button onClick={handleReset} disabled={isLocked}>重置</Button>
                     </Row>
                 </Form>
             </div>

@@ -66,7 +66,7 @@ const SSOLoginPage = () => {
                     <h1>欢迎，{user?.name}!</h1> {/* 显示用户的认证信息 */}
                     <p>认证帐号：{user?.accountName}</p>
                     <p>{user?.organizationName}</p><br/>
-                    <p>即将跳转至登录系统。。。</p>
+                    <p>即将进入系统。。。</p>
                 </div>
             )}
             {error && <p style={{color: 'red'}}>{error}</p>} {/* 显示错误信息 */}
