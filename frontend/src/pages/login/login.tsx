@@ -164,7 +164,7 @@ function LoginPage() {
             <div className="wrapper">
                 <Button onClick={() => navigate('/')}
                         style={{position: "fixed", top: "10px", left: "10px", border: "none"}}>&lt;返回首页</Button>
-                <div className="title">技术寻人系统登录</div>
+                <div className="title">用户管理系统登录</div>
                 <Form
                     className="login-form"
                     initialValues={{

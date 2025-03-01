@@ -191,7 +191,7 @@ function RegisterPage() {
     return (
         <div className="login-container">
             <div className="wrapper">
-                <div className="title">技术寻人系统注册</div>
+                <div className="title">用户管理系统注册</div>
 
                 <Form form={form} className="login-form" onFinish={onFinish}>
                     <Row justify="start">
