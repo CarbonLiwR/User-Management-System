@@ -35,6 +35,9 @@ export interface RegisterRes {
     msg: string;
     code: number;
 }
+export interface SsoData{
+    ticket:string;
+}
 
 
 export function getCaptcha(): Promise<CaptchaRes> {

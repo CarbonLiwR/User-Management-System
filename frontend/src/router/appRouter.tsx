@@ -13,6 +13,7 @@ import AdminRolePage from "../pages/admin/role";
 import AdminMenuPage from "../pages/admin/menu";
 import AdminUserPage from "../pages/admin/user";
 import AdminDeptPage from "../pages/admin/dept";
+import SsoUserLogin from "../pages/login/sso.tsx";
 
 function AppRouter() {
     const userInfo = useSelector((state: RootState) => state.user);
@@ -37,6 +38,7 @@ function AppRouter() {
                 <Route path="/forget" element={<ForgetPasswordPage/>}/>
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
+                <Route path="/sso/login" element={<SsoUserLogin/>}/>
 
                 {/* 如果没有登录信息，重定向到登录页面 */}
                 {!persistedUserInfo && (

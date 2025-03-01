@@ -9,7 +9,8 @@ from backend.app.admin.conf import admin_settings
 from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
-from backend.app.admin.schema.user import AuthLoginParam, AuthRegisterParam, RegisterUserParam, AuthResetPasswordParam
+from backend.app.admin.schema.user import AuthLoginParam, AuthRegisterParam, RegisterUserParam, AuthResetPasswordParam, \
+    AuthSSOLoginParam
 from backend.app.admin.service.login_log_service import LoginLogService
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
@@ -144,6 +145,80 @@ class AuthService:
                 return data
 
     @staticmethod
+    async def sso_login(
+            request: Request,
+            response: Response,
+            obj: AuthSSOLoginParam,
+            background_tasks: BackgroundTasks
+    ) -> GetLoginToken:
+        async with async_db_session.begin() as db:
+            try:
+                # 解密前端加密的用户名
+                obj.username = decrypt_data(obj.username, obj.username_iv)
+
+                # 获取用户信息
+                current_user = await user_dao.get_by_username(db, obj.username)
+                if not current_user:
+                    raise errors.NotFoundError(msg='用户不存在')
+                if not current_user.status:
+                    raise errors.AuthorizationError(msg='用户已被锁定, 请联系系统管理员')
+
+                # 生成令牌
+                current_user_id = current_user.id
+                access_token = await create_access_token(str(current_user_id), current_user.is_multi_login)
+                refresh_token = await create_refresh_token(str(current_user_id), current_user.is_multi_login)
+
+            except errors.NotFoundError as e:
+                raise errors.NotFoundError(msg=e.msg)
+            except errors.AuthorizationError as e:
+                background_tasks.add_task(
+                    LoginLogService.create,
+                    db=db,
+                    request=request,
+                    user_uuid=current_user.uuid if current_user else None,
+                    username=obj.username,
+                    login_time=timezone.now(),
+                    status=LoginLogStatusType.fail.value,
+                    msg=e.msg,
+                )
+                raise errors.AuthorizationError(msg=e.msg)
+            except Exception as e:
+                raise e
+            else:
+                # 记录登录日志
+                background_tasks.add_task(
+                    LoginLogService.create,
+                    db=db,
+                    request=request,
+                    user_uuid=current_user.uuid,
+                    username=current_user.username,
+                    login_time=timezone.now(),
+                    status=LoginLogStatusType.success.value,
+                    msg='SSO 登录成功',
+                )
+
+                # 设置 Refresh Token 到 Cookie
+                response.set_cookie(
+                    key=settings.COOKIE_REFRESH_TOKEN_KEY,
+                    value=refresh_token.refresh_token,
+                    max_age=settings.COOKIE_REFRESH_TOKEN_EXPIRE_SECONDS,
+                    expires=timezone.f_utc(refresh_token.refresh_token_expire_time),
+                    httponly=True,
+                )
+
+                # 更新用户登录时间
+                await user_dao.update_login_time(db, obj.username)
+                await db.refresh(current_user)
+
+                # 返回登录凭证
+                data = GetLoginToken(
+                    access_token=access_token.access_token,
+                    access_token_expire_time=access_token.access_token_expire_time,
+                    user=current_user,  # type: ignore
+                )
+                return data
+
+    @staticmethod
     async def register(
             *, request: Request, obj: AuthRegisterParam,
     ):
@@ -161,9 +236,9 @@ class AuthService:
                 if username:
                     raise errors.ForbiddenError(msg='用户已注册')
                 obj.nickname = obj.nickname if obj.nickname else f'#{random.randrange(10000, 88888)}'
-                nickname = await user_dao.get_by_nickname(db, obj.nickname)
-                if nickname:
-                    raise errors.ForbiddenError(msg='昵称已注册')
+                # nickname = await user_dao.get_by_nickname(db, obj.nickname)
+                # if nickname:
+                #     raise errors.ForbiddenError(msg='昵称已注册')
                 email = await user_dao.check_email(db, obj.email)
                 if email:
                     raise errors.ForbiddenError(msg='邮箱已注册')
@@ -175,6 +250,51 @@ class AuthService:
                 obj_dict = obj.dict(exclude={"captcha"})
                 user_param = RegisterUserParam(**obj_dict)
                 await user_dao.create(db, user_param)
+
+            except errors.NotFoundError as e:
+                raise errors.NotFoundError(msg=e.msg)
+
+    @staticmethod
+    async def sso_register(
+            request: Request,
+            obj: AuthRegisterParam,
+    ):
+        async with async_db_session.begin() as db:
+            try:
+                obj.username = decrypt_data(obj.username, obj.username_iv)  # 解密用户名
+                obj.password = decrypt_data(obj.password, obj.password_iv)  # 解密密码
+                obj.captcha = decrypt_data(obj.captcha, obj.captcha_iv)  # 解密验证码
+                obj.nickname = decrypt_data(obj.nickname, obj.nickname_iv)  # 解密昵称
+
+                if not obj.password:
+                    raise errors.ForbiddenError(msg='密码为空')
+
+                # 检查用户名是否已注册
+                existing_user = await user_dao.get_by_username(db, obj.username)
+                if existing_user:
+                    raise errors.ForbiddenError(msg='用户已注册')
+
+                # 处理昵称
+                obj.nickname = obj.nickname if obj.nickname else f'#{random.randrange(10000, 88888)}'
+                nickname_exists = await user_dao.get_by_nickname(db, obj.nickname)
+                if nickname_exists:
+                    raise errors.ForbiddenError(msg='昵称已注册')
+
+                # 校验验证码
+                captcha_code = await redis_client.get(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
+                if not captcha_code:
+                    raise errors.AuthorizationError(msg='验证码失效，请重新获取')
+                if captcha_code.lower() != obj.captcha.lower():
+                    raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
+
+                # 构造注册用户参数（去掉邮箱）
+                obj_dict = obj.dict(exclude={"captcha", "email", "email_iv"})  # 去掉 email 相关字段
+                user_param = RegisterUserParam(**obj_dict)
+
+                # 创建用户
+                await user_dao.create(db, user_param)
+
+                return {"message": "注册成功"}
 
             except errors.NotFoundError as e:
                 raise errors.NotFoundError(msg=e.msg)

@@ -22,9 +22,17 @@ class AuthLoginParam(AuthSchemaBase):
     username_iv: str  # 添加 iv 字段
     password_iv: str  # 添加 iv 字段
     captcha_iv: str  # 添加 iv 字段
+
+class AuthSSOLoginParam(SchemaBase):
+    username: str
+    username_iv: str  # 添加 iv 字段
+
 class RegisterUserParam(AuthSchemaBase):
     nickname: str
     email: str
+
+class SsoRegisterUserParam(SchemaBase):
+    nickname: str
 
 
 class AuthRegisterParam(SchemaBase):

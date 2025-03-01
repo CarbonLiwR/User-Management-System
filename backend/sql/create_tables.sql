@@ -279,7 +279,6 @@ CREATE TABLE `sys_user`
     `updated_time`    datetime     DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uuid` (`uuid`),
-    UNIQUE KEY `nickname` (`nickname`),
     UNIQUE KEY `ix_sys_user_email` (`email`),
     UNIQUE KEY `ix_sys_user_username` (`username`),
     KEY `dept_id` (`dept_id`),

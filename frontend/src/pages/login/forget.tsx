@@ -69,7 +69,7 @@ function ForgetPwdPage() {
     }, [refreshCaptcha]);
 
     // AES 加密函数
-    function encryptData(data, secretKey) {
+    function encryptData(data:any, secretKey:any) {
         const iv = CryptoJS.lib.WordArray.random(16);  // 随机生成 16 字节的 IV
         const encrypted = CryptoJS.AES.encrypt(data, secretKey, { iv: iv });  // 使用 AES CBC 模式加密数据
         // 返回 IV 和密文（Base64 编码）

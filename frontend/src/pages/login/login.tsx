@@ -1,6 +1,6 @@
 import {useCallback, useState, useEffect, useRef} from "react";
 import {Form, Input, Button, Checkbox, message, Row, Image, Col} from "antd";
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import type {LoginData} from '../../api/auth';
@@ -8,7 +8,8 @@ import {useDispatchUser} from '../../hooks';
 import './index.css'
 import {EyeInvisibleOutlined, EyeOutlined, UserOutlined, LockOutlined, CheckCircleOutlined} from "@ant-design/icons";
 import {setInfo} from "../../store/userSlice.tsx";
-import CryptoJS from 'crypto-js'; // 引入 CryptoJS 库 加密模块
+import CryptoJS from 'crypto-js';
+import axios from "axios";
 
 const IPT_RULE_USERNAME = [{required: true, message: "请输入账号"}];
 const IPT_RULE_PASSWORD = [{required: true, message: "请输入密码"}];
@@ -29,7 +30,34 @@ function LoginPage() {
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);
     };
+    const location = useLocation();
+    const {userInfo, tab} = location.state || {}; // 获取状态信息
 
+    useEffect(() => {
+        if (tab === "sso" && userInfo?.user) {
+            axios.get(`api/v1/auth/sso/${userInfo.user}`)
+                .then(response => {
+                    console.log("SSO 用户信息:", response);
+
+                    if (response?.email) {
+                        handleSSOLogin(response);
+                    } else {
+                        message.error("缺少邮箱信息，请填写");
+                    }
+                })
+                .catch(error => {
+                    console.error("SSO 检查失败:", error);
+
+                    // 处理 404 用户不存在的情况
+                    if (error.code === 404 && userInfo?.user) {
+                        message.error("请输入邮箱和密码信息！");
+                        navigate(`/register?username=${encodeURIComponent(userInfo.user)}&nickname=${encodeURIComponent(userInfo.name)}`);
+                    } else {
+                        message.error("SSO 登录失败，请重试");
+                    }
+                });
+        }
+    }, []); // 监听 userInfo 和 tab 变化
 
     useEffect(() => {
         if (!hasFetchedCaptcha.current) {
@@ -37,16 +65,62 @@ function LoginPage() {
             hasFetchedCaptcha.current = true; // 仅请求一次
         }
     }, [refreshCaptcha]);
+
     // AES 加密函数
     function encryptData(data, secretKey) {
         const iv = CryptoJS.lib.WordArray.random(16);  // 随机生成 16 字节的 IV
-        const encrypted = CryptoJS.AES.encrypt(data, secretKey, { iv: iv });  // 使用 AES CBC 模式加密数据
+        const encrypted = CryptoJS.AES.encrypt(data, secretKey, {iv: iv});  // 使用 AES CBC 模式加密数据
         // 返回 IV 和密文（Base64 编码）
         return {
             iv: iv.toString(CryptoJS.enc.Base64),
             ciphertext: encrypted.ciphertext.toString(CryptoJS.enc.Base64)
         };
     }
+
+    const handleSSOLogin = async (userInfo: any) => {
+        try {
+            // console.log("SSO 用户信息:", userInfo);
+            if (!userInfo?.username) {
+                message.error("用户信息缺失");
+                return;
+            }
+
+            const secretKeyBase64 = "G8ZyYyZ0Xf5x5f6uZrwf6ft4gD0pniYAkHp/Y6f4Pv4=";
+            const secretKey = CryptoJS.enc.Base64.parse(secretKeyBase64);
+
+            // 确保 userInfo.username 正确
+            const encryptedUsername = encryptData(userInfo.username, secretKey);
+
+            // 发送 SSO 登录请求
+            const response = await axios.post("api/v1/auth/sso/login", {
+                username: encryptedUsername.ciphertext,
+                username_iv: encryptedUsername.iv,
+            }, {withCredentials: true});
+
+            // console.log("SSO 登录响应:", response);
+
+            // 确保请求成功
+            if (response?.access_token && response?.user) {
+                const {access_token, user} = response;
+
+                localStorage.setItem("access_token", access_token);
+
+                localStorage.setItem("userInfo", JSON.stringify(user));
+
+                dispatch(setInfo(user));
+
+                message.success("SSO 登录成功");
+                navigate("/"); // 跳转到首页（如果有）
+            } else {
+                message.error("SSO 登录失败，未返回用户信息");
+            }
+
+        } catch (error) {
+            console.error("SSO 登录错误:", error);
+            message.error("SSO 登录请求失败");
+        }
+    };
+
 
     const onFinish = useCallback((values: LoginData) => {
         setBtnLoad(true);
@@ -88,7 +162,8 @@ function LoginPage() {
     return (
         <div className="login-container">
             <div className="wrapper">
-                <Button onClick={() => navigate('/')} style={{position:"fixed",top:"10px",left:"10px",border:"none"}}>&lt;返回首页</Button>
+                <Button onClick={() => navigate('/')}
+                        style={{position: "fixed", top: "10px", left: "10px", border: "none"}}>&lt;返回首页</Button>
                 <div className="title">技术寻人系统登录</div>
                 <Form
                     className="login-form"
@@ -165,7 +240,34 @@ function LoginPage() {
                         <Link to="/register">
                             <Button>注册</Button>
                         </Link>
+
                     </Row>
+                    <div style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        gap: "8px",
+                        alignItems: "center",
+                        height: "100%"
+                    }}><Link to="/sso/login">
+                        <Button
+                            style={{
+                                display: "flex",
+                                height: "40px",
+                                borderRadius: "10px",
+                                gap: "8px",
+                                marginTop: "20px",
+                                width: "300px"
+                            }}
+                        >
+                            <span className="social-logo-wrapper">
+                                <img src="/src/assets/images/jxnu.png"
+                                     style={{width: "23px", height: "23px", verticalAlign: "middle"}}/>
+                            </span>
+                            <span
+                                style={{verticalAlign: "middle", fontSize: "14px"}}>使用江西师范大学身份授权登录</span>
+                        </Button>
+                    </Link>
+                    </div>
                 </Form>
             </div>
         </div>

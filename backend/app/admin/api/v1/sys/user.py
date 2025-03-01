@@ -46,6 +46,7 @@ async def password_reset(request: Request, obj: ResetPasswordParam) -> ResponseM
         return response_base.success()
     return response_base.fail()
 
+# @router.get('/info')
 
 @router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth], response_model_exclude={'password'})
 async def get_current_user(request: Request) -> ResponseModel:

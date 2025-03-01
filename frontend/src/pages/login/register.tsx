@@ -1,7 +1,7 @@
 import {useCallback, useState, useEffect, useRef} from "react";
 import {Form, Input, Button, message, Row, Image} from "antd";
 import {Rule} from 'antd/es/form'; // 引入 Rule 类型
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useNavigate, useLocation} from "react-router-dom";
 import {getCaptcha, RegisterRes} from '../../api/auth';
 import {useDispatch} from 'react-redux';
 import {register as registerThunk} from "../../service/userService.tsx";
@@ -62,14 +62,14 @@ function generateUsername() {
 }
 
 
-
 function RegisterPage() {
     const [form] = Form.useForm();
     const [captchaSrc, setCaptchaSrc] = useState("");
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const hasFetchedCaptcha = useRef(false); // 使用 useRef 控制请求次数
-
+    const location = useLocation();
+    const [isLocked, setIsLocked] = useState(false);
     const refreshCaptcha = useCallback(async () => {
         try {
             const captcha = await getCaptcha();
@@ -96,10 +96,25 @@ function RegisterPage() {
     }, [refreshCaptcha]);
 
     useEffect(() => {
+
         // 系统自动生成账号并设置到表单中
         // const generatedUsername = generateUsername();
         // form.setFieldsValue({username: generatedUsername});
     }, [form]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const username = params.get("username") || "";
+        const nickname = params.get("nickname") || "";
+
+        if (username && nickname) {
+            setIsLocked(true);  // 只有当 URL 中带参数时才锁定
+        } else {
+            setIsLocked(false);
+        }
+
+        form.setFieldsValue({username, nickname});
+    }, [location.search, form]);
 
     const validateConfirmPassword = (_: { required?: boolean }, value: string): Promise<void> => {
         return new Promise((resolve, reject) => {
@@ -116,17 +131,19 @@ function RegisterPage() {
         const generatedUsername = generateUsername(); // 生成新的账号
         form.setFieldsValue({username: generatedUsername}); // 设置新的账号到表单
     };
+
     // AES 加密函数
     function encryptData(data, secretKey) {
         const iv = CryptoJS.lib.WordArray.random(16);  // 随机生成 16 字节的 IV
-        const encrypted = CryptoJS.AES.encrypt(data, secretKey, { iv: iv });  // 使用 AES CBC 模式加密数据
+        const encrypted = CryptoJS.AES.encrypt(data, secretKey, {iv: iv});  // 使用 AES CBC 模式加密数据
         // 返回 IV 和密文（Base64 编码）
         return {
             iv: iv.toString(CryptoJS.enc.Base64),
             ciphertext: encrypted.ciphertext.toString(CryptoJS.enc.Base64)
         };
     }
-    const onFinish = useCallback(async (values:RegisterData) => {
+
+    const onFinish = useCallback(async (values: RegisterData) => {
 
         const secretKeyBase64 = "G8ZyYyZ0Xf5x5f6uZrwf6ft4gD0pniYAkHp/Y6f4Pv4=";  // Base64 编码的密钥
         const secretKey = CryptoJS.enc.Base64.parse(secretKeyBase64);  // 解码为字节数组
@@ -140,24 +157,28 @@ function RegisterPage() {
         const encryptedRegisterData = {
             username: encryptedUsername.ciphertext,
             username_iv: encryptedUsername.iv,
-            nickname:encryptedNickname.ciphertext,
-            nickname_iv:encryptedNickname.iv,
-            email:encryptedEmail.ciphertext,
-            email_iv:encryptedEmail.iv,
+            nickname: encryptedNickname.ciphertext,
+            nickname_iv: encryptedNickname.iv,
+            email: encryptedEmail.ciphertext,
+            email_iv: encryptedEmail.iv,
             password: encryptedPassword.ciphertext,
             password_iv: encryptedPassword.iv,
             captcha: encryptedCaptcha.ciphertext,
             captcha_iv: encryptedCaptcha.iv,
         };
 
-        const resultAction = await dispatch(registerThunk(encryptedRegisterData)) as { payload: RegisterRes, error?: any };
+        const resultAction = await dispatch(registerThunk(encryptedRegisterData)) as {
+            payload: RegisterRes,
+            error?: any
+        };
 
         if (registerThunk.fulfilled.match(resultAction)) {
             const {data} = resultAction.payload; // 确保从 payload 中提取 msg
             message.success(data || "注册成功", 3);
-            navigate('/login'); // 添加这一行以使用 navigate
+            navigate('/sso/login'); // 添加这一行以使用 navigate
+
         } else {
-            // message.error('注册请求错误，请重试');
+            message.error('注册请求错误，请重试');
         }
 
     }, [dispatch, navigate]);
@@ -175,11 +196,11 @@ function RegisterPage() {
                     <br/>
 
                     <Form.Item name="nickname" rules={IPT_RULE_NICKNAME}>
-                        <Input prefix={<SmileOutlined/>} placeholder="昵称"/>
+                        <Input prefix={<SmileOutlined/>} placeholder="昵称" disabled={isLocked}/>
                     </Form.Item>
 
                     <Form.Item name="username" rules={IPT_RULE_USERNAME}>
-                        <Input prefix={<UserOutlined/>} autoComplete="off" placeholder="账号"  />
+                        <Input prefix={<UserOutlined/>} autoComplete="off" placeholder="账号" disabled={isLocked}/>
                     </Form.Item>
 
                     <Form.Item name="email" rules={IPT_RULE_EMAIL}>

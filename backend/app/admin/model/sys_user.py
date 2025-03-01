@@ -21,7 +21,7 @@ class User(Base):
     id: Mapped[id_key] = mapped_column(init=False)
     uuid: Mapped[str] = mapped_column(String(50), init=False, default_factory=uuid4_str, unique=True)
     username: Mapped[str] = mapped_column(String(20), unique=True, index=True, comment='用户名')
-    nickname: Mapped[str] = mapped_column(String(20), unique=True, comment='昵称')
+    nickname: Mapped[str] = mapped_column(String(20), comment='昵称')
     password: Mapped[str | None] = mapped_column(String(255), comment='密码')
     salt: Mapped[str | None] = mapped_column(String(5), comment='加密盐')
     email: Mapped[str] = mapped_column(String(50), unique=True, index=True, comment='邮箱')

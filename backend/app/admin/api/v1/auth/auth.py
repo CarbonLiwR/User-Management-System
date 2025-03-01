@@ -63,3 +63,4 @@ async def create_new_token(request: Request, response: Response) -> ResponseMode
 async def user_logout(request: Request, response: Response) -> ResponseModel:
     await auth_service.logout(request=request, response=response)
     return response_base.success()
+
