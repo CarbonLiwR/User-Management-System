@@ -50,8 +50,9 @@ const EditUserModal = ({ visible, onCancel, onCreate, user, changeUsername }) =>
                     label="昵称"
                     rules={[{ required: true, message: '请输入昵称' }]}
                 >
-                    <Input placeholder="请输入昵称" />
+                    <Input placeholder="请输入昵称"  />
                 </Form.Item>
+
 
                 {!changeUsername ? (
                     <Form.Item name="username" style={{ display: 'none' }}>

@@ -16,7 +16,7 @@ const SSOLoginPage = () => {
             // console.log(JSON.stringify({ticket}))
             const fetchUserInfo = async () => {
                 try {
-                    const response = await fetch('http://127.0.0.1:8000/api/v1/auth/ssocheck', {
+                    const response = await fetch('http://127.0.0.1:8000/api/v1/auth/checksso', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',  // 设置请求头为 JSON 格式

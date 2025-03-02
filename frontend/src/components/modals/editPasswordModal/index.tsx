@@ -4,6 +4,7 @@ import {CheckCircleOutlined, EyeInvisibleOutlined, EyeOutlined, LockOutlined} fr
 import {useDispatch} from 'react-redux';
 import {getCaptcha, RegisterRes} from '../../../api/auth';
 import {Rule} from "antd/es/form";
+import CryptoJS from 'crypto-js'; // 引入 CryptoJS 库 加密模块
 
 
 const IPT_RULE_PASSWORD: Rule[] = [
@@ -42,6 +43,16 @@ const EditUserModal = ({visible, onCancel, onCreate, user}) => {
         setConfirmPasswordVisible(!confirmPasswordVisible);
     };
 
+    function encryptData(data:any, secretKey:any) {
+        const iv = CryptoJS.lib.WordArray.random(16);  // 随机生成 16 字节的 IV
+        const encrypted = CryptoJS.AES.encrypt(data, secretKey, { iv: iv });  // 使用 AES CBC 模式加密数据
+        // 返回 IV 和密文（Base64 编码）
+        return {
+            iv: iv.toString(CryptoJS.enc.Base64),
+            ciphertext: encrypted.ciphertext.toString(CryptoJS.enc.Base64)
+        };
+    }
+
     const validateConfirmPassword = (_: { required?: boolean }, value: string): Promise<void> => {
         return new Promise((resolve, reject) => {
             const password = form.getFieldValue('password');
@@ -62,23 +73,46 @@ const EditUserModal = ({visible, onCancel, onCreate, user}) => {
 
 
     const handleOk = () => {
-        form
-            .validateFields()
-            .then((values) => {
-                const {confirm, ...rest} = values; // 移除 confirm 字段
-                const submitValues = {
-                    ...rest,
-                    username: user?.username, // 添加 username
-                    email: user?.email, // 添加 email
-                };
-                // console.log(submitValues);
-                onCreate(submitValues); // 调用父组件的创建方法
-                form.resetFields(); // 提交后重置表单
-            })
-            .catch((info) => {
-                console.log('Validate Failed:', info);
-            });
-    };
+    form
+        .validateFields()
+        .then((values) => {
+            const { confirm, ...rest } = values; // 移除 confirm 字段
+            const submitValues = {
+                ...rest,
+                username: user?.username, // 添加 username
+                email: user?.email, // 添加 email
+            };
+
+            // 加密数据
+            const secretKeyBase64 = "G8ZyYyZ0Xf5x5f6uZrwf6ft4gD0pniYAkHp/Y6f4Pv4=";  // Base64 编码的密钥
+            const secretKey = CryptoJS.enc.Base64.parse(secretKeyBase64);  // 解码为字节数组
+
+            const encryptedUsername = encryptData(submitValues.username, secretKey);
+            const encryptedEmail = encryptData(submitValues.email, secretKey);
+            const encryptedPassword = encryptData(submitValues.password, secretKey);
+            const encryptedCaptcha = encryptData(submitValues.captcha, secretKey);
+
+            const encryptedResetData = {
+                username: encryptedUsername.ciphertext,
+                username_iv: encryptedUsername.iv,
+                email: encryptedEmail.ciphertext,
+                email_iv: encryptedEmail.iv,
+                password: encryptedPassword.ciphertext,
+                password_iv: encryptedPassword.iv,
+                captcha: encryptedCaptcha.ciphertext,
+                captcha_iv: encryptedCaptcha.iv,
+            };
+
+            // 调用父组件的创建方法，传递加密后的数据
+            onCreate(encryptedResetData);
+
+            // 提交后重置表单
+            form.resetFields();
+        })
+        .catch((info) => {
+            console.log('Validate Failed:', info);
+        });
+};
 
 
     return (

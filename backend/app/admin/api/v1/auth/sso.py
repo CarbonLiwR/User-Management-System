@@ -47,7 +47,7 @@ async def get_sso_user(username: Annotated[str, Path(...)]) -> ResponseModel:
     data = GetUserInfoListDetails(**select_as_dict(current_user))
     return response_base.success(data=data)
 
-@router.post('/ssocheck', summary='sso验证用户')
+@router.post('/checksso', summary='sso验证用户')
 async def validate_ticket(ticket_request: TicketRequest):
     ticket = ticket_request.ticket
     validate_url = f"{CAS_SERVER}/serviceValidate"
