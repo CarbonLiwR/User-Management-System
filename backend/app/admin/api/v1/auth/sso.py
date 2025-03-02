@@ -24,7 +24,7 @@ class TicketRequest(BaseModel):
 router = APIRouter()
 
 @router.post(
-    '/sso/login',
+    '/ssologin',
     summary='sso用户登录',
     )
 async def user_sso_login(
@@ -41,13 +41,13 @@ async def user_sso_login(
 #     await auth_service.sso_register(request=request, obj=obj)
 #     return response_base.success(data='注册成功')
 
-@router.get('/sso/{username}', summary='sso检查用户')
+@router.get('/sso/{username}', summary='sso检查用户', dependencies=[])
 async def get_sso_user(username: Annotated[str, Path(...)]) -> ResponseModel:
     current_user = await user_service.get_userinfo(username=username)
     data = GetUserInfoListDetails(**select_as_dict(current_user))
     return response_base.success(data=data)
 
-@router.post('/ssologin', summary='sso验证用户')
+@router.post('/ssocheck', summary='sso验证用户')
 async def validate_ticket(ticket_request: TicketRequest):
     ticket = ticket_request.ticket
     validate_url = f"{CAS_SERVER}/serviceValidate"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from typing import Any
-
+import re
 from fastapi import Request, Response
 from fastapi.security.utils import get_authorization_scheme_param
 from pydantic_core import from_json
@@ -41,7 +41,8 @@ class JwtAuthMiddleware(AuthenticationBackend):
         if not token:
             return
 
-        if request.url.path in settings.TOKEN_REQUEST_PATH_EXCLUDE:
+        url=re.sub(r'/sso/.*', '/sso', request.url.path)
+        if url in settings.TOKEN_REQUEST_PATH_EXCLUDE:
             return
 
         scheme, token = get_authorization_scheme_param(token)

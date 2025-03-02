@@ -14,11 +14,9 @@ const SSOLoginPage = () => {
 
         if (ticket) {
             // console.log(JSON.stringify({ticket}))
-            // 如果有 ticket，发送请求到后端获取用户信息
             const fetchUserInfo = async () => {
                 try {
-                    // 替换为你自己的后端 API，用 ticket 获取用户信息
-                    const response = await fetch('http://127.0.0.1:8000/api/v1/auth/ssologin', {
+                    const response = await fetch('http://127.0.0.1:8000/api/v1/auth/ssocheck', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',  // 设置请求头为 JSON 格式

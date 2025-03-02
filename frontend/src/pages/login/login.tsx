@@ -35,6 +35,7 @@ function LoginPage() {
 
     useEffect(() => {
         if (tab === "sso" && userInfo?.user) {
+            console.log("用户信息:", userInfo);
             axios.get(`api/v1/auth/sso/${userInfo.user}`)
                 .then(response => {
                     console.log("SSO 用户信息:", response);
@@ -92,7 +93,7 @@ function LoginPage() {
             const encryptedUsername = encryptData(userInfo.username, secretKey);
 
             // 发送 SSO 登录请求
-            const response = await axios.post("api/v1/auth/sso/login", {
+            const response = await axios.post("api/v1/auth/ssologin", {
                 username: encryptedUsername.ciphertext,
                 username_iv: encryptedUsername.iv,
             }, {withCredentials: true});

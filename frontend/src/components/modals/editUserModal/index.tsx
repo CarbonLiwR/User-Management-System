@@ -14,7 +14,8 @@ const EditUserModal = ({ visible, onCancel, onCreate, user, changeUsername }) =>
         form
             .validateFields()
             .then((values) => {
-                onCreate(values); // 调用父组件的创建方法
+                console.log("zhe"+values);
+                // onCreate(values); // 调用父组件的创建方法
                 form.resetFields(); // 提交后重置表单
             })
             .catch((info) => {
