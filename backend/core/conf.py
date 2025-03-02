@@ -62,7 +62,7 @@ class Settings(BaseSettings):
 
     # Token
     TOKEN_ALGORITHM: str = 'HS256'  # 算法
-    TOKEN_EXPIRE_SECONDS: int = 60 * 60  # 过期时间，单位：秒 ？？一年？？
+    TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 15 # 过期时间，单位：秒 ？？一年？？
     TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # refresh token 过期时间，单位：秒
     TOKEN_REDIS_PREFIX: str = 'fba:token'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba:refresh_token'
