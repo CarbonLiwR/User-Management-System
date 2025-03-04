@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Union
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.admin.model.sys_user_dept import sys_user_dept
@@ -25,11 +25,11 @@ class User(Base):
     password: Mapped[str | None] = mapped_column(String(255), comment='密码')
     salt: Mapped[str | None] = mapped_column(String(5), comment='加密盐')
     email: Mapped[str] = mapped_column(String(50), unique=True, index=True, comment='邮箱')
+    setting: Mapped[str| None] = mapped_column(String(100),  comment='用户配置')
     is_superuser: Mapped[bool] = mapped_column(default=False, comment='超级权限(0否 1是)')
     is_staff: Mapped[bool] = mapped_column(default=False, comment='后台管理登陆(0否 1是)')
     status: Mapped[int] = mapped_column(default=1, comment='用户账号状态(0停用 1正常)')
     is_multi_login: Mapped[bool] = mapped_column(default=False, comment='是否重复登陆(0否 1是)')
-    
     avatar: Mapped[str | None] = mapped_column(String(255), default=None, comment='头像')
     phone: Mapped[str | None] = mapped_column(String(11), default=None, comment='手机号')
     join_time: Mapped[datetime] = mapped_column(init=False, default_factory=timezone.now, comment='注册时间')

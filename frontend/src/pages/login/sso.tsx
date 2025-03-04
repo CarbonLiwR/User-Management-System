@@ -1,11 +1,25 @@
 import React, {useEffect, useState} from 'react';
 import {message} from "antd";
+import CryptoJS from 'crypto-js'; // 引入 CryptoJS 库 加密模块
 import {useNavigate} from "react-router-dom";
 
 const SSOLoginPage = () => {
     const [user, setUser] = useState<any>(null); // 用户认证信息
     const [error, setError] = useState<string>(''); // 错误信息
     const navigate = useNavigate(); // 使用 useNavigate hook
+
+
+
+    // AES 加密函数
+    function encryptData(data, secretKey) {
+        const iv = CryptoJS.lib.WordArray.random(16);  // 随机生成 16 字节的 IV
+        const encrypted = CryptoJS.AES.encrypt(data, secretKey, {iv: iv});  // 使用 AES CBC 模式加密数据
+        // 返回 IV 和密文（Base64 编码）
+        return {
+            iv: iv.toString(CryptoJS.enc.Base64),
+            ciphertext: encrypted.ciphertext.toString(CryptoJS.enc.Base64)
+        };
+    }
 
     useEffect(() => {
         // 从 URL 获取 ticket（假设 SSO 登录后将 ticket 作为查询参数传递）

@@ -170,8 +170,6 @@ class UserService:
             await redis_client.delete_prefix(f'{settings.PERMISSION_REDIS_PREFIX}:{request.user.uuid}')
             await redis_client.delete(f'{settings.JWT_USER_REDIS_PREFIX}:{request.user.id}')
 
-
-
     @staticmethod
     async def update_avatar(*, request: Request, username: str, avatar: AvatarParam) -> int:
         async with async_db_session.begin() as db:

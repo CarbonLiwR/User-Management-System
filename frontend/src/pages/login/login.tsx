@@ -35,10 +35,9 @@ function LoginPage() {
 
     useEffect(() => {
         if (tab === "sso" && userInfo?.user) {
-            console.log("用户信息:", userInfo);
             axios.get(`api/v1/auth/sso/${userInfo.user}`)
                 .then(response => {
-                    console.log("SSO 用户信息:", response);
+                    // console.log("SSO 用户信息:", response);
 
                     if (response?.email) {
                         handleSSOLogin(response);
@@ -51,8 +50,31 @@ function LoginPage() {
 
                     // 处理 404 用户不存在的情况
                     if (error.code === 404 && userInfo?.user) {
-                        message.error("请输入邮箱和密码信息！");
-                        navigate(`/register?username=${encodeURIComponent(userInfo.user)}&nickname=${encodeURIComponent(userInfo.name)}`);
+                        const secretKeyBase64 = "G8ZyYyZ0Xf5x5f6uZrwf6ft4gD0pniYAkHp/Y6f4Pv4=";  // Base64 编码的密钥
+                        const secretKey = CryptoJS.enc.Base64.parse(secretKeyBase64);  // 解码为字节数组
+                        // 对数据进行加密
+                        const encryptedUsername = encryptData(userInfo.user, secretKey);
+                        const encryptedNickname = encryptData(userInfo.name, secretKey);
+                        axios.post(`api/v1/auth/sso/register`, {
+                            username: encryptedUsername.ciphertext,
+                            username_iv: encryptedUsername.iv,
+                            nickname: encryptedNickname.ciphertext,
+                            nickname_iv: encryptedNickname.iv,
+                        }).then(response => {
+                            console.log("SSO 注册响应:", response);
+                            if (response === "注册成功") {
+                                message.success("SSO 用户注册成功");
+                                console.log("用户信息:", userInfo);
+                                axios.get(`api/v1/auth/sso/${userInfo.user}`)
+                                if (response?.email) {
+                                    handleSSOLogin(response);
+                                } else {
+                                    message.error("缺少邮箱信息，请填写");
+                                }
+                            } else {
+                                message.error("SSO 用户注册失败，请重试");
+                            }
+                        })
                     } else {
                         message.error("SSO 登录失败，请重试");
                     }
@@ -249,7 +271,7 @@ function LoginPage() {
                         gap: "8px",
                         alignItems: "center",
                         height: "100%"
-                    }}><Link to="/sso/login">
+                    }}>
                         <Button
                             style={{
                                 display: "flex",
@@ -257,17 +279,23 @@ function LoginPage() {
                                 borderRadius: "10px",
                                 gap: "8px",
                                 marginTop: "20px",
-                                width: "300px"
+                                width: "300px",
                             }}
                         >
+                            <Link to="/sso/login">
                             <span className="social-logo-wrapper">
                                 <img src="/src/assets/images/jxnu.png"
                                      style={{width: "23px", height: "23px", verticalAlign: "middle"}}/>
                             </span>
-                            <span
-                                style={{verticalAlign: "middle", fontSize: "14px"}}>使用江西师范大学身份授权登录</span>
+                                <span>&emsp;</span>
+                                <span
+                                    style={{
+                                        verticalAlign: "middle",
+                                        fontSize: "14px"
+                                    }}>使用江西师范大学身份授权登录
+                                </span>
+                            </Link>
                         </Button>
-                    </Link>
                     </div>
                 </Form>
             </div>

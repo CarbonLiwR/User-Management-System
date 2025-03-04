@@ -8,17 +8,20 @@ import EditPasswordModal from "../../components/modals/editPasswordModal";
 import {useDispatch} from 'react-redux';
 import {updatePasswordThunk} from "../../service/userService.tsx";
 import {RegisterRes} from "../../api/auth.tsx";
+import EditUserSettingModal from "../../components/modals/editUserSettingModal";
 
 const Personal: React.FC = () => {
-    const { fetchUser } = useDispatchUser();
+    const {fetchUser} = useDispatchUser();
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [isEditUserModalVisible, setIsEditUserModalVisible] = useState(false);
     const [isEditPasswordModalVisible, setIsEditPasswordModalVisible] = useState(false);
+    const [isEditSettingModalVisible, setIsEditSettingModalVisible] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const loadUser = async () => { // 将 loadUser 提取到外部
         const user = await fetchUser();
+        console.log(user);
         setCurrentUser(user.payload);
     };
 
@@ -26,6 +29,7 @@ const Personal: React.FC = () => {
         loadUser(); // 调用异步函数
     }, []);
 
+    //修改用户信息modal
     const showEditUserModal = () => {
         setIsEditUserModalVisible(true);
     };
@@ -40,6 +44,7 @@ const Personal: React.FC = () => {
         setIsEditUserModalVisible(false);
     };
 
+    //修改用户密码modal
     const showEditPasswordModal = () => {
         setIsEditPasswordModalVisible(true);
     }
@@ -58,6 +63,23 @@ const Personal: React.FC = () => {
     const handleCancelEditPassword = () => {
         setIsEditPasswordModalVisible(false);
     }
+
+    //修改个人配置modal
+    const showEditSettingModal = () => {
+        setIsEditSettingModalVisible(true);
+    }
+
+    const handleEditUserSetting = async (userData: any) => {
+        await updateUser(currentUser.username, userData);
+        await loadUser(); // 确保这里也是异步调用
+        setIsEditSettingModalVisible(false);
+    };
+
+    const handleCancelEditUserSetting = () => {
+        setIsEditSettingModalVisible(false);
+    };
+
+
 
     const data = currentUser ? [
         {
@@ -94,6 +116,13 @@ const Personal: React.FC = () => {
                 user={currentUser}
             />
 
+            <EditUserSettingModal
+                visible={isEditSettingModalVisible}
+                onCancel={handleCancelEditUserSetting}
+                onCreate={handleEditUserSetting}
+                user={currentUser}
+            />
+
             <Splitter style={{height: "80vh", boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'}}>
                 <Splitter.Panel defaultSize="35%" min="20%" max="50%" style={{textAlign: 'center'}}>
                     <Card title="用户信息">
@@ -123,6 +152,12 @@ const Personal: React.FC = () => {
                         onClick={showEditPasswordModal}
                     >
                         修改密码
+                    </Button>
+                    <Button
+                        style={{position: "relative", bottom: "-30vh"}}
+                        onClick={showEditSettingModal}
+                    >
+                        修改配置
                     </Button>
                 </Splitter.Panel>
                 <Splitter.Panel>

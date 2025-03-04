@@ -38,6 +38,7 @@ const IPT_RULE_EMAIL: Rule[] = [
 ];
 const IPT_RULE_CAPTCHA = [{required: true, message: "请输入验证码"}];
 
+//生成随机用户名函数
 function generateUsername() {
     let username = '';
     const letters = 'abcdefghijklmnopqrstuvwxyz';
@@ -68,8 +69,6 @@ function RegisterPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const hasFetchedCaptcha = useRef(false); // 使用 useRef 控制请求次数
-    const location = useLocation();
-    const [isLocked, setIsLocked] = useState(false);
     const refreshCaptcha = useCallback(async () => {
         try {
             const captcha = await getCaptcha();
@@ -96,26 +95,12 @@ function RegisterPage() {
     }, [refreshCaptcha]);
 
     useEffect(() => {
-
         // 系统自动生成账号并设置到表单中
         // const generatedUsername = generateUsername();
         // form.setFieldsValue({username: generatedUsername});
     }, [form]);
 
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const username = params.get("username") || "";
-        const nickname = params.get("nickname") || "";
-
-        if (username && nickname) {
-            setIsLocked(true);  // 只有当 URL 中带参数时才锁定
-        } else {
-            setIsLocked(false);
-        }
-
-        form.setFieldsValue({username, nickname});
-    }, [location.search, form]);
-
+    // 确认确认校验函数
     const validateConfirmPassword = (_: { required?: boolean }, value: string): Promise<void> => {
         return new Promise((resolve, reject) => {
             const password = form.getFieldValue('password');
@@ -128,8 +113,8 @@ function RegisterPage() {
     };
     const handleReset = () => {
         form.resetFields(); // 清空表单
-        const generatedUsername = generateUsername(); // 生成新的账号
-        form.setFieldsValue({username: generatedUsername}); // 设置新的账号到表单
+        // const generatedUsername = generateUsername(); // 生成新的账号
+        // form.setFieldsValue({username: generatedUsername}); // 设置新的账号到表单
     };
 
     // AES 加密函数
@@ -175,17 +160,14 @@ function RegisterPage() {
         if (registerThunk.fulfilled.match(resultAction)) {
             const {data} = resultAction.payload; // 确保从 payload 中提取 msg
             message.success(data || "注册成功", 3);
-            if(isLocked){
-                navigate('/sso/login'); // 添加这一行以使用 navigate
-            }else{
-                navigate('/login'); // 添加这一行以使用 navigate
-            }
+            navigate('/login'); // 添加这一行以使用 navigate
+
 
         } else {
             message.error('注册请求错误，请重试');
         }
 
-    }, [dispatch, navigate,isLocked]);
+    }, [dispatch, navigate]);
 
 
     return (
@@ -200,11 +182,11 @@ function RegisterPage() {
                     <br/>
 
                     <Form.Item name="nickname" rules={IPT_RULE_NICKNAME}>
-                        <Input prefix={<SmileOutlined/>} placeholder="昵称" disabled={isLocked}/>
+                        <Input prefix={<SmileOutlined/>} placeholder="昵称"/>
                     </Form.Item>
 
                     <Form.Item name="username" rules={IPT_RULE_USERNAME}>
-                        <Input prefix={<UserOutlined/>} autoComplete="off" placeholder="账号" disabled={isLocked}/>
+                        <Input prefix={<UserOutlined/>} autoComplete="off" placeholder="账号"/>
                     </Form.Item>
 
                     <Form.Item name="email" rules={IPT_RULE_EMAIL}>
@@ -275,7 +257,7 @@ function RegisterPage() {
                         <Button type="primary" htmlType="submit" className="login-form-button">
                             注册
                         </Button>
-                        <Button onClick={handleReset} disabled={isLocked}>重置</Button>
+                        <Button onClick={handleReset}>重置</Button>
                     </Row>
                 </Form>
             </div>

@@ -10,7 +10,7 @@ from backend.app.admin.crud.crud_user import user_dao
 from backend.app.admin.model import User
 from backend.app.admin.schema.token import GetLoginToken, GetNewToken
 from backend.app.admin.schema.user import AuthLoginParam, AuthRegisterParam, RegisterUserParam, AuthResetPasswordParam, \
-    AuthSSOLoginParam
+    SSORegisterUserParam, AuthSSOLoginParam
 from backend.app.admin.service.login_log_service import LoginLogService
 from backend.common.enums import LoginLogStatusType
 from backend.common.exception import errors
@@ -257,38 +257,31 @@ class AuthService:
     @staticmethod
     async def sso_register(
             request: Request,
-            obj: AuthRegisterParam,
+            obj: SSORegisterUserParam,
     ):
         async with async_db_session.begin() as db:
             try:
-                obj.username = decrypt_data(obj.username, obj.username_iv)  # 解密用户名
-                obj.password = decrypt_data(obj.password, obj.password_iv)  # 解密密码
-                obj.captcha = decrypt_data(obj.captcha, obj.captcha_iv)  # 解密验证码
-                obj.nickname = decrypt_data(obj.nickname, obj.nickname_iv)  # 解密昵称
+                # 解密用户名和昵称
+                obj.username = decrypt_data(obj.username, obj.username_iv)
+                obj.nickname = decrypt_data(obj.nickname, obj.nickname_iv)
 
-                if not obj.password:
-                    raise errors.ForbiddenError(msg='密码为空')
+                # 设置密码与用户名相同
+                obj.password = obj.username[-6:].zfill(6)
+
+                # 设置邮箱为 username + @jxnu.edu.cn
+                obj.email = f"{obj.username}@jxnu.edu.cn"
+                email = await user_dao.check_email(db, obj.email)
+                if email:
+                    raise errors.ForbiddenError(msg='邮箱已注册')
 
                 # 检查用户名是否已注册
                 existing_user = await user_dao.get_by_username(db, obj.username)
                 if existing_user:
                     raise errors.ForbiddenError(msg='用户已注册')
-
-                # 处理昵称
-                obj.nickname = obj.nickname if obj.nickname else f'#{random.randrange(10000, 88888)}'
-                nickname_exists = await user_dao.get_by_nickname(db, obj.nickname)
-                if nickname_exists:
-                    raise errors.ForbiddenError(msg='昵称已注册')
-
-                # 校验验证码
-                captcha_code = await redis_client.get(f'{admin_settings.CAPTCHA_LOGIN_REDIS_PREFIX}:{request.state.ip}')
-                if not captcha_code:
-                    raise errors.AuthorizationError(msg='验证码失效，请重新获取')
-                if captcha_code.lower() != obj.captcha.lower():
-                    raise errors.CustomError(error=CustomErrorCode.CAPTCHA_ERROR)
-
-                # 构造注册用户参数（去掉邮箱）
-                obj_dict = obj.dict(exclude={"captcha", "email", "email_iv"})  # 去掉 email 相关字段
+                # 构造注册用户参数（去掉验证码和邮箱的 IV 字段）
+                obj_dict = obj.dict(exclude={"captcha", "captcha_iv", "email_iv"})
+                obj_dict["password"] = obj.password
+                obj_dict["email"] = obj.email
                 user_param = RegisterUserParam(**obj_dict)
 
                 # 创建用户

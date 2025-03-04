@@ -6,7 +6,8 @@ from fastapi import APIRouter,Path, Request,Response
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from backend.app.admin.service.user_service import user_service
-from backend.app.admin.schema.user import GetUserInfoListDetails, AuthRegisterParam, AuthLoginParam, AuthSSOLoginParam,SsoRegisterUserParam
+from backend.app.admin.schema.user import GetUserInfoListDetails, AuthRegisterParam, AuthLoginParam, AuthSSOLoginParam, \
+    SSORegisterUserParam
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.utils.serializers import select_as_dict
 from backend.app.admin.service.auth_service import auth_service
@@ -33,13 +34,13 @@ async def user_sso_login(
     data = await auth_service.sso_login(request=request, response=response, obj=obj, background_tasks=background_tasks)
     return response_base.success(data=data)
 
-# @router.post(
-#     '/sso/register',
-#     summary='sso注册用户' )
-# async def user_sso_register(request: Request,obj: SsoRegisterUserParam
-# ) -> ResponseModel:
-#     await auth_service.sso_register(request=request, obj=obj)
-#     return response_base.success(data='注册成功')
+@router.post(
+    '/sso/register',
+    summary='sso注册用户' )
+async def user_sso_register(request: Request,obj: SSORegisterUserParam
+) -> ResponseModel:
+    await auth_service.sso_register(request=request, obj=obj)
+    return response_base.success(data='注册成功')
 
 @router.get('/sso/{username}', summary='sso检查用户', dependencies=[])
 async def get_sso_user(username: Annotated[str, Path(...)]) -> ResponseModel:
