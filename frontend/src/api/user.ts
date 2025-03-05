@@ -57,6 +57,7 @@ export interface SysUserInfoReq {
   username: string;
   nickname: string;
   email: string;
+  settings?: string;
   phone?: string;
 }
 

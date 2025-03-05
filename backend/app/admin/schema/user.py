@@ -47,8 +47,8 @@ class AuthRegisterParam(SchemaBase):
     username: str
     password: str
     nickname: str
-    setting: Optional[str] = None
     email: str
+    setting: Optional[str] = None
     captcha: str
     username_iv: str  # 添加 iv 字段
     nickname_iv: str
@@ -74,7 +74,7 @@ class AddUserParam(AuthSchemaBase):
 
 class UserInfoSchemaBase(SchemaBase):
     # dept_id: Optional[int] = None
-    setting: Optional[str] = None
+    settings: Optional[str] = None
     username: str
     nickname: str
     email: EmailStr = Field(..., examples=['user@example.com'])
@@ -102,13 +102,13 @@ class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
     uuid: str
     avatar: Optional[str] = None
     status: StatusType = Field(default=StatusType.enable)
-    setting: Optional[str] = None
-    phone: Optional[CustomPhoneNumber] = None
+    # phone: Optional[CustomPhoneNumber] = None
     is_superuser: bool
     is_staff: bool
     is_multi_login: bool
     join_time: datetime = None
     last_login_time: Optional[datetime] = None
+    settings: Optional[str] = None
 
 
 class GetUserInfoListDetails(GetUserInfoNoRelationDetail):

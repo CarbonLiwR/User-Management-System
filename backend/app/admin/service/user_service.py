@@ -119,10 +119,10 @@ class UserService:
                 _username = await user_dao.get_by_username(db, obj.username)
                 if _username:
                     raise errors.ForbiddenError(msg='用户名已注册')
-            if input_user.nickname != obj.nickname:
-                nickname = await user_dao.get_by_nickname(db, obj.nickname)
-                if nickname:
-                    raise errors.ForbiddenError(msg='昵称已注册')
+            # if input_user.nickname != obj.nickname:
+            #     nickname = await user_dao.get_by_nickname(db, obj.nickname)
+            #     if nickname:
+            #         raise errors.ForbiddenError(msg='昵称已注册')
             if input_user.email != obj.email:
                 email = await user_dao.check_email(db, obj.email)
                 if email:

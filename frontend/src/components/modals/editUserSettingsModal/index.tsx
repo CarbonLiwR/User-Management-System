@@ -1,19 +1,21 @@
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, Button, Select } from 'antd';
+import {Modal, Form, Input, Button, Select, InputNumber} from 'antd';
 
 const { Option } = Select;
 
-const EditSettingModal = ({ visible, onCancel, onCreate, user }) => {
+const EditSettingsModal = ({ visible, onCancel, onCreate, user }) => {
     const [form] = Form.useForm();
 
     useEffect(() => {
         if (visible && user) {
+            const settings=JSON.parse(user.settings);
             form.setFieldsValue({
                 username: user.username || '',
                 nickname: user.nickname || '',
                 email: user.email || '',
-                model_name: user.model_name || 'sentence-transformers/all-MiniLM-L6-v2', // 设置默认值
-                maxsize: user.maxsize || '64', // 设置默认值
+                model_name: settings.model_name || 'sentence-transformers/all-MiniLM-L6-v2', // 设置默认值
+                maxsize: settings.maxsize || '64', // 设置默认值
+                api_key: settings.api_key || '',
             });
         }
     }, [visible, user, form]);
@@ -21,17 +23,19 @@ const EditSettingModal = ({ visible, onCancel, onCreate, user }) => {
     const handleOk = () => {
         form.validateFields()
             .then(values => {
-                const setting = {
-                    api_key: values.API_KEY,
+                const pre_settings = {
+                    api_key: values.api_key,
                     model_name: values.model_name,
                     maxsize: Number(values.maxsize), // 转换为数字
                 };
+                const settings =JSON.stringify(pre_settings);
+                // console.log(settings);
 
                 const formData = {
                     username: user?.username || '',
                     nickname: user?.nickname || '',
                     email: user?.email || '',
-                    setting,
+                    settings,
                 };
 
                 onCreate(formData);
@@ -82,7 +86,7 @@ const EditSettingModal = ({ visible, onCancel, onCreate, user }) => {
                     label="切块模型"
                     rules={[{ required: true, message: '请输入模型名称' }]}
                 >
-                    <Select placeholder="请选择模型名称" defaultValue="sentence-transformers/all-MiniLM-L6-v2">
+                    <Select placeholder="请选择模型名称" defaultValue="user">
                         <Option value="sentence-transformers/all-MiniLM-L6-v2">sentence-transformers/all-MiniLM-L6-v2</Option>
                         <Option value="sentence-transformers/all-MiniLM-L12-v2">sentence-transformers/all-MiniLM-L12-v2</Option>
                     </Select>
@@ -92,15 +96,14 @@ const EditSettingModal = ({ visible, onCancel, onCreate, user }) => {
                     name="maxsize"
                     label="最大切块大小"
                     rules={[
-                        { required: true, message: '请输入最大切块大小' },
-                        { type: 'number', message: '必须输入数字', transform: value => Number(value) },
+                        { required: true, message: '请输入最大切块大小' , type: 'number'},
                     ]}
                 >
-                    <Input placeholder="请输入最大切块大小" defaultValue="64" />
+                    <InputNumber min={1} placeholder="请输入最大切块大小" defaultValue="64" />
                 </Form.Item>
 
                 <Form.Item
-                    name="API_KEY"
+                    name="api_key"
                     label="API-KEY"
                     rules={[{ required: true, message: '请输入API-KEY' }]}
                 >
@@ -115,4 +118,4 @@ const EditSettingModal = ({ visible, onCancel, onCreate, user }) => {
     );
 };
 
-export default EditSettingModal;
+export default EditSettingsModal;

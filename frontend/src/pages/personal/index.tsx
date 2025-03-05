@@ -8,7 +8,7 @@ import EditPasswordModal from "../../components/modals/editPasswordModal";
 import {useDispatch} from 'react-redux';
 import {updatePasswordThunk} from "../../service/userService.tsx";
 import {RegisterRes} from "../../api/auth.tsx";
-import EditUserSettingModal from "../../components/modals/editUserSettingModal";
+import EditUserSettingsModal from "../../components/modals/editUserSettingsModal";
 
 const Personal: React.FC = () => {
     const {fetchUser} = useDispatchUser();
@@ -21,7 +21,7 @@ const Personal: React.FC = () => {
 
     const loadUser = async () => { // 将 loadUser 提取到外部
         const user = await fetchUser();
-        console.log(user);
+        // console.log(user.payload);
         setCurrentUser(user.payload);
     };
 
@@ -37,6 +37,7 @@ const Personal: React.FC = () => {
     const handleEditUser = async (userData: any) => {
         await updateUser(currentUser.username, userData);
         await loadUser(); // 确保这里也是异步调用
+        message.success("个人信息修改成功！");
         setIsEditUserModalVisible(false);
     };
 
@@ -54,7 +55,7 @@ const Personal: React.FC = () => {
 
         if (updatePasswordThunk.fulfilled.match(resultAction)) {
             const {data} = resultAction.payload; // 确保从 payload 中提取 msg
-            message.success(data || "密码修改成功", 3);
+            message.success(data || "密码修改成功，请重新登录！", 3);
             navigate('/login'); // 添加这一行以使用 navigate
         }
         setIsEditPasswordModalVisible(false);
@@ -72,14 +73,13 @@ const Personal: React.FC = () => {
     const handleEditUserSetting = async (userData: any) => {
         await updateUser(currentUser.username, userData);
         await loadUser(); // 确保这里也是异步调用
+        message.success("个人配置修改成功！");
         setIsEditSettingModalVisible(false);
     };
 
     const handleCancelEditUserSetting = () => {
         setIsEditSettingModalVisible(false);
     };
-
-
 
     const data = currentUser ? [
         {
@@ -116,7 +116,7 @@ const Personal: React.FC = () => {
                 user={currentUser}
             />
 
-            <EditUserSettingModal
+            <EditUserSettingsModal
                 visible={isEditSettingModalVisible}
                 onCancel={handleCancelEditUserSetting}
                 onCreate={handleEditUserSetting}
