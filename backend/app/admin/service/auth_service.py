@@ -279,11 +279,11 @@ class AuthService:
                 if existing_user:
                     raise errors.ForbiddenError(msg='用户已注册')
                 # 构造注册用户参数（去掉验证码和邮箱的 IV 字段）
-                obj_dict = obj.dict(exclude={"captcha", "captcha_iv", "email_iv"})
+                obj_dict = obj.dict(exclude={"captcha","setting", "captcha_iv", "email_iv"})
                 obj_dict["password"] = obj.password
                 obj_dict["email"] = obj.email
+                obj_dict["settings"]="{\"api_key\":\"sk-\",\"model_name\":\"\",\"maxsize\":64}"
                 user_param = RegisterUserParam(**obj_dict)
-
                 # 创建用户
                 await user_dao.create(db, user_param)
 

@@ -30,7 +30,7 @@ class AuthSSOLoginParam(SchemaBase):
 class RegisterUserParam(AuthSchemaBase):
     nickname: str
     email: str
-    setting: Optional[str] = None
+    settings: Optional[str] = None
 
 class SSORegisterUserParam(SchemaBase):
     username: str
@@ -40,7 +40,7 @@ class SSORegisterUserParam(SchemaBase):
     password: Optional[str] = None
     captcha: Optional[str] = None
     email: Optional[str] = None
-    setting: Optional[str] = None
+    settings: Optional[str] = None
 
 
 class AuthRegisterParam(SchemaBase):
