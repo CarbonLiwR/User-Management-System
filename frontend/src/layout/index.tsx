@@ -83,12 +83,12 @@ const LayoutContainer = () => {
   <Layout>
     <CustomHeader />
     <Content style={{ margin: '16px 10px 16px 5px', height: 'calc(100vh - 64px - 64px)', overflowY: 'auto' }}>
-      <Breadcrumb style={{ margin: '5px 0' }}>
-        <Breadcrumb.Item>
-          <Link to="/">主页</Link>
-        </Breadcrumb.Item>
-        {breadcrumbItems}
-      </Breadcrumb>
+      {/*<Breadcrumb style={{ margin: '5px 0' }}>*/}
+      {/*  <Breadcrumb.Item>*/}
+      {/*    <Link to="/">主页</Link>*/}
+      {/*  </Breadcrumb.Item>*/}
+      {/*  {breadcrumbItems}*/}
+      {/*</Breadcrumb>*/}
       <div style={{ padding: 12, background: '#fff' }}>
         <Outlet />
       </div>

@@ -5,6 +5,8 @@ import xml.etree.ElementTree as ET
 from fastapi import APIRouter,Path, Request,Response
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
+
+from backend.app.admin.service.llm_create_service import LlmCreateService
 from backend.app.admin.service.user_service import user_service
 from backend.app.admin.schema.user import GetUserInfoListDetails, AuthRegisterParam, AuthLoginParam, AuthSSOLoginParam, \
     SSORegisterUserParam
@@ -12,6 +14,7 @@ from backend.common.response.response_schema import ResponseModel, response_base
 from backend.utils.serializers import select_as_dict
 from backend.app.admin.service.auth_service import auth_service
 from starlette.background import BackgroundTask, BackgroundTasks
+
 
 
 
@@ -40,13 +43,18 @@ async def user_sso_login(
 async def user_sso_register(request: Request,obj: SSORegisterUserParam
 ) -> ResponseModel:
     await auth_service.sso_register(request=request, obj=obj)
+    # user = await user_service.get_userinfo(username=obj.username)
+    # await LlmCreateService.add_llm_providers(user.uuid)
     return response_base.success(data='注册成功')
 
 @router.get('/sso/{username}', summary='sso检查用户', dependencies=[])
 async def get_sso_user(username: Annotated[str, Path(...)]) -> ResponseModel:
-    current_user = await user_service.get_userinfo(username=username)
-    data = GetUserInfoListDetails(**select_as_dict(current_user))
-    return response_base.success(data=data)
+    current_user = await user_service.get_sso_userinfo(username=username)
+    if(current_user):
+        data = GetUserInfoListDetails(**select_as_dict(current_user))
+        return response_base.success(data=data)
+    else:
+        return response_base.fail(data='注册')
 
 @router.post('/checksso', summary='sso验证用户')
 async def validate_ticket(ticket_request: TicketRequest):

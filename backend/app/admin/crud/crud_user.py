@@ -8,6 +8,7 @@ from sqlalchemy.sql import Select
 from sqlalchemy_crud_plus import CRUDPlus
 
 from backend.app.admin.model import Role, User ,Dept
+from backend.app.admin.model.llm_provider_model import LlmProvider
 from backend.app.admin.schema.user import (
     AddUserParam,
     AvatarParam,
@@ -43,6 +44,7 @@ class CRUDUser(CRUDPlus[User]):
             select(self.model)
             .options(selectinload(self.model.depts))
             .options(selectinload(self.model.roles).joinedload(Role.menus))
+            .options(selectinload(self.model.llm_models).options(selectinload(LlmProvider.models)))
         )
         filters = []
 
@@ -237,6 +239,7 @@ class CRUDUser(CRUDPlus[User]):
             select(self.model)
             .options(selectinload(self.model.depts))
             .options(selectinload(self.model.roles).selectinload(Role.menus))
+            .options(selectinload(self.model.llm_models).options(selectinload(LlmProvider.models)))
             .order_by(desc(self.model.join_time))
         )
         where_list = []
@@ -353,6 +356,7 @@ class CRUDUser(CRUDPlus[User]):
             select(self.model)
             .options(selectinload(self.model.depts))
             .options(selectinload(self.model.roles).joinedload(Role.menus))
+            .options(selectinload(self.model.llm_models).options(selectinload(LlmProvider.models)))
         )
         filters = []
         if user_id:

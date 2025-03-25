@@ -6,6 +6,7 @@ from typing import Union
 from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from backend.app.admin.model.llm_provider_model import LlmProvider
 from backend.app.admin.model.sys_user_dept import sys_user_dept
 from backend.app.admin.model.sys_user_role import sys_user_role
 from backend.common.model import Base, id_key
@@ -25,7 +26,6 @@ class User(Base):
     password: Mapped[str | None] = mapped_column(String(255), comment='密码')
     salt: Mapped[str | None] = mapped_column(String(5), comment='加密盐')
     email: Mapped[str] = mapped_column(String(50), unique=True, index=True, comment='邮箱')
-    settings: Mapped[str| None] = mapped_column(String(255),  comment='用户配置')
     is_superuser: Mapped[bool] = mapped_column(default=False, comment='超级权限(0否 1是)')
     is_staff: Mapped[bool] = mapped_column(default=False, comment='后台管理登陆(0否 1是)')
     status: Mapped[int] = mapped_column(default=1, comment='用户账号状态(0停用 1正常)')
@@ -44,3 +44,5 @@ class User(Base):
     )
 
     socials: Mapped[list['UserSocial']] = relationship(init=False, back_populates='user')  # noqa: F821
+    llm_models: Mapped[list['LlmProvider']] = relationship("LlmProvider", cascade="all, delete-orphan",
+                                                 init=False)

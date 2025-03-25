@@ -39,17 +39,7 @@ function LoginPage() {
                 .then(response => {
                     // console.log("SSO 用户信息:", response);
 
-                    if (response?.email) {
-                        handleSSOLogin(response);
-                    } else {
-                        message.error("缺少邮箱信息，请填写");
-                    }
-                })
-                .catch(error => {
-                    console.error("SSO 检查失败:", error);
-
-                    // 处理 404 用户不存在的情况
-                    if (error.code === 404 && userInfo?.user) {
+                    if(response == "注册"){
                         const secretKeyBase64 = "G8ZyYyZ0Xf5x5f6uZrwf6ft4gD0pniYAkHp/Y6f4Pv4=";  // Base64 编码的密钥
                         const secretKey = CryptoJS.enc.Base64.parse(secretKeyBase64);  // 解码为字节数组
                         // 对数据进行加密
@@ -61,23 +51,26 @@ function LoginPage() {
                             nickname: encryptedNickname.ciphertext,
                             nickname_iv: encryptedNickname.iv,
                         }).then(response => {
-                            console.log("SSO 注册响应:", response);
+                            // console.log("SSO 注册响应:", response);
                             if (response === "注册成功") {
                                 message.success("SSO 用户注册成功");
-                                console.log("用户信息:", userInfo);
+                                // console.log("用户信息:", userInfo);
                                 axios.get(`api/v1/auth/sso/${userInfo.user}`)
-                                if (response?.email) {
-                                    handleSSOLogin(response);
-                                } else {
-                                    message.error("缺少邮箱信息，请填写");
-                                }
+                                    .then(response => {
+                                        handleSSOLogin(response);
+                                    })
+
                             } else {
                                 message.error("SSO 用户注册失败，请重试");
                             }
                         })
-                    } else {
-                        message.error("SSO 登录失败，请重试");
                     }
+                    else
+                    {  handleSSOLogin(response);}
+
+                })
+                .catch(error => {
+                    console.error("SSO 检查失败:", error);
                 });
         }
     }, []); // 监听 userInfo 和 tab 变化

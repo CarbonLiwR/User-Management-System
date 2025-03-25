@@ -11,6 +11,8 @@ from backend.app.admin.schema.user import RegisterUserParam, AuthRegisterParam, 
 from backend.app.admin.schema.token import GetSwaggerToken
 from backend.app.admin.schema.user import AuthLoginParam
 from backend.app.admin.service.auth_service import auth_service
+from backend.app.admin.service.llm_create_service import llm_create_service
+from backend.app.admin.service.user_service import user_service
 from backend.common.response.response_schema import ResponseModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
 
@@ -43,6 +45,8 @@ async def user_login(
 async def user_register(request: Request,obj: AuthRegisterParam
 ) -> ResponseModel:
     await auth_service.register(request=request, obj=obj)
+    user = await user_service.get_userinfo(username=obj.username)
+    await llm_create_service.add_llm_providers(user.uuid)
     return response_base.success(data='注册成功')
 
 @router.put(
@@ -63,4 +67,3 @@ async def create_new_token(request: Request, response: Response) -> ResponseMode
 async def user_logout(request: Request, response: Response) -> ResponseModel:
     await auth_service.logout(request=request, response=response)
     return response_base.success()
-

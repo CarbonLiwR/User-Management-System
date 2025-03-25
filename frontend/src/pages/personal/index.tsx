@@ -5,31 +5,32 @@ import {updateUser} from "../../api/user.ts";
 import {useNavigate} from "react-router-dom";
 import {useDispatchUser} from "../../hooks";
 import EditPasswordModal from "../../components/modals/editPasswordModal";
+import EditUserSettingsModal from "../../components/modals/editSystemConfigModel";
 import {useDispatch} from 'react-redux';
 import {updatePasswordThunk} from "../../service/userService.tsx";
-import {RegisterRes} from "../../api/auth.tsx";
-import EditUserSettingsModal from "../../components/modals/editUserSettingsModal";
+import {RegisterRes, type ResetPasswordData} from "../../api/auth.tsx";
+import CryptoJS from 'crypto-js'; // 引入 CryptoJS 库 加密模块
+import avatar from '../../assets/images/jxnu.png';
 
 const Personal: React.FC = () => {
     const {fetchUser} = useDispatchUser();
     const [currentUser, setCurrentUser] = useState<any>(null);
+
+    //用户配置管理
     const [isEditUserModalVisible, setIsEditUserModalVisible] = useState(false);
     const [isEditPasswordModalVisible, setIsEditPasswordModalVisible] = useState(false);
-    const [isEditSettingModalVisible, setIsEditSettingModalVisible] = useState(false);
+    const [isEditSystemConfigModelVisible, setIsEditSystemConfigModelVisible] = useState(false);
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const loadUser = async () => { // 将 loadUser 提取到外部
         const user = await fetchUser();
-        // console.log(user.payload);
+        localStorage.setItem("user", JSON.stringify(user.payload));
+        // console.log("user",user.payload);
         setCurrentUser(user.payload);
     };
 
-    useEffect(() => {
-        loadUser(); // 调用异步函数
-    }, []);
-
-    //修改用户信息modal
     const showEditUserModal = () => {
         setIsEditUserModalVisible(true);
     };
@@ -37,25 +38,53 @@ const Personal: React.FC = () => {
     const handleEditUser = async (userData: any) => {
         await updateUser(currentUser.username, userData);
         await loadUser(); // 确保这里也是异步调用
-        message.success("个人信息修改成功！");
         setIsEditUserModalVisible(false);
+        message.success("用户信息更新成功")
     };
 
     const handleCancelEditUser = () => {
         setIsEditUserModalVisible(false);
     };
 
-    //修改用户密码modal
     const showEditPasswordModal = () => {
         setIsEditPasswordModalVisible(true);
     }
 
-    const handleEditPassword = async (passwordData: any) => {
-        const resultAction = await dispatch(updatePasswordThunk(passwordData)) as { payload: RegisterRes, error?: any };
+    function encryptData(data: any, secretKey: any) {
+        const iv = CryptoJS.lib.WordArray.random(16);  // 随机生成 16 字节的 IV
+        const encrypted = CryptoJS.AES.encrypt(data, secretKey, {iv: iv});  // 使用 AES CBC 模式加密数据
+        // 返回 IV 和密文（Base64 编码）
+        return {
+            iv: iv.toString(CryptoJS.enc.Base64),
+            ciphertext: encrypted.ciphertext.toString(CryptoJS.enc.Base64)
+        };
+    }
 
+    const handleEditPassword = async (values: ResetPasswordData) => {
+        const secretKeyBase64 = "G8ZyYyZ0Xf5x5f6uZrwf6ft4gD0pniYAkHp/Y6f4Pv4=";  // Base64 编码的密钥
+        const secretKey = CryptoJS.enc.Base64.parse(secretKeyBase64);  // 解码为字节数组
+        // 对数据进行加密
+        const encryptedUsername = encryptData(values.username, secretKey);
+        const encryptedUEmail = encryptData(values.email, secretKey);
+        const encryptedPassword = encryptData(values.password, secretKey);
+        const encryptedCaptcha = encryptData(values.captcha, secretKey);
+        const encryptedResetData = {
+            username: encryptedUsername.ciphertext,
+            username_iv: encryptedUsername.iv,
+            email: encryptedUEmail.ciphertext,
+            email_iv: encryptedUEmail.iv,
+            password: encryptedPassword.ciphertext,
+            password_iv: encryptedPassword.iv,
+            captcha: encryptedCaptcha.ciphertext,
+            captcha_iv: encryptedCaptcha.iv,
+        };
+        const resultAction = await dispatch(updatePasswordThunk(encryptedResetData)) as {
+            payload: RegisterRes,
+            error?: any
+        };
         if (updatePasswordThunk.fulfilled.match(resultAction)) {
             const {data} = resultAction.payload; // 确保从 payload 中提取 msg
-            message.success(data || "密码修改成功，请重新登录！", 3);
+            message.success(data || "密码修改成功，请重新登录", 3);
             navigate('/login'); // 添加这一行以使用 navigate
         }
         setIsEditPasswordModalVisible(false);
@@ -64,22 +93,22 @@ const Personal: React.FC = () => {
     const handleCancelEditPassword = () => {
         setIsEditPasswordModalVisible(false);
     }
-
-    //修改个人配置modal
-    const showEditSettingModal = () => {
-        setIsEditSettingModalVisible(true);
+    //用户配置方法
+    const showEditSystemConfigModel = () => {
+        setIsEditSystemConfigModelVisible(true);
     }
+    //
 
-    const handleEditUserSetting = async (userData: any) => {
+    const handleEditSystemConfig = async (userData: any) => {
         await updateUser(currentUser.username, userData);
         await loadUser(); // 确保这里也是异步调用
         message.success("个人配置修改成功！");
-        setIsEditSettingModalVisible(false);
+        setIsEditSystemConfigModelVisible(false);
     };
 
-    const handleCancelEditUserSetting = () => {
-        setIsEditSettingModalVisible(false);
-    };
+    const handleCancelEditSystemConfig = () => {
+        setIsEditSystemConfigModelVisible(false);
+    }
 
     const data = currentUser ? [
         {
@@ -99,6 +128,10 @@ const Personal: React.FC = () => {
         },
     ] : [];
 
+    useEffect(() => {
+        loadUser(); // 调用异步函数
+    }, []);
+
     return (
         <div>
             <EditUserModal
@@ -116,19 +149,12 @@ const Personal: React.FC = () => {
                 user={currentUser}
             />
 
-            <EditUserSettingsModal
-                visible={isEditSettingModalVisible}
-                onCancel={handleCancelEditUserSetting}
-                onCreate={handleEditUserSetting}
-                user={currentUser}
-            />
 
             <Splitter style={{height: "80vh", boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'}}>
-                <Splitter.Panel defaultSize="35%" min="20%" max="50%" style={{textAlign: 'center'}}>
+                <Splitter.Panel defaultSize="25%" min="10%" max="30%" style={{textAlign: 'center'}}>
                     <Card title="用户信息">
-                        <Avatar size={100} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                                alt="用户头像"/>
-                        <div style={{margin: '20px 0'}}>
+                        <Avatar size={100} src={avatar} alt="用户头像"/>
+                        <div style={{margin: '20px 0', height: '20vh'}}>
                             {data.map(item => (
                                 <Row key={item.key} style={{marginBottom: 8}}>
                                     <Col span={8} style={{textAlign: 'right', paddingRight: 10}}>
@@ -139,30 +165,27 @@ const Personal: React.FC = () => {
                                     </Col>
                                 </Row>
                             ))}
+                            <Button
+                                style={{position: "relative"}}
+                                onClick={showEditUserModal}
+                            >
+                                修改信息
+                            </Button>
+                            <Button
+                                style={{position: "relative"}}
+                                onClick={showEditPasswordModal}
+                            >
+                                修改密码
+                            </Button>
+
                         </div>
                     </Card>
-                    <Button
-                        style={{position: "relative", bottom: "-30vh"}}
-                        onClick={showEditUserModal}
-                    >
-                        修改信息
-                    </Button>
-                    <Button
-                        style={{position: "relative", bottom: "-30vh"}}
-                        onClick={showEditPasswordModal}
-                    >
-                        修改密码
-                    </Button>
-                    <Button
-                        style={{position: "relative", bottom: "-30vh"}}
-                        onClick={showEditSettingModal}
-                    >
-                        修改配置
-                    </Button>
+
                 </Splitter.Panel>
-                <Splitter.Panel>
-                    <Card title="个人信息">
-                        {/* 在这里添加个人信息内容 */}
+                <Splitter.Panel style={{overflowY: 'hidden', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'}}>
+                    <Card title="模型服务配置">
+                        <EditUserSettingsModal
+                        />
                     </Card>
                 </Splitter.Panel>
             </Splitter>

@@ -6,6 +6,7 @@ from pydantic import ConfigDict, EmailStr, Field, HttpUrl, model_validator
 from pymsgbox import password
 from typing_extensions import Self
 
+from backend.app.admin.schema import LlmProviderDetailSchema, LlmProviderListSchema
 from backend.app.admin.schema.dept import GetDeptListDetails
 from backend.app.admin.schema.role import GetRoleListDetails
 from backend.common.enums import StatusType
@@ -30,7 +31,6 @@ class AuthSSOLoginParam(SchemaBase):
 class RegisterUserParam(AuthSchemaBase):
     nickname: str
     email: str
-    settings: Optional[str] = None
 
 class SSORegisterUserParam(SchemaBase):
     username: str
@@ -40,7 +40,6 @@ class SSORegisterUserParam(SchemaBase):
     password: Optional[str] = None
     captcha: Optional[str] = None
     email: Optional[str] = None
-    settings: Optional[str] = None
 
 
 class AuthRegisterParam(SchemaBase):
@@ -48,7 +47,6 @@ class AuthRegisterParam(SchemaBase):
     password: str
     nickname: str
     email: str
-    setting: Optional[str] = None
     captcha: str
     username_iv: str  # 添加 iv 字段
     nickname_iv: str
@@ -108,7 +106,6 @@ class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
     is_multi_login: bool
     join_time: datetime = None
     last_login_time: Optional[datetime] = None
-    settings: Optional[str] = None
 
 
 class GetUserInfoListDetails(GetUserInfoNoRelationDetail):
@@ -124,6 +121,7 @@ class GetCurrentUserInfoDetail(GetUserInfoListDetails):
 
     depts: Optional[Union[List[GetDeptListDetails], List[str]]] = None
     roles: Optional[Union[List[GetRoleListDetails], List[str]]] = None
+    llm_models: List[LlmProviderDetailSchema]
 
     @model_validator(mode='after')
     def handel(self) -> Self:
@@ -136,6 +134,15 @@ class GetCurrentUserInfoDetail(GetUserInfoListDetails):
 
         if roles:
             self.roles = [role.name for role in roles]  # type: ignore
+
+        llm_models = self.llm_models
+        if llm_models:
+            self.llm_models = [
+                model for model in llm_models
+                if model.status == 1
+                   and model.api_key != ''  # 改用 != 替代 is not
+                   and model.models  # 直接判断列表是否非空
+            ]
         return self
 
 

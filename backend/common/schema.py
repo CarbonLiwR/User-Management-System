@@ -149,4 +149,8 @@ class CustomEmailStr(EmailStr):
 
 
 class SchemaBase(BaseModel):
-    model_config = ConfigDict(use_enum_values=True)
+    class Config:
+        orm_model = True
+        from_attributes = True
+
+    # model_config = ConfigDict(use_enum_values=True)

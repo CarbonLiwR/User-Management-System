@@ -6,12 +6,11 @@ from fastapi import APIRouter, Depends, Path, Query, Request
 from backend.app.admin.schema.user import (
     AddUserParam,
     AvatarParam,
-    GetCurrentUserInfoDetail,
     GetUserInfoListDetails,
     RegisterUserParam,
     ResetPasswordParam,
     UpdateUserParam,
-    UpdateUserRoleParam, UpdateUserDeptParam,
+    UpdateUserRoleParam, UpdateUserDeptParam, GetCurrentUserInfoDetail,
 )
 from backend.app.admin.service.user_service import user_service
 from backend.common.pagination import DependsPagination, paging_data
@@ -49,7 +48,8 @@ async def password_reset(request: Request, obj: ResetPasswordParam) -> ResponseM
 
 @router.get('/me', summary='获取当前用户信息', dependencies=[DependsJwtAuth], response_model_exclude={'password'})
 async def get_current_user(request: Request) -> ResponseModel:
-    data = GetCurrentUserInfoDetail(**request.user.model_dump())
+    user = await user_service.get_userinfo(username=request.user.username)
+    data = GetCurrentUserInfoDetail(**select_as_dict(user))
     return response_base.success(data=data)
 
 @router.get('/uuid/{user_uuid}', summary='查看用户信息(uuid)', dependencies=[DependsJwtAuth])

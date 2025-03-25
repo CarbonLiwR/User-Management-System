@@ -107,6 +107,12 @@ class UserService:
             return user
 
     @staticmethod
+    async def get_sso_userinfo(*, username: str) -> User:
+        async with async_db_session() as db:
+            user = await user_dao.get_with_relation(db, username=username)
+            return user
+
+    @staticmethod
     async def update(*, request: Request, username: str, obj: UpdateUserParam) -> int:
         async with async_db_session.begin() as db:
             # if not request.user.is_superuser:
