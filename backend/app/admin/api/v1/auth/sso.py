@@ -43,8 +43,8 @@ async def user_sso_login(
 async def user_sso_register(request: Request,obj: SSORegisterUserParam
 ) -> ResponseModel:
     await auth_service.sso_register(request=request, obj=obj)
-    # user = await user_service.get_userinfo(username=obj.username)
-    # await LlmCreateService.add_llm_providers(user.uuid)
+    user = await user_service.get_userinfo(username=obj.username)
+    await LlmCreateService.add_llm_providers(user.uuid)
     return response_base.success(data='注册成功')
 
 @router.get('/sso/{username}', summary='sso检查用户', dependencies=[])
