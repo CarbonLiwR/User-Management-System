@@ -17,15 +17,6 @@ class LlmProviderSchemaBase(SchemaBase):
     status: Optional[int] = Field(None, description="状态(0停用 1正常)")
 
 
-class LlmProviderDetailSchema(LlmProviderSchemaBase):
-    id: int
-    uuid: str
-    user_uuid: str
-    created_time: datetime
-    updated_time: Optional[datetime] = None
-    models: List['LlmModelSimpleSchema'] = Field(default_factory=list, description="关联模型列表")
-
-
 class LlmProviderListSchema(LlmProviderSchemaBase):
     id: int
     uuid: str
@@ -122,6 +113,17 @@ class LlmModelSimpleSchema(SchemaBase):
     uuid: str
     name: str
     type: str
+
+
+class LlmProviderDetailSchema(LlmProviderSchemaBase):
+    id: int
+    uuid: str
+    user_uuid: str
+    models: List[LlmModelListSchema]
+    created_time: datetime
+    updated_time: Optional[datetime] = None
+
+    # List['LlmModelSimpleSchema'] = Field(default_factory=list, description="关联模型列表")
 
 
 # 解决前向引用问题
